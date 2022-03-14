@@ -1,0 +1,3 @@
+[submodule "lib/micropython-microbit-v2"]
+	path = lib/micropython-microbit-v2
+	url = https://github.com/microbit-foundation/micropython-microbit-v2.git

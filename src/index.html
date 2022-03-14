@@ -23,9 +23,7 @@
         // LF as EOL chars.
         data = data.replace(/\n/g, "\r");
         for (var i = 0; i < data.length; i++) {
-          if (mp_js_process_char(data.charCodeAt(i))) {
-            // exit for soft reset
-          }
+          mp_js_stdin_push_char(data.charCodeAt(i));
         }
       });
       mp_js_stdout.addEventListener('print', function(e) {

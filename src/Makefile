@@ -44,7 +44,7 @@ COPT += -O3 -DNDEBUG
 endif
 
 JSFLAGS += -s ASYNCIFY
-JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_init', '_mp_js_init_repl', '_mp_js_process_char']"
+JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshooks.js
 
 SRC_C += \

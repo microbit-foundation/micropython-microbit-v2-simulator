@@ -41,33 +41,53 @@
 #include "emscripten.h"
 #include "jshooks.h"
 
-void mp_js_init(int heap_size) {
-    extern void microbit_hal_init(void);
+extern void microbit_hal_init(void);
 
-    microbit_hal_init();
-    microbit_system_init();
-    microbit_display_init();
+void mp_js_main(int heap_size) {
+    for (;;) {
+        microbit_hal_init();
+        microbit_system_init();
+        microbit_display_init();
 
-    #if MICROPY_ENABLE_GC
-    char *heap = (char *)malloc(heap_size * sizeof(char));
-    gc_init(heap, heap + heap_size);
-    #endif
+        #if MICROPY_ENABLE_GC
+        char *heap = (char *)malloc(heap_size * sizeof(char));
+        gc_init(heap, heap + heap_size);
+        #endif
 
-    #if MICROPY_ENABLE_PYSTACK
-    static mp_obj_t pystack[1024];
-    mp_pystack_init(pystack, &pystack[MP_ARRAY_SIZE(pystack)]);
-    #endif
+        #if MICROPY_ENABLE_PYSTACK
+        static mp_obj_t pystack[1024];
+        mp_pystack_init(pystack, &pystack[MP_ARRAY_SIZE(pystack)]);
+        #endif
 
-    mp_init();
+        mp_init();
+
+        pyexec_event_repl_init();
+        for (;;) {
+            int c = mp_hal_stdin_rx_chr();
+            if (pyexec_event_repl_process_char(c)) {
+                // Exit for a soft reset.
+                break;
+            }
+        }
+
+        mp_printf(MP_PYTHON_PRINTER, "MPY: soft reboot\n");
+        //microbit_soft_timer_deinit();
+        gc_sweep_all();
+        mp_deinit();
+    }
 }
 
-void mp_js_init_repl(void) {
-    pyexec_event_repl_init();
-}
+EM_JS(int, mp_js_stdin_pop_char, (), {
+    if (Module.stdin_buffer.length > 0) {
+        return Module.stdin_buffer.shift();
+    } else {
+        return -1;
+    }
+});
 
-int mp_js_process_char(int c) {
-    return pyexec_event_repl_process_char(c);
-}
+EM_JS(void, mp_js_stdin_push_char, (int c), {
+    Module.stdin_buffer.push(c);
+});
 
 void nlr_jump_fail(void *val) {
     printf("FATAL: uncaught NLR %p\n", val);

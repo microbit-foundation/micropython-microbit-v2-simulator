@@ -18,9 +18,3 @@ Once it is build the webpage in src/ needs to be served, eg via:
     $ (cd src && python -m http.server)
 
 Then browse to localhost:8000.
-
-Known issues:
-- Does not support keys being pressed when async code is running, for
-  example time.sleep(1) and microbit.display.scroll(...).
-- Background events like display scrolling do not run when the RELP is
-  idle.

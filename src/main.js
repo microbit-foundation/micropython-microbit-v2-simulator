@@ -27,14 +27,13 @@
 var Module = {};
 
 var mainProgram = function() {
-    mp_js_init = Module.cwrap('mp_js_init', 'null', ['number']);
-    mp_js_init_repl = Module.cwrap('mp_js_init_repl', 'null', ['null']);
-    mp_js_process_char = Module.cwrap('mp_js_process_char', 'number', ['number'], {async: true});
+    mp_js_main = Module.cwrap('mp_js_main', 'null', ['number'], {async: true});
+
+    Module.stdin_buffer = [];
 
     MP_JS_EPOCH = (new Date()).getTime();
 
-    mp_js_init(64 * 1024);
-    mp_js_init_repl();
+    mp_js_main(64 * 1024);
 }
 
 Module["onRuntimeInitialized"] = mainProgram;

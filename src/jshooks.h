@@ -24,6 +24,12 @@
  * THE SOFTWARE.
  */
 
+#include "py/ringbuf.h"
+
+extern ringbuf_t stdin_ringbuf;
+
+int mp_js_stdin_pop_char(void);
+
 void mp_js_write(const char *str, size_t len);
 int mp_js_ticks_ms(void);
 

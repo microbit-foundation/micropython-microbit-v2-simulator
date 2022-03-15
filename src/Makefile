@@ -45,10 +45,10 @@ endif
 
 JSFLAGS += -s ASYNCIFY
 JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main']"
-JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshooks.js
+JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js --js-library jshooks.js
 
 SRC_C += \
-	jshal.c \
+	microbithal_js.c \
 	main.c \
 
 SRC_C += $(addprefix $(CODAL_PORT)/, \
@@ -127,7 +127,7 @@ $(MBIT_VER_FILE): FORCE
 	$(PYTHON) $(TOP)/py/makeversionhdr.py $(MBIT_VER_FILE).pre
 	$(CAT) $(MBIT_VER_FILE).pre | $(SED) s/MICROPY_/MICROBIT_/ > $(MBIT_VER_FILE)
 
-$(BUILD)/micropython.js: $(OBJ) jshooks.js main.js
+$(BUILD)/micropython.js: $(OBJ) jshal.js jshooks.js main.js
 	$(ECHO) "LINK $(BUILD)/firmware.js"
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
 	cat main.js $(BUILD)/firmware.js > $@

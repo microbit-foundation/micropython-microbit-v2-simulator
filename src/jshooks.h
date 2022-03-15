@@ -35,3 +35,5 @@ int mp_js_ticks_ms(void);
 
 void mp_js_hal_init(void);
 void mp_js_hal_display_set_pixel(int x, int y, int value);
+void mp_js_hal_audio_period_us(int period);
+void mp_js_hal_audio_amplitude_u10(int amplitude);

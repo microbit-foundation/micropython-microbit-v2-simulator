@@ -3,7 +3,6 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2018 Rami Ali
  * Copyright (c) 2022 Damien P. George
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,17 +25,42 @@
  */
 
 mergeInto(LibraryManager.library, {
-    mp_js_write: function(ptr, len) {
-        for (var i = 0; i < len; ++i) {
-            var c = String.fromCharCode(getValue(ptr + i, 'i8'));
-            var mp_js_stdout = document.getElementById('mp_js_stdout');
-            var print = new Event('print');
-            print.data = c;
-            mp_js_stdout.dispatchEvent(print);
+    mp_js_hal_init: function() {
+        var c = document.getElementById('uBitDisplay');
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = `rgb(0, 0, 0)`;
+        ctx.fillRect(0, 0, 200, 200);
+
+        audio_context = new AudioContext();
+        audio_osc = null;
+        audio_frequency = 440;
+    },
+
+    mp_js_hal_display_set_pixel: function(x, y, value) {
+        var c = document.getElementById('uBitDisplay');
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = `rgb(${value}, 0, 0)`;
+        ctx.fillRect(40 * x, 40 * y, 40, 40);
+    },
+
+    mp_js_hal_audio_period_us: function(period_us) {
+        audio_frequency = 1000000 / period_us;
+        if (audio_osc) {
+            audio_osc.frequency.value = audio_frequency;
         }
     },
 
-    mp_js_ticks_ms: function() {
-        return (new Date()).getTime() - MP_JS_EPOCH;
+    mp_js_hal_audio_amplitude_u10: function(amplitude_u10) {
+        if (audio_osc) {
+            audio_osc.stop();
+            audio_osc = null;
+        }
+        if (amplitude_u10) {
+            audio_osc = audio_context.createOscillator();
+            audio_osc.type = "sine";
+            audio_osc.connect(audio_context.destination);
+            audio_osc.frequency.value = audio_frequency;
+            audio_osc.start();
+        }
     },
 });

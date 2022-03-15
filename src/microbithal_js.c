@@ -21,7 +21,7 @@ void microbit_hal_init(void) {
     mp_js_hal_init();
 }
 
-void microbit_hal_background_processing(void) {
+static void microbit_hal_process_events(void) {
     // Call microbit_hal_timer_callback() every 6ms.
     static uint32_t last_ms = 0;
     uint32_t ms = mp_hal_ticks_ms();
@@ -40,14 +40,16 @@ void microbit_hal_background_processing(void) {
             ringbuf_put(&stdin_ringbuf, c);
         }
     }
+}
 
-    // Yield to the outside world.
+void microbit_hal_background_processing(void) {
+    microbit_hal_process_events();
     emscripten_sleep(0);
 }
 
 void microbit_hal_idle(void) {
-    microbit_hal_background_processing();
-    emscripten_sleep(1);
+    microbit_hal_process_events();
+    emscripten_sleep(5);
 }
 
 void microbit_hal_reset(void) {

@@ -28,11 +28,6 @@ var Module = {};
 
 var mainProgram = function() {
     mp_js_main = Module.cwrap('mp_js_main', 'null', ['number'], {async: true});
-
-    Module.stdin_buffer = [];
-
-    MP_JS_EPOCH = (new Date()).getTime();
-
     mp_js_main(64 * 1024);
 }
 

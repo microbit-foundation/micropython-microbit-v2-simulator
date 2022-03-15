@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <emscripten.h>
 
 #include "py/gc.h"
 #include "py/lexer.h"
@@ -38,10 +39,7 @@
 #include "drv_system.h"
 #include "drv_display.h"
 #include "modmicrobit.h"
-#include "emscripten.h"
-#include "jshooks.h"
-
-extern void microbit_hal_init(void);
+#include "microbithal_js.h"
 
 void mp_js_main(int heap_size) {
     for (;;) {
@@ -76,18 +74,6 @@ void mp_js_main(int heap_size) {
         mp_deinit();
     }
 }
-
-EM_JS(int, mp_js_stdin_pop_char, (), {
-    if (Module.stdin_buffer.length > 0) {
-        return Module.stdin_buffer.shift();
-    } else {
-        return -1;
-    }
-});
-
-EM_JS(void, mp_js_stdin_push_char, (int c), {
-    Module.stdin_buffer.push(c);
-});
 
 void nlr_jump_fail(void *val) {
     printf("FATAL: uncaught NLR %p\n", val);

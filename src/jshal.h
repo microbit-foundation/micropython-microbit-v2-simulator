@@ -24,16 +24,12 @@
  * THE SOFTWARE.
  */
 
-#include "py/ringbuf.h"
-
-extern ringbuf_t stdin_ringbuf;
-
-int mp_js_stdin_pop_char(void);
-
-void mp_js_write(const char *str, size_t len);
-int mp_js_ticks_ms(void);
-
 void mp_js_hal_init(void);
+
+uint32_t mp_js_hal_ticks_ms(void);
+void mp_js_hal_stdout_tx_strn(const char *ptr, size_t len);
+int mp_js_hal_stdin_pop_char(void);
+
 void mp_js_hal_display_set_pixel(int x, int y, int value);
 void mp_js_hal_audio_period_us(int period);
 void mp_js_hal_audio_amplitude_u10(int amplitude);

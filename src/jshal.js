@@ -26,21 +26,62 @@
 
 mergeInto(LibraryManager.library, {
     mp_js_hal_init: function() {
-        var c = document.getElementById('uBitDisplay');
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = `rgb(0, 0, 0)`;
-        ctx.fillRect(0, 0, 200, 200);
+        MP_JS_EPOCH = (new Date()).getTime();
+        stdin_buffer = [];
 
+        // Create terminal and set up input data event.
+        term = new Terminal({
+            cols: 80,
+            rows: 24,
+            useStyle: true,
+            screenKeys: true,
+            cursorBlink: false
+        });
+        term.open(document.getElementById("term"));
+        term.removeAllListeners("data");
+        term.on("data", function(data) {
+            // Pasted data from clipboard will likely contain
+            // LF as EOL chars.
+            data = data.replace(/\n/g, "\r");
+            for (var i = 0; i < data.length; i++) {
+                stdin_buffer.push(data.charCodeAt(i));
+            }
+        });
+
+        // Create display canvas.
+        var c = document.getElementById('uBitDisplay');
+        display_context = c.getContext('2d');
+        display_context.fillStyle = `rgb(0, 0, 0)`;
+        display_context.fillRect(0, 0, 200, 200);
+
+        // Create audio output context.
         audio_context = new AudioContext();
         audio_osc = null;
         audio_frequency = 440;
     },
 
+    mp_js_hal_ticks_ms: function() {
+        return (new Date()).getTime() - MP_JS_EPOCH;
+    },
+
+    mp_js_hal_stdin_pop_char: function() {
+        if (stdin_buffer.length > 0) {
+            return stdin_buffer.shift();
+        } else {
+            return -1;
+        }
+    },
+
+    mp_js_hal_stdout_tx_strn: function(ptr, len) {
+        for (var i = 0; i < len; ++i) {
+            var c = String.fromCharCode(getValue(ptr + i, 'i8'));
+            term.write(c);
+        }
+    },
+
     mp_js_hal_display_set_pixel: function(x, y, value) {
-        var c = document.getElementById('uBitDisplay');
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = `rgb(${value}, 0, 0)`;
-        ctx.fillRect(40 * x, 40 * y, 40, 40);
+        display_context.fillStyle = `rgb(${value}, 0, 0)`;
+        display_context.fillRect(40 * x, 40 * y, 40, 40);
     },
 
     mp_js_hal_audio_period_us: function(period_us) {

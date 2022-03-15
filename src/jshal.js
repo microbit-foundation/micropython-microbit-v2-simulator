@@ -25,39 +25,39 @@
  */
 
 mergeInto(LibraryManager.library, {
-    mp_js_hal_init: function() {
+    mp_js_hal_init: async function() {
         MP_JS_EPOCH = (new Date()).getTime();
         stdin_buffer = [];
 
-        // Create terminal and set up input data event.
-        term = new Terminal({
-            cols: 80,
-            rows: 24,
-            useStyle: true,
-            screenKeys: true,
-            cursorBlink: false
-        });
-        term.open(document.getElementById("term"));
-        term.removeAllListeners("data");
-        term.on("data", function(data) {
-            // Pasted data from clipboard will likely contain
-            // LF as EOL chars.
-            data = data.replace(/\n/g, "\r");
-            for (var i = 0; i < data.length; i++) {
-                stdin_buffer.push(data.charCodeAt(i));
+        messageListener = (e) => {
+            if (e.source === window.parent) {
+                switch (e.data.kind) {
+                    case "serial_input": {
+                        const text = e.data.data;
+                        for (let i = 0; i < text.length; i++) {
+                            stdin_buffer.push(text.charCodeAt(i));
+                        }
+                        break;
+                    }
+                }
             }
-        });
+        };
+        window.addEventListener("message", messageListener);
+        board = await createBoard()
+        window.parent.postMessage({
+            kind: "ready"
+        })
+    },
 
-        // Create display canvas.
-        var c = document.getElementById('uBitDisplay');
-        display_context = c.getContext('2d');
-        display_context.fillStyle = `rgb(0, 0, 0)`;
-        display_context.fillRect(0, 0, 200, 200);
-
-        // Create audio output context.
-        audio_context = new AudioContext();
-        audio_osc = null;
-        audio_frequency = 440;
+    mp_js_hal_deinit: function() {
+        if (board) {
+            board.dispose();
+            board = null;
+        }
+        if (messageListener) {
+            window.removeEventListener("message", messageListener);
+            messageListener = null;
+        }
     },
 
     mp_js_hal_ticks_ms: function() {
@@ -73,35 +73,35 @@ mergeInto(LibraryManager.library, {
     },
 
     mp_js_hal_stdout_tx_strn: function(ptr, len) {
-        for (var i = 0; i < len; ++i) {
-            var c = String.fromCharCode(getValue(ptr + i, 'i8'));
-            term.write(c);
-        }
+        const data = UTF8ToString(ptr, len);
+        window.parent.postMessage({
+            kind: "serial_output",
+            data
+        });
+    },
+
+    mp_js_hal_button_get_presses: function(button) {
+        return board.buttons[button].getAndClearPresses()
+    },
+
+    mp_js_hal_button_is_pressed: function(button) {
+        return board.buttons[button].isPressed();
     },
 
     mp_js_hal_display_set_pixel: function(x, y, value) {
-        display_context.fillStyle = `rgb(${value}, 0, 0)`;
-        display_context.fillRect(40 * x, 40 * y, 40, 40);
+        board.display.setPixel(x, y, value);
+    },
+
+    mp_js_hal_display_read_light_level: function() {
+        return board.display.lightLevel.value;
     },
 
     mp_js_hal_audio_period_us: function(period_us) {
-        audio_frequency = 1000000 / period_us;
-        if (audio_osc) {
-            audio_osc.frequency.value = audio_frequency;
-        }
+        board.audio.setPeriodUs(period_us);
     },
 
     mp_js_hal_audio_amplitude_u10: function(amplitude_u10) {
-        if (audio_osc) {
-            audio_osc.stop();
-            audio_osc = null;
-        }
-        if (amplitude_u10) {
-            audio_osc = audio_context.createOscillator();
-            audio_osc.type = "sine";
-            audio_osc.connect(audio_context.destination);
-            audio_osc.frequency.value = audio_frequency;
-            audio_osc.start();
-        }
+        board.audio.setAmplitudeU10(amplitude_u10);
     },
+
 });

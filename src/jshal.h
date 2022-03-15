@@ -25,11 +25,17 @@
  */
 
 void mp_js_hal_init(void);
+void mp_js_hal_deinit(void);
 
 uint32_t mp_js_hal_ticks_ms(void);
 void mp_js_hal_stdout_tx_strn(const char *ptr, size_t len);
 int mp_js_hal_stdin_pop_char(void);
 
+int mp_js_hal_button_get_presses(int button);
+bool mp_js_hal_button_is_pressed(int button);
+
 void mp_js_hal_display_set_pixel(int x, int y, int value);
+int mp_js_hal_display_read_light_level(void);
+
 void mp_js_hal_audio_period_us(int period);
 void mp_js_hal_audio_amplitude_u10(int amplitude);

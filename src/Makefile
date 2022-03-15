@@ -46,6 +46,7 @@ endif
 JSFLAGS += -s ASYNCIFY
 JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
+JSFLAGS += --pre-js board.js
 
 SRC_C += \
 	microbithal_js.c \

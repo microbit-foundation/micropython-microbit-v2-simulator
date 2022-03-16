@@ -17,4 +17,4 @@ Once it is build the webpage in src/ needs to be served, eg via:
 
     $ (cd src && python -m http.server)
 
-Then browse to https://localhost:8000/demo.html
+Then browse to http://localhost:8000/demo.html

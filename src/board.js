@@ -130,6 +130,7 @@ class AudioUI {
 
   dispose() {
     this._context.close();
+    this._oscillator = null;
   }
 }
 

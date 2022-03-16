@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Example simulator embedding</title>
@@ -10,7 +10,9 @@
         width: 400px;
         height: 100vh;
       }
-      button, textarea, select {
+      button,
+      textarea,
+      select {
         display: block;
         margin-top: 0.25em;
         margin-bottom: 0.25em;
@@ -33,7 +35,13 @@
   </head>
   <body>
     <div class="container">
-      <iframe id="simulator" src="index.html" title="Simulator" frameborder="0" scrolling="no"></iframe>
+      <iframe
+        id="simulator"
+        src="index.html"
+        title="Simulator"
+        frameborder="0"
+        scrolling="no"
+      ></iframe>
       <div class="io">
         <div id="term"></div>
         <div class="samples">
@@ -45,8 +53,7 @@
             <option value="music">Music</option>
             <option value="sensors">Sensors</option>
           </select>
-          <textarea id="program" rows="10">
-          </textarea>
+          <textarea id="program" rows="10"> </textarea>
           <button id="run">Run</button>
         </div>
       </div>
@@ -60,14 +67,14 @@
         rows: 24,
         useStyle: true,
         screenKeys: true,
-        cursorBlink: false
+        cursorBlink: false,
       });
       term.open(document.getElementById("term"));
-      term.removeAllListeners('data');
-      term.on('data', function(data) {
+      term.removeAllListeners("data");
+      term.on("data", function (data) {
         simulator.postMessage({
           kind: "serial_input",
-          data
+          data,
         });
       });
 
@@ -87,19 +94,19 @@
             }
           }
         }
-      })
+      });
 
       // Support for running samples via the REPL.
       // There is no filesystem support for the moment.
       const sample = document.querySelector("#sample");
       const program = document.querySelector("#program");
       async function fetchProgram(name) {
-        const response = await fetch(`examples/${name}.py`)
+        const response = await fetch(`examples/${name}.py`);
         if (response.ok) {
           const text = await response.text();
           program.value = text;
         } else {
-          program.value = `# No matching example found for ${name}`
+          program.value = `# No matching example found for ${name}`;
         }
       }
       sample.addEventListener("change", async () => {
@@ -107,22 +114,23 @@
       });
       fetchProgram(sample.value);
 
+      // Ideally this would just be changing main.py and rebooting.
       document.querySelector("#run").addEventListener("click", async () => {
         simulator.postMessage({
           kind: "serial_input",
           // Ctrl-C to interrupt, Ctrl-D to reboot (straight to REPL as no program)
-          data: `\x03\x04`
+          data: `\x03\x04`,
         });
 
         // Wait for the ready message after the reboot.
         await new Promise((resolve) => readyCallbacks.push(resolve));
-        
+
         simulator.postMessage({
           kind: "serial_input",
           // Ctrl-E to enter paste mode and Ctrl-D to finish
-          data: `\x05${program.value}\x04`.replace(/\n/g, "\r")
+          data: `\x05${program.value}\x04`.replace(/\n/g, "\r"),
         });
-      })
+      });
     </script>
   </body>
 </html>

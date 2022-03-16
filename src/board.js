@@ -10,62 +10,58 @@ async function createBoard() {
 }
 
 class BoardUI {
-  
   constructor(svg) {
-      this.svg = svg;
-      this.display = new DisplayUI(this.svg.querySelector('#LEDsOn').querySelectorAll('use'))
-      this.buttons = [
-        new ButtonUI(this.svg.querySelector('#ButtonA'), "A"),
-        new ButtonUI(this.svg.querySelector('#ButtonB'), "B")
-      ]
-      this.audio = new AudioUI();
+    this.svg = svg;
+    this.display = new DisplayUI(
+      this.svg.querySelector("#LEDsOn").querySelectorAll("use")
+    );
+    this.buttons = [
+      new ButtonUI(this.svg.querySelector("#ButtonA"), "A"),
+      new ButtonUI(this.svg.querySelector("#ButtonB"), "B"),
+    ];
+    this.audio = new AudioUI();
 
-      const sensors = [
-        this.display.lightLevel
-      ];
-      // Temporary, not sure sensor UI belongs here.
-      const sensorElt = document.querySelector("#sensors");
-      for (const sensor of sensors) {
-        if (sensor.type === "range") {
-          sensorElt.appendChild(createRangeUI(sensor))
-        }
+    const sensors = [this.display.lightLevel];
+    // Temporary, not sure sensor UI belongs here.
+    const sensorElt = document.querySelector("#sensors");
+    for (const sensor of sensors) {
+      if (sensor.type === "range") {
+        sensorElt.appendChild(createRangeUI(sensor));
       }
+    }
   }
 
   dispose() {
     this.audio.dispose();
-    document.querySelector("#sensors").innerHTML = '';
-    this.buttons.forEach(b => b.dispose());
+    document.querySelector("#sensors").innerHTML = "";
+    this.buttons.forEach((b) => b.dispose());
     this.display.dispose();
 
     // For now we recreate it.
     // In future we can reset state then update the UI.
     this.svg.remove();
   }
-
 }
 
 class DisplayUI {
   constructor(leds) {
-      this.leds = leds;
-      this.lightLevel = new RangeSensor("lightLevel", 0, 255, 127);
+    this.leds = leds;
+    this.lightLevel = new RangeSensor("lightLevel", 0, 255, 127);
   }
 
   setPixel(x, y, value) {
-      const on = value > 0;
-      const led = this.leds[x * 5 + y];
-      if (on) {
-          led.style.display = "inline";
-          led.style.opacity = value / 255;
-      } else {
-          led.style.display = "none";
-      }
+    const on = value > 0;
+    const led = this.leds[x * 5 + y];
+    if (on) {
+      led.style.display = "inline";
+      led.style.opacity = value / 255;
+    } else {
+      led.style.display = "none";
+    }
   }
 
-  dispose() {
-  }
+  dispose() {}
 }
-
 
 class ButtonUI {
   constructor(element, label) {
@@ -104,7 +100,6 @@ class ButtonUI {
   }
 }
 
-
 class AudioUI {
   constructor() {
     this._frequency = 440;
@@ -115,7 +110,7 @@ class AudioUI {
   setPeriodUs(periodUs) {
     this._frequency = 1000000 / periodUs;
     if (this._oscillator) {
-        this._oscillator.frequency.value = this._frequency;
+      this._oscillator.frequency.value = this._frequency;
     }
   }
 
@@ -125,11 +120,11 @@ class AudioUI {
       this._oscillator = null;
     }
     if (amplitudeU10) {
-        this._oscillator = this._context.createOscillator();
-        this._oscillator.type = "sine";
-        this._oscillator.connect(this._context.destination);
-        this._oscillator.frequency.value = this._frequency;
-        this._oscillator.start();
+      this._oscillator = this._context.createOscillator();
+      this._oscillator.type = "sine";
+      this._oscillator.connect(this._context.destination);
+      this._oscillator.frequency.value = this._frequency;
+      this._oscillator.start();
     }
   }
 
@@ -138,13 +133,11 @@ class AudioUI {
   }
 }
 
-
 class Sensor {
   constructor(type) {
     this.type = type;
   }
 }
-
 
 class RangeSensor extends Sensor {
   constructor(id, min, max, initial) {
@@ -156,16 +149,15 @@ class RangeSensor extends Sensor {
   }
 }
 
-
 const createRangeUI = (sensor) => {
   const { min, max, value, type, id } = sensor;
   const labelElt = document.createElement("label");
   const text = labelElt.appendChild(document.createElement("span"));
   text.innerText = id;
   const input = labelElt.appendChild(document.createElement("input"));
-  Object.assign(input, { min, max, value, type })
+  Object.assign(input, { min, max, value, type });
   input.addEventListener("change", () => {
-      sensor.value = input.value;
-  })
+    sensor.value = input.value;
+  });
   return labelElt;
-}
+};

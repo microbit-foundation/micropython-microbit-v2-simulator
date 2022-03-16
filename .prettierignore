@@ -1,0 +1,8 @@
+# Temporary - I want to format these too but avoiding large diff.
+src/jshal.js
+main.js
+# Dependencies
+term.js
+src/build
+lib
+*.md

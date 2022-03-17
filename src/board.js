@@ -143,11 +143,15 @@ class ButtonUI {
       e.preventDefault();
       this.release();
     };
+    this.mouseLeaveListener = (e) => {
+      this.release();
+    };
 
     this.element.addEventListener("mousedown", this.mouseDownListener);
     this.element.addEventListener("mouseup", this.mouseUpListener);
     this.element.addEventListener("keydown", this.keyListener);
     this.element.addEventListener("keyup", this.keyListener);
+    this.element.addEventListener("mouseleave", this.mouseLeaveListener);
   }
 
   press() {
@@ -181,6 +185,7 @@ class ButtonUI {
   }
 
   dispose() {
+    this.element.removeEventListener("mouseleave", this.mouseLeaveListener);
     this.element.removeEventListener("keyup", this.keyListener);
     this.element.removeEventListener("keydown", this.keyListener);
     this.element.removeEventListener("mouseup", this.mouseUpListener);

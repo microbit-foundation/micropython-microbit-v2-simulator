@@ -112,7 +112,8 @@ class ButtonUI {
     this.keyListener = (e) => {
       switch (e.key) {
         case "Enter":
-        case "Space":
+        case " ":
+          e.preventDefault();
           if (e.type === "keydown") {
             this._isPressed = true;
             this._presses++;
@@ -122,13 +123,16 @@ class ButtonUI {
       }
     };
 
-    this.mouseDownListener = () => {
+    this.mouseDownListener = (e) => {
+      e.preventDefault();
       this._isPressed = true;
       this._presses++;
     };
-    this.mouseUpListener = () => {
+    this.mouseUpListener = (e) => {
+      e.preventDefault();
       this._isPressed = false;
     };
+
     this.element.addEventListener("mousedown", this.mouseDownListener);
     this.element.addEventListener("mouseup", this.mouseUpListener);
     this.element.addEventListener("keydown", this.keyListener);

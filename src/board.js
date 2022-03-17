@@ -108,6 +108,7 @@ class ButtonUI {
     this.element.setAttribute("role", "button");
     this.element.setAttribute("tabindex", "0");
     this.element.ariaLabel = label;
+    this.element.style.cursor = "pointer";
 
     this.keyListener = (e) => {
       switch (e.key) {
@@ -115,22 +116,20 @@ class ButtonUI {
         case " ":
           e.preventDefault();
           if (e.type === "keydown") {
-            this._isPressed = true;
-            this._presses++;
+            this.press();
           } else {
-            this._isPressed = false;
+            this.release();
           }
       }
     };
 
     this.mouseDownListener = (e) => {
       e.preventDefault();
-      this._isPressed = true;
-      this._presses++;
+      this.press();
     };
     this.mouseUpListener = (e) => {
       e.preventDefault();
-      this._isPressed = false;
+      this.release();
     };
 
     this.element.addEventListener("mousedown", this.mouseDownListener);
@@ -139,21 +138,41 @@ class ButtonUI {
     this.element.addEventListener("keyup", this.keyListener);
   }
 
-  dispose() {
-    this.element.removeEventListener("keyup", this.keyListener);
-    this.element.removeEventListener("keydown", this.keyListener);
-    this.element.removeEventListener("mouseup", this.mouseUpListener);
-    this.element.removeEventListener("mousedown", this.mouseDownListener);
+  press() {
+    this._isPressed = true;
+    this._presses++;
+
+    this.render();
+  }
+
+  release() {
+    this._isPressed = false;
+
+    this.render();
   }
 
   isPressed() {
     return this._isPressed;
   }
 
+  render() {
+    const fill = this._isPressed ? "#d3b12c" : "none";
+    this.element.querySelectorAll("circle").forEach((c) => {
+      c.style.fill = fill;
+    });
+  }
+
   getAndClearPresses() {
     const result = this._presses;
     this._presses = 0;
     return result;
+  }
+
+  dispose() {
+    this.element.removeEventListener("keyup", this.keyListener);
+    this.element.removeEventListener("keydown", this.keyListener);
+    this.element.removeEventListener("mouseup", this.mouseUpListener);
+    this.element.removeEventListener("mousedown", this.mouseDownListener);
   }
 }
 

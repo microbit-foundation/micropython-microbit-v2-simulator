@@ -1,10 +1,22 @@
+const svgPromise = (async () => {
+  try {
+    const response = await fetch("microbit-drawing.svg");
+    if (!response.ok) {
+      return null;
+    }
+    return await response.text();
+  } catch (e) {
+    return null;
+  }
+})();
+
 async function createBoard() {
-  const response = await fetch("microbit-drawing.svg");
-  if (!response.ok) {
+  const svgData = await svgPromise;
+  if (!svgData) {
     // TODO: add a visual indicator of the failure or inline the resource.
     return null;
   }
-  document.body.insertAdjacentHTML("afterbegin", await response.text());
+  document.body.insertAdjacentHTML("afterbegin", svgData);
   const svg = document.querySelector("svg");
   return new BoardUI(svg);
 }

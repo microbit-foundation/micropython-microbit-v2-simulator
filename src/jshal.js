@@ -29,13 +29,23 @@ mergeInto(LibraryManager.library, {
         MP_JS_EPOCH = (new Date()).getTime();
         stdin_buffer = [];
 
+        board = await createBoard()
         messageListener = (e) => {
             if (e.source === window.parent) {
-                switch (e.data.kind) {
+                const { data } = e;
+                switch (data.kind) {
                     case "serial_input": {
-                        const text = e.data.data;
+                        const text = data.data;
                         for (let i = 0; i < text.length; i++) {
                             stdin_buffer.push(text.charCodeAt(i));
+                        }
+                        break;
+                    }
+                    case "sensor_set": {
+                        const sensor = board.getSensor(data.sensor);
+                        const value = data.value;
+                        if (sensor && value) {
+                          sensor.value = parseInt(value, 10);
                         }
                         break;
                     }
@@ -43,9 +53,9 @@ mergeInto(LibraryManager.library, {
             }
         };
         window.addEventListener("message", messageListener);
-        board = await createBoard()
         window.parent.postMessage({
-            kind: "ready"
+            kind: "ready",
+            sensors: board.sensors,
         })
     },
 

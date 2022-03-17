@@ -3,12 +3,9 @@
   <head>
     <title>Example simulator embedding</title>
     <style>
-      .container {
-        display: flex;
-      }
       iframe {
         width: 400px;
-        height: 100vh;
+        height: 329px;
       }
       button,
       textarea,
@@ -23,25 +20,34 @@
         white-space: pre;
         width: calc(100% - 15px);
       }
-      .io {
+      .row {
+        display: flex;
+      }
+      .column {
         display: flex;
         flex-direction: column;
       }
       .terminal {
         margin-bottom: 0.5em;
       }
+      .simulator {
+        height: 100vh;
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <iframe
-        id="simulator"
-        src="index.html"
-        title="Simulator"
-        frameborder="0"
-        scrolling="no"
-      ></iframe>
-      <div class="io">
+    <div class="row">
+      <div class="simulator column">
+        <iframe
+          id="simulator"
+          src="index.html"
+          title="Simulator"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+        <div id="sensors"></div>
+      </div>
+      <div class="column">
         <div id="term"></div>
         <div class="samples">
           <select id="sample">
@@ -79,13 +85,17 @@
 
       const readyCallbacks = [];
       window.addEventListener("message", (e) => {
+        const { data } = e;
         if (e.source === simulator) {
-          switch (e.data.kind) {
+          switch (data.kind) {
             case "serial_output": {
               term.write(e.data.data);
               break;
             }
             case "ready": {
+              // We create this here to allow embedders to use
+              // relevant styling/widgets.
+              createSensorUI(data.sensors);
               while (readyCallbacks.length) {
                 readyCallbacks.pop()();
               }
@@ -130,6 +140,34 @@
           data: `\x05${program.value}\x04`.replace(/\n/g, "\r"),
         });
       });
+
+      function createSensorUI(sensors) {
+        const createRangeUI = (sensor) => {
+          const { min, max, value, type, id } = sensor;
+          const labelElt = document.createElement("label");
+          const text = labelElt.appendChild(document.createElement("span"));
+          text.innerText = id;
+          const input = labelElt.appendChild(document.createElement("input"));
+          Object.assign(input, { min, max, value, type });
+          input.addEventListener("change", () => {
+            simulator.postMessage({
+              kind: "sensor_set",
+              sensor: id,
+              value: input.value,
+            });
+          });
+          return labelElt;
+        };
+
+        // Create UI for sensors.
+        const parent = document.querySelector("#sensors");
+        parent.innerHTML = "";
+        for (const sensor of sensors) {
+          if (sensor.type === "range") {
+            parent.appendChild(createRangeUI(sensor));
+          }
+        }
+      }
     </script>
   </body>
 </html>

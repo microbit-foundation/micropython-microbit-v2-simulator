@@ -33,19 +33,19 @@ class BoardUI {
     ];
     this.audio = new AudioUI();
 
-    const sensors = [this.display.lightLevel];
-    // Temporary, not sure sensor UI belongs here.
-    const sensorElt = document.querySelector("#sensors");
-    for (const sensor of sensors) {
-      if (sensor.type === "range") {
-        sensorElt.appendChild(createRangeUI(sensor));
-      }
-    }
+    this.sensors = [this.display.lightLevel];
+    this._sensorsById = {};
+    this.sensors.forEach((sensor) => {
+      this._sensorsById[sensor.id] = sensor;
+    });
+  }
+
+  getSensor(id) {
+    return this._sensorsById[id];
   }
 
   dispose() {
     this.audio.dispose();
-    document.querySelector("#sensors").innerHTML = "";
     this.buttons.forEach((b) => b.dispose());
     this.display.dispose();
 
@@ -242,19 +242,6 @@ class RangeSensor extends Sensor {
     this.value = initial;
   }
 }
-
-const createRangeUI = (sensor) => {
-  const { min, max, value, type, id } = sensor;
-  const labelElt = document.createElement("label");
-  const text = labelElt.appendChild(document.createElement("span"));
-  text.innerText = id;
-  const input = labelElt.appendChild(document.createElement("input"));
-  Object.assign(input, { min, max, value, type });
-  input.addEventListener("change", () => {
-    sensor.value = input.value;
-  });
-  return labelElt;
-};
 
 function clamp(value, min, max) {
   if (value < min) {

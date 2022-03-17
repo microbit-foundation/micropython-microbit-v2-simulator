@@ -70,8 +70,22 @@ class ButtonUI {
     this._presses = 0;
 
     this.element = element;
-    this.element.role = "button";
+    this.element.setAttribute("role", "button");
+    this.element.setAttribute("tabindex", "0");
     this.element.ariaLabel = label;
+
+    this.keyListener = (e) => {
+      switch (e.key) {
+        case "Enter":
+        case "Space":
+          if (e.type === "keydown") {
+            this._isPressed = true;
+            this._presses++;
+          } else {
+            this._isPressed = false;
+          }
+      }
+    };
 
     this.mouseDownListener = () => {
       this._isPressed = true;
@@ -82,9 +96,13 @@ class ButtonUI {
     };
     this.element.addEventListener("mousedown", this.mouseDownListener);
     this.element.addEventListener("mouseup", this.mouseUpListener);
+    this.element.addEventListener("keydown", this.keyListener);
+    this.element.addEventListener("keyup", this.keyListener);
   }
 
   dispose() {
+    this.element.removeEventListener("keyup", this.keyListener);
+    this.element.removeEventListener("keydown", this.keyListener);
     this.element.removeEventListener("mouseup", this.mouseUpListener);
     this.element.removeEventListener("mousedown", this.mouseDownListener);
   }

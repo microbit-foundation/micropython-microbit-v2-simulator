@@ -43,20 +43,55 @@ class BoardUI {
   }
 }
 
+// This mapping is designed to give a set of 10 visually distinct levels.
+// Carried across from microbit_hal_display_set_pixel.
+const brightMap = [0, 20, 40, 60, 80, 120, 160, 190, 220, 255];
+
 class DisplayUI {
   constructor(leds) {
     this.leds = leds;
     this.lightLevel = new RangeSensor("lightLevel", 0, 255, 127);
+    this.state = this.initialState();
+  }
+
+  initialState() {
+    return [
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+    ];
+  }
+
+  clear() {
+    this.state = this.initialState();
+    this.render();
   }
 
   setPixel(x, y, value) {
-    const on = value > 0;
-    const led = this.leds[x * 5 + y];
-    if (on) {
-      led.style.display = "inline";
-      led.style.opacity = value / 255;
-    } else {
-      led.style.display = "none";
+    value = clamp(value, 0, 9);
+    this.state[x][y] = value;
+    this.render();
+  }
+
+  getPixel(x, y) {
+    return this.state[x][y];
+  }
+
+  render() {
+    for (let x = 0; x < 5; ++x) {
+      for (let y = 0; y < 5; ++y) {
+        const on = this.state[x][y];
+        const led = this.leds[x * 5 + y];
+        if (on) {
+          const bright = brightMap[this.state[x][y]];
+          led.style.display = "inline";
+          led.style.opacity = bright / 255;
+        } else {
+          led.style.display = "none";
+        }
+      }
     }
   }
 
@@ -180,3 +215,13 @@ const createRangeUI = (sensor) => {
   });
   return labelElt;
 };
+
+function clamp(value, min, max) {
+  if (value < min) {
+    return min;
+  }
+  if (value > max) {
+    return max;
+  }
+  return value;
+}

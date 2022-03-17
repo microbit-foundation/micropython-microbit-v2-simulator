@@ -88,8 +88,16 @@ mergeInto(LibraryManager.library, {
         return board.buttons[button].isPressed();
     },
 
+    mp_js_hal_display_get_pixel: function(x, y) {
+        return board.display.getPixel(x, y);
+    },
+
     mp_js_hal_display_set_pixel: function(x, y, value) {
         board.display.setPixel(x, y, value);
+    },
+
+    mp_js_hal_display_clear: function() {
+        board.display.clear();
     },
 
     mp_js_hal_display_read_light_level: function() {

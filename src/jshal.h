@@ -34,7 +34,9 @@ int mp_js_hal_stdin_pop_char(void);
 int mp_js_hal_button_get_presses(int button);
 bool mp_js_hal_button_is_pressed(int button);
 
+int mp_js_hal_display_get_pixel(int x, int y);
 void mp_js_hal_display_set_pixel(int x, int y, int value);
+void mp_js_hal_display_clear(void);
 int mp_js_hal_display_read_light_level(void);
 
 void mp_js_hal_audio_period_us(int period);

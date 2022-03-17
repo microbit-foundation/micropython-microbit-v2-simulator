@@ -295,31 +295,15 @@ void microbit_hal_display_enable(int value) {
 }
 
 void microbit_hal_display_clear(void) {
-    //uBit.display.clear();
+    mp_js_hal_display_clear();
 }
 
 int microbit_hal_display_get_pixel(int x, int y) {
-    /*
-    uint32_t pixel = uBit.display.image.getPixelValue(x, y);
-    if (pixel == 255) {
-        return 9;
-    } else {
-        return 32 - __builtin_clz(pixel);
-    }
-    */
-    return 0;
+    return mp_js_hal_display_get_pixel(x, y);
 }
 
 void microbit_hal_display_set_pixel(int x, int y, int bright) {
-    // This mapping is designed to give a set of 10 visually distinct levels.
-    static uint8_t bright_map[10] = { 0, 20, 40, 60, 80, 120, 160, 190, 220, 255 };
-    if (bright < 0) {
-        bright = 0;
-    } else if (bright > 9) {
-        bright = 9;
-    }
-    //uBit.display.image.setPixelValue(x, y, bright_map[bright]);
-    mp_js_hal_display_set_pixel(x, y, bright_map[bright]);
+    mp_js_hal_display_set_pixel(x, y, bright);
 }
 
 int microbit_hal_display_read_light_level(void) {

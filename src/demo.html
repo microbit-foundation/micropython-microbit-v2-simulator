@@ -96,10 +96,13 @@
       term.open(document.getElementById("term"));
       term.removeAllListeners("data");
       term.on("data", function (data) {
-        simulator.postMessage({
-          kind: "serial_input",
-          data,
-        });
+        simulator.postMessage(
+          {
+            kind: "serial_input",
+            data,
+          },
+          "*"
+        );
       });
 
       const readyCallbacks = [];
@@ -145,20 +148,26 @@
       // Ideally this would just be changing main.py via some filesystem
       // message, then resetting.
       document.querySelector("#run").addEventListener("click", async () => {
-        simulator.postMessage({
-          kind: "serial_input",
-          // Ctrl-C to interrupt, Ctrl-D to reboot (straight to REPL as no program)
-          data: `\x03\x04`,
-        });
+        simulator.postMessage(
+          {
+            kind: "serial_input",
+            // Ctrl-C to interrupt, Ctrl-D to reboot (straight to REPL as no program)
+            data: `\x03\x04`,
+          },
+          "*"
+        );
 
         // Wait for the ready message after the reboot.
         await new Promise((resolve) => readyCallbacks.push(resolve));
 
-        simulator.postMessage({
-          kind: "serial_input",
-          // Ctrl-E to enter paste mode and Ctrl-D to finish
-          data: `\x05${program.value}\x04`.replace(/\n/g, "\r"),
-        });
+        simulator.postMessage(
+          {
+            kind: "serial_input",
+            // Ctrl-E to enter paste mode and Ctrl-D to finish
+            data: `\x05${program.value}\x04`.replace(/\n/g, "\r"),
+          },
+          "*"
+        );
       });
 
       function createSensorUI(sensors) {
@@ -170,11 +179,14 @@
           const input = labelElt.appendChild(document.createElement("input"));
           Object.assign(input, { min, max, value, type });
           input.addEventListener("change", () => {
-            simulator.postMessage({
-              kind: "sensor_set",
-              sensor: id,
-              value: input.value,
-            });
+            simulator.postMessage(
+              {
+                kind: "sensor_set",
+                sensor: id,
+                value: input.value,
+              },
+              "*"
+            );
           });
           return labelElt;
         };

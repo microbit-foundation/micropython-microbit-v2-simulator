@@ -56,7 +56,7 @@ mergeInto(LibraryManager.library, {
         window.parent.postMessage({
             kind: "ready",
             sensors: board.sensors,
-        })
+        }, "*")
     },
 
     mp_js_hal_deinit: function() {
@@ -87,7 +87,7 @@ mergeInto(LibraryManager.library, {
         window.parent.postMessage({
             kind: "serial_output",
             data
-        });
+        }, "*");
     },
 
     mp_js_hal_button_get_presses: function(button) {

@@ -24,6 +24,8 @@ Then browse to http://localhost:8000/demo.html
 The simulator is designed to be embedded into other web applications
 via an iframe.
 
+The page to embed is http://localhost:8000/simulator.html
+
 The iframe provides the micro:bit board user interface and some limited
 interactions. It does not provide a terminal for serial output or the 
 REPL or any UI for the sensors.
@@ -32,10 +34,11 @@ REPL or any UI for the sensors.
 It connects the iframe to a terminal and provides a simple interface for 
 sensors.
 
-The following sections documents the messages send via postMessage.
+The following sections documents the messages supported via postMessage.
+
+## Messages sent to parent window from iframe
 
 <table>
-<caption>Messages sent to parent from iframe
 <thead>
 <tr>
 <th>Kind
@@ -76,8 +79,10 @@ The following sections documents the messages send via postMessage.
 <td>Serial output suitable for a terminal or other use.
 </table>
 
+
+## Messages supported by the iframe
+
 <table>
-<caption>Messages supported by the iframe
 <thead>
 <tr>
 <th>Kind

@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Example simulator embedding</title>
+    <title>MicroPython-micro:bit simulator example embedding</title>
     <style>
+      html,
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
       iframe {
         width: 400px;
         height: 329px;
@@ -20,6 +25,10 @@
         white-space: pre;
         width: calc(100% - 15px);
       }
+      .content {
+        margin: 2em auto;
+        max-width: fit-content;
+      }
       .row {
         display: flex;
       }
@@ -36,30 +45,40 @@
     </style>
   </head>
   <body>
-    <div class="row">
-      <div class="simulator column">
-        <iframe
-          id="simulator"
-          src="index.html"
-          title="Simulator"
-          frameborder="0"
-          scrolling="no"
-        ></iframe>
-        <div id="sensors"></div>
-      </div>
-      <div class="column">
-        <div id="term"></div>
-        <div class="samples">
-          <select id="sample">
-            <!-- option values correspond to filenames in the examples folder -->
-            <option value="background">Background music and display</option>
-            <option value="buttons">Buttons</option>
-            <option value="display">Display</option>
-            <option value="music">Music</option>
-            <option value="sensors">Sensors</option>
-          </select>
-          <textarea id="program" rows="10"> </textarea>
-          <button id="run">Run</button>
+    <div class="content">
+      <h1>MicroPython-micro:bit simulator example embedding</h1>
+      <div class="row">
+        <div class="simulator column">
+          <iframe
+            id="simulator"
+            src="simulator.html"
+            title="Simulator"
+            frameborder="0"
+            scrolling="no"
+          ></iframe>
+          <div id="sensors"></div>
+        </div>
+        <div class="column">
+          <div id="term"></div>
+          <div class="samples">
+            <select id="sample">
+              <!-- option values correspond to filenames in the examples folder -->
+              <option value="background">Background music and display</option>
+              <option value="buttons">Buttons</option>
+              <option value="display">Display</option>
+              <option value="music">Music</option>
+              <option value="sensors">Sensors</option>
+            </select>
+            <textarea
+              id="program"
+              rows="10"
+              spellcheck="false"
+              autocapitalize="false"
+              autocomplete="false"
+            >
+            </textarea>
+            <button id="run">Run</button>
+          </div>
         </div>
       </div>
     </div>
@@ -123,7 +142,8 @@
       });
       fetchProgram(sample.value);
 
-      // Ideally this would just be changing main.py and rebooting.
+      // Ideally this would just be changing main.py via some filesystem
+      // message, then resetting.
       document.querySelector("#run").addEventListener("click", async () => {
         simulator.postMessage({
           kind: "serial_input",

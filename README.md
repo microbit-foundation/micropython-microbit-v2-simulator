@@ -32,4 +32,82 @@ REPL or any UI for the sensors.
 It connects the iframe to a terminal and provides a simple interface for 
 sensors.
 
-TODO: document the messages format.
+The following sections documents the messages send via postMessage.
+
+<table>
+<caption>Messages sent to parent from iframe
+<thead>
+<tr>
+<th>Kind
+<th>Example
+<th>Description
+<tbody>
+<tr>
+<td>ready
+<td>
+
+```javascript
+{ 
+  "kind": "ready", 
+  "sensors": [ 
+    { 
+      "id": "lightLevel", 
+      "type": "range", 
+      "min": 0, 
+      "max": 255
+    }
+    // More sensors here.
+  ] 
+}
+```
+
+<td>Sent when the simulator is ready for input. Includes a description of the available sensors.
+<tr>
+<td>ready
+<td>
+
+```javascript
+{ 
+  "kind": "serial_output",
+  "data": "text" 
+}
+```
+
+<td>Serial output suitable for a terminal or other use.
+</table>
+
+<table>
+<caption>Messages supported by the iframe
+<thead>
+<tr>
+<th>Kind
+<th>Example
+<th>Description
+<tbody>
+<tr>
+<td>ready
+<td>
+
+```javascript
+{ 
+  "kind": "serial_input",
+  "data": "text"
+  ] 
+}
+```
+
+<td>Serial input. If the REPL is active it will echo this text via `serial_write`.
+<tr>
+<td>sensor_set
+<td>
+
+```javascript
+{ 
+  "kind": "sensor_set",
+  "sensor": "lightLevel",
+  "value": 255 
+}
+```
+
+<td>Set a sensor value.
+</table>

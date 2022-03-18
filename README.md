@@ -97,7 +97,6 @@ The following sections documents the messages supported via postMessage.
 { 
   "kind": "serial_input",
   "data": "text"
-  ] 
 }
 ```
 

@@ -63,7 +63,7 @@ The following sections documents the messages send via postMessage.
 
 <td>Sent when the simulator is ready for input. Includes a description of the available sensors.
 <tr>
-<td>ready
+<td>serial_output
 <td>
 
 ```javascript
@@ -85,7 +85,7 @@ The following sections documents the messages send via postMessage.
 <th>Description
 <tbody>
 <tr>
-<td>ready
+<td>serial_input
 <td>
 
 ```javascript

@@ -4,7 +4,7 @@ DIST = dist
 all: build dist
 
 build:
-	make -C src
+	$(MAKE) -C src
 
 dist:
 	mkdir -p $(DIST)/build

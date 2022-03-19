@@ -32,8 +32,9 @@ class BoardUI {
       new ButtonUI(this.svg.querySelector("#ButtonB"), "B"),
     ];
     this.audio = new AudioUI();
+    this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
 
-    this.sensors = [this.display.lightLevel];
+    this.sensors = [this.display.lightLevel, this.temperature];
     this._sensorsById = {};
     this.sensors.forEach((sensor) => {
       this._sensorsById[sensor.id] = sensor;
@@ -234,12 +235,13 @@ class Sensor {
 }
 
 class RangeSensor extends Sensor {
-  constructor(id, min, max, initial) {
+  constructor(id, min, max, initial, unit) {
     super("range");
     this.id = id;
     this.min = min;
     this.max = max;
     this.value = initial;
+    this.unit = unit;
   }
 }
 

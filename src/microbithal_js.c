@@ -63,8 +63,7 @@ void microbit_hal_panic(int code) {
 }
 
 int microbit_hal_temperature(void) {
-    //return uBit.thermometer.getTemperature();
-    return 0;
+    return mp_js_hal_temperature();
 }
 
 void microbit_hal_pin_set_pull(int pin, int pull) {

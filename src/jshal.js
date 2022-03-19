@@ -90,6 +90,10 @@ mergeInto(LibraryManager.library, {
         }, "*");
     },
 
+    mp_js_hal_temperature: function() {
+        return board.temperature.value;
+    },
+
     mp_js_hal_button_get_presses: function(button) {
         return board.buttons[button].getAndClearPresses()
     },

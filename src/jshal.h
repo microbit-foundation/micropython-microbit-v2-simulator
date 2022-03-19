@@ -31,6 +31,8 @@ uint32_t mp_js_hal_ticks_ms(void);
 void mp_js_hal_stdout_tx_strn(const char *ptr, size_t len);
 int mp_js_hal_stdin_pop_char(void);
 
+int mp_js_hal_temperature(void);
+
 int mp_js_hal_button_get_presses(int button);
 bool mp_js_hal_button_is_pressed(int button);
 

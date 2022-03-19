@@ -42,6 +42,15 @@
       .simulator {
         height: 100vh;
       }
+      #sensors {
+        padding: 0.5em 2em;
+      }
+      #sensors > * {
+        padding: 0.5em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
@@ -123,6 +132,9 @@
               }
               break;
             }
+            case "sensor_change": {
+              createSensorUI(data.sensors);
+            }
           }
         }
       });
@@ -171,7 +183,7 @@
       });
 
       function createSensorUI(sensors) {
-        const createRangeUI = (sensor) => {
+        const createRangeUI = function (sensor) {
           const { min, max, value, type, id } = sensor;
           const labelElt = document.createElement("label");
           const text = labelElt.appendChild(document.createElement("span"));
@@ -191,13 +203,44 @@
           });
           return labelElt;
         };
+        const createEnumUI = function (sensor) {
+          const { id, choices, value } = sensor;
+          const labelElt = document.createElement("label");
+          const text = labelElt.appendChild(document.createElement("span"));
+          text.innerText = id;
+          const select = labelElt.appendChild(document.createElement("select"));
+          for (const choice of sensor.choices) {
+            const option = select.appendChild(document.createElement("option"));
+            option.textContent = choice;
+            option.value = choice;
+            if (value === choice) {
+              option.setAttribute("selected", "true");
+            }
+          }
+          select.addEventListener("change", () => {
+            simulator.postMessage(
+              {
+                kind: "sensor_set",
+                sensor: id,
+                value: select.value,
+              },
+              "*"
+            );
+          });
+          return labelElt;
+        };
 
         // Create UI for sensors.
         const parent = document.querySelector("#sensors");
         parent.innerHTML = "";
         for (const sensor of sensors) {
-          if (sensor.type === "range") {
-            parent.appendChild(createRangeUI(sensor));
+          switch (sensor.type) {
+            case "range":
+              parent.appendChild(createRangeUI(sensor));
+              break;
+            case "enum":
+              parent.appendChild(createEnumUI(sensor));
+              break;
           }
         }
       }

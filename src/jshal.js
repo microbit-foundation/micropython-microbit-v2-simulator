@@ -29,7 +29,12 @@ mergeInto(LibraryManager.library, {
         MP_JS_EPOCH = (new Date()).getTime();
         stdin_buffer = [];
 
-        board = await createBoard()
+        const onSensorChange = () => window.parent.postMessage({
+            kind: "sensor_change",
+            sensors: board.sensors,
+        }, "*")
+
+        board = await createBoard(onSensorChange)
         messageListener = (e) => {
             if (e.source === window.parent) {
                 const { data } = e;
@@ -45,7 +50,7 @@ mergeInto(LibraryManager.library, {
                         const sensor = board.getSensor(data.sensor);
                         const value = data.value;
                         if (sensor && value) {
-                          sensor.value = parseInt(value, 10);
+                          sensor.value = sensor.type === "range" ? parseInt(value, 10) : value;
                         }
                         break;
                     }
@@ -116,6 +121,58 @@ mergeInto(LibraryManager.library, {
 
     mp_js_hal_display_read_light_level: function() {
         return board.display.lightLevel.value;
+    },
+
+    mp_js_hal_accelerometer_get_x: function() {
+        return board.accelerometer.x.value;
+    },
+
+    mp_js_hal_accelerometer_get_y: function() {
+        return board.accelerometer.y.value;
+    },
+
+    mp_js_hal_accelerometer_get_z: function() {
+        return board.accelerometer.z.value;
+    },
+
+    mp_js_hal_accelerometer_get_gesture: function() {
+        // Equivalent to gesture_name_map.
+        // Is there a way to access e.g. MICROBIT_HAL_ACCELEROMETER_EVT_NONE ?
+        console.log(board.accelerometer.gesture.value);
+        switch (board.accelerometer.gesture.value) {
+            case "none":
+                return 0;
+            case "up":
+                return 1;
+            case "down":
+                return 2;
+            case "left":
+                return 3;
+            case "right":
+                return 4;
+            case "face up":
+                return 5;
+            case "face down":
+                return 6;
+            case "freefall":
+                return 7;
+            case "2g":
+                // Out of order.
+                return 12;
+            case "3g":
+                return 8;
+            case "6g":
+                return 9
+            case "8g":
+                return 10
+            case "shake":
+                return 11;
+        }
+
+    },
+
+    mp_js_hal_accelerometer_set_range: function(r) {
+        board.accelerometer.setRange(r)
     },
 
     mp_js_hal_audio_period_us: function(period_us) {

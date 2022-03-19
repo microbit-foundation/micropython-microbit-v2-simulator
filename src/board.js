@@ -10,7 +10,7 @@ const svgPromise = (async () => {
   }
 })();
 
-async function createBoard() {
+async function createBoard(onSensorChange) {
   const svgData = await svgPromise;
   if (!svgData) {
     // TODO: add a visual indicator of the failure or inline the resource.
@@ -18,11 +18,11 @@ async function createBoard() {
   }
   document.body.insertAdjacentHTML("afterbegin", svgData);
   const svg = document.querySelector("svg");
-  return new BoardUI(svg);
+  return new BoardUI(svg, onSensorChange);
 }
 
 class BoardUI {
-  constructor(svg) {
+  constructor(svg, onSensorChange) {
     this.svg = svg;
     this.display = new DisplayUI(
       this.svg.querySelector("#LEDsOn").querySelectorAll("use")
@@ -33,8 +33,13 @@ class BoardUI {
     ];
     this.audio = new AudioUI();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
+    this.accelerometer = new AccelerometerUI(onSensorChange);
 
-    this.sensors = [this.display.lightLevel, this.temperature];
+    this.sensors = [
+      this.display.lightLevel,
+      this.temperature,
+      ...this.accelerometer.sensors,
+    ];
     this._sensorsById = {};
     this.sensors.forEach((sensor) => {
       this._sensorsById[sensor.id] = sensor;
@@ -49,6 +54,7 @@ class BoardUI {
     this.audio.dispose();
     this.buttons.forEach((b) => b.dispose());
     this.display.dispose();
+    this.accelerometer.dispose();
 
     // For now we recreate it.
     // In future we can reset state then update the UI.
@@ -228,20 +234,75 @@ class AudioUI {
   }
 }
 
+class AccelerometerUI {
+  constructor(onSensorChange) {
+    this.onSensorChange = onSensorChange;
+    this.gesture = new EnumSensor(
+      "gesture",
+      [
+        "none",
+        "up",
+        "down",
+        "left",
+        "right",
+        "face up",
+        "face down",
+        "freefall",
+        "3g",
+        "6g",
+        "8g",
+        "shake",
+      ],
+      "none"
+    );
+    const min = -2000;
+    const max = 2000;
+    this.x = new RangeSensor("accelerometerX", min, max, 0, "mg");
+    this.y = new RangeSensor("accelerometerY", min, max, 0, "mg");
+    this.z = new RangeSensor("accelerometerZ", min, max, 0, "mg");
+  }
+
+  get sensors() {
+    return [this.gesture, this.x, this.y, this.z];
+  }
+
+  setRange(range) {
+    const min = -1000 * range;
+    const max = +1000 * range;
+    for (const sensor of [this.x, this.y, this.z]) {
+      sensor.value = clamp(sensor.value, min, max);
+      sensor.min = min;
+      sensor.max = max;
+    }
+    this.onSensorChange();
+  }
+
+  dispose() {}
+}
+
 class Sensor {
-  constructor(type) {
+  constructor(type, id) {
     this.type = type;
+    this.id = id;
   }
 }
 
 class RangeSensor extends Sensor {
   constructor(id, min, max, initial, unit) {
-    super("range");
-    this.id = id;
+    super("range", id);
     this.min = min;
     this.max = max;
     this.value = initial;
     this.unit = unit;
+  }
+}
+
+class EnumSensor extends Sensor {
+  constructor(id, choices, initial) {
+    super("enum", id);
+    this.id = id;
+    this.choices = choices;
+    this.value = initial;
   }
 }
 

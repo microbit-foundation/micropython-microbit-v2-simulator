@@ -41,5 +41,11 @@ void mp_js_hal_display_set_pixel(int x, int y, int value);
 void mp_js_hal_display_clear(void);
 int mp_js_hal_display_read_light_level(void);
 
+int mp_js_hal_accelerometer_get_x(void);
+int mp_js_hal_accelerometer_get_y(void);
+int mp_js_hal_accelerometer_get_z(void);
+int mp_js_hal_accelerometer_get_gesture(void);
+void mp_js_hal_accelerometer_set_range(int r);
+
 void mp_js_hal_audio_period_us(int period);
 void mp_js_hal_audio_amplitude_u10(int amplitude);

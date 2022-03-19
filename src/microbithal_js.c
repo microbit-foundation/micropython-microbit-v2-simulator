@@ -306,32 +306,21 @@ void microbit_hal_display_set_pixel(int x, int y, int bright) {
 }
 
 int microbit_hal_display_read_light_level(void) {
-    /*
-    return uBit.display.readLightLevel();
-    */
     return mp_js_hal_display_read_light_level();
 }
 
 void microbit_hal_accelerometer_get_sample(int axis[3]) {
-    /*
-    Sample3D sample = uBit.accelerometer.getSample();
-    axis[0] = sample.x;
-    axis[1] = sample.y;
-    axis[2] = sample.z;
-    */
+    axis[0] = mp_js_hal_accelerometer_get_x();
+    axis[1] = mp_js_hal_accelerometer_get_y();
+    axis[2] = mp_js_hal_accelerometer_get_z();
 }
 
 int microbit_hal_accelerometer_get_gesture(void) {
-    /*
-    return uBit.accelerometer.getGesture();
-    */
-    return 0;
+    return mp_js_hal_accelerometer_get_gesture();
 }
 
 void microbit_hal_accelerometer_set_range(int r) {
-    /*
-    uBit.accelerometer.setRange(r);
-    */
+    return mp_js_hal_accelerometer_set_range(r);
 }
 
 int microbit_hal_compass_is_calibrated(void) {

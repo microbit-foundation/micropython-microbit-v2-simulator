@@ -38,7 +38,7 @@
 #define MICROPY_EMIT_INLINE_THUMB               (1)
 
 // Python internal features
-#define MICROPY_VM_HOOK_COUNT                   (64)
+#define MICROPY_VM_HOOK_COUNT                   (256)
 #define MICROPY_VM_HOOK_INIT \
     static unsigned int vm_hook_divisor = MICROPY_VM_HOOK_COUNT;
 #define MICROPY_VM_HOOK_POLL \

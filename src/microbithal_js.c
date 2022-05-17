@@ -498,6 +498,7 @@ void microbit_hal_audio_init(uint32_t sample_rate) {
         uBit.audio.mixer.addChannel(data_source, sample_rate, 255);
     }
     */
+   mp_js_hal_audio_init(sample_rate);
 }
 
 void microbit_hal_audio_write_data(const uint8_t *buf, size_t num_samples) {
@@ -508,6 +509,7 @@ void microbit_hal_audio_write_data(const uint8_t *buf, size_t num_samples) {
     memcpy(data_source.buf.getBytes(), buf, num_samples);
     data_source.sink->pullRequest();
     */
+    mp_js_hal_audio_write_data(buf, num_samples);
 }
 
 void microbit_hal_audio_speech_init(uint32_t sample_rate) {

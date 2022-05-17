@@ -57,7 +57,6 @@ const MICROBIT_HAL_LOG_TIMESTAMP_MINUTES = 600;
 const MICROBIT_HAL_LOG_TIMESTAMP_HOURS = 36000;
 const MICROBIT_HAL_LOG_TIMESTAMP_DAYS = 864000;
 
-
 const svgPromise = (async () => {
   try {
     const response = await fetch("microbit-drawing.svg");
@@ -261,10 +260,23 @@ class ButtonUI {
 }
 
 class AudioUI {
-  constructor() {
+  constructor() {}
+
+  init(sampleRate) {
     this._frequency = 440;
-    this._context = new AudioContext();
+    this._context = new AudioContext({ sampleRate });
     this._oscillator = null;
+  }
+
+  createBuffer(length) {
+    return this._context.createBuffer(1, length, this._context.sampleRate);
+  }
+
+  writeData(buffer) {
+    const source = this._context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(this._context.destination);
+    source.start();
   }
 
   setPeriodUs(periodUs) {
@@ -289,7 +301,9 @@ class AudioUI {
   }
 
   dispose() {
-    this._context.close();
+    if (this._context) {
+      this._context.close();
+    }
     this._oscillator = null;
   }
 }

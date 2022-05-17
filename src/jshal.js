@@ -138,35 +138,33 @@ mergeInto(LibraryManager.library, {
     mp_js_hal_accelerometer_get_gesture: function() {
         // Equivalent to gesture_name_map.
         // Is there a way to access e.g. MICROBIT_HAL_ACCELEROMETER_EVT_NONE ?
-        console.log(board.accelerometer.gesture.value);
         switch (board.accelerometer.gesture.value) {
             case "none":
-                return 0;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_NONE;
             case "up":
-                return 1;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP;
             case "down":
-                return 2;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_DOWN;
             case "left":
-                return 3;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT;
             case "right":
-                return 4;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT;
             case "face up":
-                return 5;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_FACE_UP;
             case "face down":
-                return 6;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_FACE_DOWN;
             case "freefall":
-                return 7;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_FREEFALL;
             case "2g":
-                // Out of order.
-                return 12;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_2G;
             case "3g":
-                return 8;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_3G;
             case "6g":
-                return 9
+                return MICROBIT_HAL_ACCELEROMETER_EVT_6G
             case "8g":
-                return 10
+                return MICROBIT_HAL_ACCELEROMETER_EVT_8G
             case "shake":
-                return 11;
+                return MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE;
         }
 
     },

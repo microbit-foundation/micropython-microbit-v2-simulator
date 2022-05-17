@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MicroPython-micro:bit simulator example embedding</title>
+    <style>
+      html,
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+      iframe {
+        width: 400px;
+        height: 329px;
+      }
+      button,
+      textarea,
+      select {
+        display: block;
+        margin: 0.25em 0;
+        padding: 0.5em;
+        border: 2px solid black;
+        background-color: white;
+      }
+      textarea {
+        white-space: pre;
+        width: calc(100% - 15px);
+      }
+      .content {
+        margin: 2em auto;
+        max-width: fit-content;
+      }
+      .row {
+        display: flex;
+      }
+      .column {
+        display: flex;
+        flex-direction: column;
+      }
+      .terminal {
+        margin-bottom: 0.5em;
+      }
+      .simulator {
+        height: 100vh;
+      }
+      #sensors {
+        padding: 0.5em 2em;
+      }
+      #sensors > * {
+        padding: 0.5em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <h1>MicroPython-micro:bit simulator example embedding</h1>
+      <div class="row">
+        <div class="simulator column">
+          <iframe
+            id="simulator"
+            src="simulator.html"
+            title="Simulator"
+            frameborder="0"
+            scrolling="no"
+          ></iframe>
+          <div id="sensors" class="column"></div>
+        </div>
+        <div class="column">
+          <div id="term"></div>
+          <div class="samples">
+            <select id="sample">
+              <!-- option values correspond to filenames in the examples folder -->
+              <option value="accelerometer">Accelerometer</option>
+              <option value="background">Background music and display</option>
+              <option value="buttons">Buttons</option>
+              <option value="display">Display</option>
+              <option value="music">Music</option>
+              <option value="sensors">Sensors</option>
+            </select>
+            <textarea
+              id="program"
+              rows="10"
+              spellcheck="false"
+              autocapitalize="false"
+              autocomplete="false"
+            >
+            </textarea>
+            <button id="run">Run</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="term.js"></script>
+    <script>
+      // Connect the simulator REPL to a terminal.
+      const simulator = document.querySelector("#simulator").contentWindow;
+      const term = new Terminal({
+        cols: 80,
+        rows: 24,
+        useStyle: true,
+        screenKeys: true,
+        cursorBlink: false,
+      });
+      term.open(document.getElementById("term"));
+      term.removeAllListeners("data");
+      term.on("data", function (data) {
+        simulator.postMessage(
+          {
+            kind: "serial_input",
+            data,
+          },
+          "*"
+        );
+      });
+
+      const readyCallbacks = [];
+      window.addEventListener("message", (e) => {
+        const { data } = e;
+        if (e.source === simulator) {
+          switch (data.kind) {
+            case "serial_output": {
+              term.write(e.data.data);
+              break;
+            }
+            case "ready": {
+              // We create this here to allow embedders to use
+              // relevant styling/widgets.
+              createSensorUI(data.sensors);
+              while (readyCallbacks.length) {
+                readyCallbacks.pop()();
+              }
+              break;
+            }
+            case "sensor_change": {
+              createSensorUI(data.sensors);
+            }
+          }
+        }
+      });
+
+      // Support for running samples via the REPL.
+      // There is no filesystem support for the moment.
+      const sample = document.querySelector("#sample");
+      const program = document.querySelector("#program");
+      async function fetchProgram(name) {
+        const response = await fetch(`examples/${name}.py`);
+        if (response.ok) {
+          const text = await response.text();
+          program.value = text;
+        } else {
+          program.value = `# No matching example found for ${name}`;
+        }
+      }
+      sample.addEventListener("change", async () => {
+        fetchProgram(sample.value);
+      });
+      fetchProgram(sample.value);
+
+      // Ideally this would just be changing main.py via some filesystem
+      // message, then resetting.
+      document.querySelector("#run").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "serial_input",
+            // Ctrl-C to interrupt, Ctrl-D to reboot (straight to REPL as no program)
+            data: `\x03\x04`,
+          },
+          "*"
+        );
+
+        // Wait for the ready message after the reboot.
+        await new Promise((resolve) => readyCallbacks.push(resolve));
+
+        simulator.postMessage(
+          {
+            kind: "serial_input",
+            // Ctrl-E to enter paste mode and Ctrl-D to finish
+            data: `\x05${program.value}\x04`.replace(/\n/g, "\r"),
+          },
+          "*"
+        );
+      });
+
+      function createSensorUI(sensors) {
+        const createRangeUI = function (sensor) {
+          const { min, max, value, type, id } = sensor;
+          const labelElt = document.createElement("label");
+          const text = labelElt.appendChild(document.createElement("span"));
+          text.innerText = id;
+          const input = labelElt.appendChild(document.createElement("input"));
+          Object.assign(input, { min, max, type });
+          input.value = value;
+          input.addEventListener("change", () => {
+            simulator.postMessage(
+              {
+                kind: "sensor_set",
+                sensor: id,
+                value: input.value,
+              },
+              "*"
+            );
+          });
+          return labelElt;
+        };
+        const createEnumUI = function (sensor) {
+          const { id, choices, value } = sensor;
+          const labelElt = document.createElement("label");
+          const text = labelElt.appendChild(document.createElement("span"));
+          text.innerText = id;
+          const select = labelElt.appendChild(document.createElement("select"));
+          for (const choice of sensor.choices) {
+            const option = select.appendChild(document.createElement("option"));
+            option.textContent = choice;
+            option.value = choice;
+            if (value === choice) {
+              option.setAttribute("selected", "true");
+            }
+          }
+          select.addEventListener("change", () => {
+            simulator.postMessage(
+              {
+                kind: "sensor_set",
+                sensor: id,
+                value: select.value,
+              },
+              "*"
+            );
+          });
+          return labelElt;
+        };
+
+        // Create UI for sensors.
+        const parent = document.querySelector("#sensors");
+        parent.innerHTML = "";
+        for (const sensor of sensors) {
+          switch (sensor.type) {
+            case "range":
+              parent.appendChild(createRangeUI(sensor));
+              break;
+            case "enum":
+              parent.appendChild(createEnumUI(sensor));
+              break;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

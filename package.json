@@ -1,0 +1,26 @@
+{
+  "name": "@microbit-foundation/microbit-micropython-v2-simulator",
+  "version": "0.1.0",
+  "description": "Experimental Wasm-based MicroPython micro:bit v2 simulator",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "make",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/microbit-foundation/micropython-microbit-v2-simulator.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/microbit-foundation/micropython-microbit-v2-simulator/issues"
+  },
+  "homepage": "https://github.com/microbit-foundation/micropython-microbit-v2-simulator#readme",
+  "devDependencies": {
+    "prettier": "2.6.0"
+  }
+}

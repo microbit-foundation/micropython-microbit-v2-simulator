@@ -15,7 +15,7 @@ Then run (from this top-level directory):
 
 Once it is build the webpage in src/ needs to be served, eg via:
 
-    $ (cd src && python -m http.server)
+    $ (cd dist && python -m http.server)
 
 Then browse to http://localhost:8000/demo.html
 

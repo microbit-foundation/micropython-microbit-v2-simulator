@@ -27,6 +27,20 @@
 var Module = {};
 
 var mainProgram = function() {
+    microbit_hal_audio_ready_callback = Module.cwrap(
+        "microbit_hal_audio_ready_callback",
+        "null",
+        [],
+        {}
+      );
+
+    microbit_hal_audio_speech_ready_callback = Module.cwrap(
+      "microbit_hal_audio_speech_ready_callback",
+      "null",
+      [],
+      {}
+    );
+
     mp_js_main = Module.cwrap('mp_js_main', 'null', ['number'], {async: true});
     mp_js_main(64 * 1024);
 }

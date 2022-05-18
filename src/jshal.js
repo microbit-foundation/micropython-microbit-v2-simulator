@@ -173,19 +173,28 @@ mergeInto(LibraryManager.library, {
         board.accelerometer.setRange(r)
     },
 
-
     mp_js_hal_audio_init: function(sample_rate) {
-        board.audio.init(sample_rate);
+        board.audio.default.init(sample_rate);
     },
 
     mp_js_hal_audio_write_data: function(buf, num_samples) {
-        const audioBuffer = board.audio.createBuffer(num_samples);
-        const channel = audioBuffer.getChannelData(0);
-        for (let i = 0; i < num_samples; ++i) {
-          // Convert from uint8 to -1..+1 float.
-          channel[i] = HEAPU8[buf + i] / 255 * 2 - 1;
-        }
-        board.audio.writeData(audioBuffer);
+        board.audio.default.writeData(
+            convertAudioBuffer(buf, 
+                board.audio.default.createBuffer(num_samples), num_samples
+            )
+        );
+    },
+
+    mp_js_hal_audio_speech_init: function(sample_rate) {
+        board.audio.speech.init(sample_rate);
+    },
+
+    mp_js_hal_audio_speech_write_data: function(buf, num_samples) {
+        board.audio.speech.writeData(
+            convertAudioBuffer(buf, 
+                board.audio.speech.createBuffer(num_samples), num_samples
+            )
+        );
     },
 
     mp_js_hal_audio_period_us: function(period_us) {

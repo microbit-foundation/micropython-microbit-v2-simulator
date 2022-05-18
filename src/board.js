@@ -259,24 +259,56 @@ class ButtonUI {
   }
 }
 
-class AudioUI {
-  constructor() {}
+class BufferedAudio {
+  constructor(context, callback) {
+    this._context = context;
+    this._callback = callback;
+  }
 
   init(sampleRate) {
-    this._frequency = 440;
-    this._context = new AudioContext({ sampleRate });
-    this._oscillator = null;
+    this._queue = [];
+    this._playing = false;
+    this._sampleRate = sampleRate;
   }
 
   createBuffer(length) {
-    return this._context.createBuffer(1, length, this._context.sampleRate);
+    return this._context.createBuffer(1, length, this._sampleRate);
   }
 
   writeData(buffer) {
-    const source = this._context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(this._context.destination);
-    source.start();
+    this._queue.push(buffer);
+    if (!this._playing) {
+      this._playNextBuffer();
+    }
+  }
+
+  _playNextBuffer() {
+    const buffer = this._queue.shift();
+    if (buffer) {
+      const source = this._context.createBufferSource();
+      source.buffer = buffer;
+      source.onended = this._callback;
+      source.connect(this._context.destination);
+      source.start();
+    } else {
+      this._playing = false;
+    }
+  }
+}
+
+class AudioUI {
+  constructor() {
+    this._frequency = 440;
+    this._context = new AudioContext();
+    this._oscillator = null;
+    this.default = new BufferedAudio(
+      this._context,
+      microbit_hal_audio_ready_callback
+    );
+    this.speech = new BufferedAudio(
+      this._context,
+      microbit_hal_audio_speech_ready_callback
+    );
   }
 
   setPeriodUs(periodUs) {
@@ -388,4 +420,16 @@ function clamp(value, min, max) {
     return max;
   }
   return value;
+}
+
+// Helpers for jshal.js
+// We should split these out when we have bundling.
+
+function convertAudioBuffer(source, target, num_samples) {
+  const channel = target.getChannelData(0);
+  for (let i = 0; i < num_samples; ++i) {
+    // Convert from uint8 to -1..+1 float.
+    channel[i] = (HEAPU8[source + i] / 255) * 2 - 1;
+  }
+  return target;
 }

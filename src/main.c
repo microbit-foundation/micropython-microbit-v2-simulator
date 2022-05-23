@@ -41,6 +41,9 @@
 #include "modmicrobit.h"
 #include "microbithal_js.h"
 
+// Set to true if a soft-timer callback can use mp_sched_exception to propagate out an exception.
+bool microbit_outer_nlr_will_handle_soft_timer_exceptions;
+
 void microbit_pyexec_file(const char *filename);
 
 void mp_js_main(int heap_size) {

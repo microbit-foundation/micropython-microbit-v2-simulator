@@ -57,7 +57,6 @@ SRC_C += \
 SRC_C += $(addprefix $(CODAL_PORT)/, \
 	drv_display.c \
 	drv_image.c \
-	drv_radio.c \
 	drv_softtimer.c \
 	drv_system.c \
 	help.c \
@@ -87,7 +86,6 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	modmusic.c \
 	modmusictunes.c \
 	modos.c \
-	modradio.c \
 	modspeech.c \
 	modthis.c \
 	modutime.c \

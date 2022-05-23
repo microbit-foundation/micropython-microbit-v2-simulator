@@ -90,7 +90,9 @@
 #define MICROPY_PY_MACHINE_PULSE                (1)
 
 #define MICROPY_HW_ENABLE_RNG                   (1)
-#define MICROPY_MBFS                            (0)
+
+// The simulator provides its own version of the relevant mbfs methods.
+#define MICROPY_MBFS                            (1)
 
 // extra built in names to add to the global namespace
 #if MICROPY_MBFS

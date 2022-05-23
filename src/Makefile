@@ -49,6 +49,7 @@ JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.j
 JSFLAGS += --pre-js board.js
 
 SRC_C += \
+	microbitfs.c \
 	microbithal_js.c \
 	main.c \
 	mphalport.c \

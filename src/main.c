@@ -175,11 +175,3 @@ void gc_collect(void) {
     emscripten_scan_registers(gc_scan_func);
     gc_collect_end();
 }
-
-mp_lexer_t *mp_lexer_new_from_file(const char *filename) {
-    mp_raise_OSError(MP_ENOENT);
-}
-
-mp_import_stat_t mp_import_stat(const char *path) {
-    return MP_IMPORT_STAT_NO_EXIST;
-}

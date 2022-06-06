@@ -3,6 +3,10 @@
 #include "microbithal.h"
 #include "modmicrobit.h"
 
+// Constants for the nRF needed by the radio module.
+#define RADIO_MODE_MODE_Nrf_1Mbit (0)
+#define RADIO_MODE_MODE_Nrf_2Mbit (1)
+
 extern ringbuf_t stdin_ringbuf;
 
 void mp_hal_set_interrupt_char(int c);

@@ -49,6 +49,7 @@ JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.j
 JSFLAGS += --pre-js board.js
 
 SRC_C += \
+	drv_radio.c \
 	microbitfs.c \
 	microbithal_js.c \
 	main.c \
@@ -86,6 +87,7 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	modmusic.c \
 	modmusictunes.c \
 	modos.c \
+	modradio.c \
 	modspeech.c \
 	modthis.c \
 	modutime.c \

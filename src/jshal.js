@@ -28,25 +28,25 @@ mergeInto(LibraryManager.library, {
     mp_js_hal_init: async function() {
         MP_JS_EPOCH = (new Date()).getTime();
         stdin_buffer = [];
+        board.initialize();
 
-        // Each entry is [filename, content].
-        // When a file is deleted the entry becomes ['', null] and can be reused.
-        mp_js_filesystem_content = [
-            ["data.txt", "line1\nline2\n"],
-            ["main.py", "print('this is main')\n"],
-            ["hello.py", "print('hello!')\n"],
-        ];
-
-        const onSensorChange = () => window.parent.postMessage({
-            kind: "sensor_change",
-            sensors: board.sensors,
-        }, "*")
-
-        board = await createBoard(onSensorChange)
         messageListener = (e) => {
             if (e.source === window.parent) {
                 const { data } = e;
                 switch (data.kind) {
+                    case "flash": {
+                        if (data.filesystem) {
+                            fs.clear();
+                            Object.entries(data.filesystem).forEach(([name, value]) => {
+                                const idx = fs.create(name);
+                                fs.write(idx, value)
+                            });
+                            // Ctrl-C, Ctrl-D to restart.
+                            // Can/should we do this programatically?
+                            stdin_buffer.push(3, 4);
+                        }
+                        break;
+                    }
                     case "serial_input": {
                         const text = data.data;
                         for (let i = 0; i < text.length; i++) {
@@ -73,10 +73,7 @@ mergeInto(LibraryManager.library, {
     },
 
     mp_js_hal_deinit: function() {
-        if (board) {
-            board.dispose();
-            board = null;
-        }
+        board.dispose();
         if (messageListener) {
             window.removeEventListener("message", messageListener);
             messageListener = null;
@@ -104,70 +101,39 @@ mergeInto(LibraryManager.library, {
     },
 
     mp_js_hal_filesystem_find: function(name, len) {
-        const filename = UTF8ToString(name, len);
-        for (var idx = 0; idx < mp_js_filesystem_content.length; ++idx) {
-            if (mp_js_filesystem_content[idx][0] == filename) {
-                return idx;
-            }
-        }
-        return -1;
+        return fs.find(UTF8ToString(name, len));
     },
 
     mp_js_hal_filesystem_create: function(name, len) {
-        var free_idx = -1;
         const filename = UTF8ToString(name, len);
-        for (var idx = 0; idx < mp_js_filesystem_content.length; ++idx) {
-            if (mp_js_filesystem_content[idx][0] == "") {
-                free_idx = idx;
-            } else if (mp_js_filesystem_content[idx][0] == filename) {
-                // Truncate existing file and return it.
-                mp_js_filesystem_content[idx][1] = '';
-                return idx;
-            }
-        }
-        if (free_idx < 0) {
-            // Add a new file and return it.
-            mp_js_filesystem_content.push([filename, '']);
-            return mp_js_filesystem_content.length - 1;
-        } else {
-            // Reuse existing slot for the new file.
-            mp_js_filesystem_content[free_idx] = [filename, ''];
-            return free_idx;
-        }
+        return fs.create(filename);
     },
 
     mp_js_hal_filesystem_name: function(idx, buf) {
-        if (idx < mp_js_filesystem_content.length) {
-            var filename = mp_js_filesystem_content[idx][0];
-            var len = lengthBytesUTF8(filename);
-            stringToUTF8(filename, buf, len + 1);
-            return len;
-        } else {
+        const name = fs.name(idx);
+        if (name === undefined) {
             return -1;
         }
+        const len = lengthBytesUTF8(name);
+        stringToUTF8(name, buf, len + 1);
+        return len;
     },
 
     mp_js_hal_filesystem_size: function(idx) {
-        var data = mp_js_filesystem_content[idx][1];
-        return data.length;
+        return fs.size(idx);
     },
 
     mp_js_hal_filesystem_remove: function(idx) {
-        mp_js_filesystem_content[idx] = ['', null];
+        return fs.remove(idx);
     },
 
     mp_js_hal_filesystem_readbyte: function(idx, offset) {
-        var data = mp_js_filesystem_content[idx][1];
-        if (offset < data.length) {
-            return data.charCodeAt(offset);
-        } else {
-            return -1;
-        }
+        return fs.readbyte(idx, offset);
     },
 
     mp_js_hal_filesystem_write: function(idx, buf, len) {
-        mp_js_filesystem_content[idx][1] += UTF8ToString(buf, len);
-        return len;
+        const data = new Uint8Array(HEAP8.buffer, buf, len);
+        return fs.write(idx, data);
     },
 
     mp_js_hal_temperature: function() {

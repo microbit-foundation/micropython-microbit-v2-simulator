@@ -90,6 +90,20 @@ The following sections documents the messages supported via postMessage.
 <th>Description
 <tbody>
 <tr>
+<td>flash
+<td>
+
+```javascript
+{ 
+  "kind": "flash",
+  "filesystem": {
+    "main.py": new TextEncoder().encode("# your program here")
+  }
+}
+```
+
+<td>Update the micro:bit filesystem and restart the program.
+<tr>
 <td>serial_input
 <td>
 

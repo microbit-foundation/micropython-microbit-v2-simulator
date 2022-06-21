@@ -26,7 +26,14 @@
 
 var Module = {};
 
-var mainProgram = function() {
+var mainProgram = async function() {
+    fs = new FileSystem();
+    const onSensorChange = () => window.parent.postMessage({
+        kind: "sensor_change",
+        sensors: board.sensors,
+    }, "*")
+    board = await createBoard(fs, onSensorChange);
+
     mp_js_main = Module.cwrap('mp_js_main', 'null', ['number'], {async: true});
     mp_js_main(64 * 1024);
 }

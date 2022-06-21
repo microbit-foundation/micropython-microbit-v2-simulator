@@ -57,7 +57,6 @@ const MICROBIT_HAL_LOG_TIMESTAMP_MINUTES = 600;
 const MICROBIT_HAL_LOG_TIMESTAMP_HOURS = 36000;
 const MICROBIT_HAL_LOG_TIMESTAMP_DAYS = 864000;
 
-
 const svgPromise = (async () => {
   try {
     const response = await fetch("microbit-drawing.svg");
@@ -70,7 +69,7 @@ const svgPromise = (async () => {
   }
 })();
 
-async function createBoard(onSensorChange) {
+async function createBoard(fs, onSensorChange) {
   const svgData = await svgPromise;
   if (!svgData) {
     // TODO: add a visual indicator of the failure or inline the resource.
@@ -78,12 +77,113 @@ async function createBoard(onSensorChange) {
   }
   document.body.insertAdjacentHTML("afterbegin", svgData);
   const svg = document.querySelector("svg");
-  return new BoardUI(svg, onSensorChange);
+  return new BoardUI(fs, svg, onSensorChange);
+}
+
+class FileSystem {
+  constructor() {
+    // Each entry is an FsFile object. The indexes are used as identifiers.
+    // When a file is deleted the entry becomes ['', null] and can be reused.
+    this._content = [];
+  }
+  create(name) {
+    let free_idx = -1;
+    for (let idx = 0; idx < this._content.length; ++idx) {
+      if (this._content[idx] === null) {
+        free_idx = idx;
+      } else if (this._content[idx].name === name) {
+        // Truncate existing file and return it.
+        this._content[idx].truncate();
+        return idx;
+      }
+    }
+    if (free_idx < 0) {
+      // Add a new file and return it.
+      this._content.push(new FsFile(name));
+      return this._content.length - 1;
+    } else {
+      // Reuse existing slot for the new file.
+      this._content[free_idx] = new FsFile(name);
+      return free_idx;
+    }
+  }
+
+  find(name) {
+    for (let idx = 0; idx < this._content.length; ++idx) {
+      if (this._content[idx]?.name === name) {
+        return idx;
+      }
+    }
+    return -1;
+  }
+
+  name(idx) {
+    const file = this._content[idx];
+    return file ? file.name : undefined;
+  }
+
+  size(idx) {
+    const file = this._content[idx];
+    if (!file) {
+      throw new Error("File must exist");
+    }
+    return file.size();
+  }
+
+  remove(idx) {
+    this._content[idx] = null;
+  }
+
+  readbyte(idx, offset) {
+    const file = this._content[idx];
+    return file ? file.readbyte(offset) : -1;
+  }
+
+  write(idx, data) {
+    const file = this._content[idx];
+    if (!file) {
+      throw new Error("File must exist");
+    }
+    file.append(data);
+    return data.length;
+  }
+
+  clear() {
+    for (let idx = 0; idx < this._content.length; ++idx) {
+      this.remove(idx);
+    }
+  }
+}
+
+class FsFile {
+  constructor(name, buffer) {
+    this.name = name;
+    this._buffer = buffer ? buffer : new Uint8Array(0);
+  }
+  readbyte(offset) {
+    if (offset < this._buffer.length) {
+      return this._buffer[offset];
+    }
+    return -1;
+  }
+  append(data) {
+    const updated = new Uint8Array(this._buffer.length + data.length);
+    updated.set(this._buffer);
+    updated.set(data, this._buffer.length);
+    this._buffer = updated;
+  }
+  truncate() {
+    this._buffer = new Uint8Array(0);
+  }
+  size() {
+    return this._buffer.length;
+  }
 }
 
 class BoardUI {
-  constructor(svg, onSensorChange) {
+  constructor(fs, svg, onSensorChange) {
     this.svg = svg;
+    this.fs = fs;
     this.display = new DisplayUI(
       this.svg.querySelector("#LEDsOn").querySelectorAll("use")
     );
@@ -110,15 +210,18 @@ class BoardUI {
     return this._sensorsById[id];
   }
 
+  initialize() {
+    this.audio.initialize();
+    this.buttons.forEach((b) => b.initialize());
+    this.display.initialize();
+    this.accelerometer.initialize();
+  }
+
   dispose() {
     this.audio.dispose();
     this.buttons.forEach((b) => b.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
-
-    // For now we recreate it.
-    // In future we can reset state then update the UI.
-    this.svg.remove();
   }
 }
 
@@ -174,7 +277,11 @@ class DisplayUI {
     }
   }
 
-  dispose() {}
+  initialize() {}
+
+  dispose() {
+    this.clear();
+  }
 }
 
 class ButtonUI {
@@ -251,19 +358,23 @@ class ButtonUI {
     return result;
   }
 
-  dispose() {
-    this.element.removeEventListener("mouseleave", this.mouseLeaveListener);
-    this.element.removeEventListener("keyup", this.keyListener);
-    this.element.removeEventListener("keydown", this.keyListener);
-    this.element.removeEventListener("mouseup", this.mouseUpListener);
-    this.element.removeEventListener("mousedown", this.mouseDownListener);
-  }
+  initialize() {}
+
+  dispose() {}
 }
 
 class AudioUI {
   constructor() {
     this._frequency = 440;
+    this._oscillator = null;
+  }
+
+  initialize() {
     this._context = new AudioContext();
+  }
+
+  dispose() {
+    this._context.close();
     this._oscillator = null;
   }
 
@@ -286,11 +397,6 @@ class AudioUI {
       this._oscillator.frequency.value = this._frequency;
       this._oscillator.start();
     }
-  }
-
-  dispose() {
-    this._context.close();
-    this._oscillator = null;
   }
 }
 
@@ -336,6 +442,8 @@ class AccelerometerUI {
     }
     this.onSensorChange();
   }
+
+  initialize() {}
 
   dispose() {}
 }

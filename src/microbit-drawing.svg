@@ -473,6 +473,7 @@
    </g>
   </g>
   <g id="Logo" fill="url(#ah)" transform="translate(87.6486993 23.604124) scale(.7019)" stroke="#fff" stroke-width=".235078">
+    <rect class="outline" width="46" height="31" x="0" y="0" rx="0" ry="0" fill="none" stroke-width="0"></rect>
     <linearGradient gradientUnits="userSpaceOnUse" x1="9.4902" y1="15.4177" x2="112.229" y2="15.4177">
       <stop offset="0" stop-color="#02ec00" fill="url(#ai)"/>
       <stop offset="1" stop-color="#3edcfd" fill="url(#ai)"/>

@@ -148,6 +148,10 @@ mergeInto(LibraryManager.library, {
         return board.buttons[button].isPressed();
     },
 
+    mp_js_hal_pin_is_touched: function(pin) {
+        return board.pins[pin].isTouched();
+    },
+
     mp_js_hal_display_get_pixel: function(x, y) {
         return board.display.getPixel(x, y);
     },

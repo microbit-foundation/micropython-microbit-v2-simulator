@@ -185,31 +185,31 @@ mergeInto(LibraryManager.library, {
         // Is there a way to access e.g. MICROBIT_HAL_ACCELEROMETER_EVT_NONE ?
         switch (board.accelerometer.gesture.value) {
             case "none":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_NONE;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_NONE;
             case "up":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP;
             case "down":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_DOWN;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_DOWN;
             case "left":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT;
             case "right":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT;
             case "face up":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_FACE_UP;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FACE_UP;
             case "face down":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_FACE_DOWN;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FACE_DOWN;
             case "freefall":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_FREEFALL;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FREEFALL;
             case "2g":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_2G;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_2G;
             case "3g":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_3G;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_3G;
             case "6g":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_6G
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_6G
             case "8g":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_8G
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_8G
             case "shake":
-                return MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE;
+                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE;
         }
 
     },

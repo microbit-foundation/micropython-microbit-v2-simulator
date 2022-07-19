@@ -46,7 +46,7 @@ endif
 JSFLAGS += -s ASYNCIFY
 JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
-JSFLAGS += --pre-js board.js
+JSFLAGS += --pre-js $(BUILD)/pre.js
 
 SRC_C += \
 	drv_radio.c \
@@ -130,9 +130,14 @@ $(MBIT_VER_FILE): FORCE
 	$(PYTHON) $(TOP)/py/makeversionhdr.py $(MBIT_VER_FILE).pre
 	$(CAT) $(MBIT_VER_FILE).pre | $(SED) s/MICROPY_/MICROBIT_/ > $(MBIT_VER_FILE)
 
-$(BUILD)/micropython.js: $(OBJ) jshal.js main.js
+$(BUILD)/micropython.js: $(OBJ) jshal.js main.js pre-js
 	$(ECHO) "LINK $(BUILD)/firmware.js"
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
 	cat main.js $(BUILD)/firmware.js > $@
 
+pre-js:
+	npx esbuild ./pre.ts --bundle --outfile=$(BUILD)/pre.js --loader:.svg=text
+
 include $(TOP)/py/mkrules.mk
+
+.PHONY: pre-js

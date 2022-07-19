@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/microbit-foundation/micropython-microbit-v2-simulator#readme",
   "devDependencies": {
+    "esbuild": "^0.14.49",
     "prettier": "2.6.0"
   }
 }

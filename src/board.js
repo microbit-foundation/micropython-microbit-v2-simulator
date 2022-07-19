@@ -191,6 +191,9 @@ class BoardUI {
       new ButtonUI(this.svg.querySelector("#ButtonA"), "A"),
       new ButtonUI(this.svg.querySelector("#ButtonB"), "B"),
     ];
+    this.pins = Array(33)
+    this.pins[MICROBIT_HAL_PIN_FACE] = 
+      new PinUI(this.svg.querySelector("#Logo"), "pin_logo"),
     this.audio = new AudioUI();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new AccelerometerUI(onSensorChange);
@@ -213,6 +216,7 @@ class BoardUI {
   initialize() {
     this.audio.initialize();
     this.buttons.forEach((b) => b.initialize());
+    this.pins.forEach((p) => p.initialize());
     this.display.initialize();
     this.accelerometer.initialize();
   }
@@ -220,6 +224,7 @@ class BoardUI {
   dispose() {
     this.audio.dispose();
     this.buttons.forEach((b) => b.dispose());
+    this.pins.forEach((p) => p.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
   }
@@ -482,4 +487,73 @@ function clamp(value, min, max) {
     return max;
   }
   return value;
+}
+
+class PinUI {
+  constructor(element, label) {
+    this.label = label;
+    this._isTouched = false;
+
+    this.element = element;
+    this.element.setAttribute("role", "button");
+    this.element.setAttribute("tabindex", "0");
+    this.element.ariaLabel = label;
+    this.element.style.cursor = "pointer";
+
+    this.keyListener = (e) => {
+      switch (e.key) {
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          if (e.type === "keydown") {
+            this.press();
+          } else {
+            this.release();
+          }
+      }
+    };
+
+    this.mouseDownListener = (e) => {
+      e.preventDefault();
+      this.press();
+    };
+    this.mouseUpListener = (e) => {
+      e.preventDefault();
+      this.release();
+    };
+    this.mouseLeaveListener = (e) => {
+      this.release();
+    };
+
+    this.element.addEventListener("mousedown", this.mouseDownListener);
+    this.element.addEventListener("mouseup", this.mouseUpListener);
+    this.element.addEventListener("keydown", this.keyListener);
+    this.element.addEventListener("keyup", this.keyListener);
+    this.element.addEventListener("mouseleave", this.mouseLeaveListener);
+  }
+
+  press() {
+    this._isTouched = true;
+    this.render();
+  }
+
+  release() {
+    this._isTouched = false;
+    this.render();
+  }
+
+  isTouched() {
+    return this._isTouched;
+  }
+
+  render() {
+    const fill = this._isTouched ? "red" : "url(#an)";
+    this.element.querySelectorAll("path").forEach((p) => {
+      p.style.fill = fill;
+    });
+  }
+
+  initialize() {}
+
+  dispose() {}
 }

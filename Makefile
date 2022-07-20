@@ -8,7 +8,7 @@ build:
 
 dist: build
 	mkdir -p $(DIST)/build
-	cp -r $(SRC)/*.html $(SRC)/*.svg $(SRC)/term.js src/examples $(DIST)
+	cp -r $(SRC)/*.html $(SRC)/term.js src/examples $(DIST)
 	cp $(SRC)/build/micropython.js $(SRC)/build/firmware.wasm  $(DIST)/build/
 
 watch: dist

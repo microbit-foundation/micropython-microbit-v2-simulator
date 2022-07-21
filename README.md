@@ -15,9 +15,21 @@ Then run (from this top-level directory):
 
 Once it is build the webpage in src/ needs to be served, eg via:
 
-    $ (cd dist && python -m http.server)
+    $ (cd build && python -m http.server)
 
 Then browse to http://localhost:8000/demo.html
+
+## Deployments
+
+The main branch is deployed to https://stage-python-simulator.microbit.org/ by CircleCI.
+
+Other branches are deployed to https://review-python-simulator.microbit.org/{branchName} by CircleCI.
+
+There is currently no stable deployment. The URLs above are under active development
+and are subject to change.
+
+There is also a Netlify based build for development purposes only.
+Netlify's GitHub integration will comment on PRs with deployment details.
 
 ## Embedding
 

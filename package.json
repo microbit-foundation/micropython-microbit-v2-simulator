@@ -8,7 +8,11 @@
   },
   "scripts": {
     "build": "make",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ci:update-version": "update-ci-version",
+    "deploy": "website-deploy-aws",
+    "invalidate": "aws cloudfront create-invalidation --distribution-id $(printenv ${STAGE}_CLOUDFRONT_DISTRIBUTION_ID) --paths \"/*\"",
+    "public-url": "node bin/public-url.js"
   },
   "repository": {
     "type": "git",

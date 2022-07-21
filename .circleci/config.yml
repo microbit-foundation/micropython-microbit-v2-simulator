@@ -82,8 +82,8 @@ jobs:
       - <<: *docker_defaults
         environment:
           STAGE: STAGING
-          STAGE_DOMAIN: "stage-python-simulator.microbit.org"
-          STAGE_CLOUDFRONT_DISTRIBUTION_ID: "E10B3FPUWOJLVL"
+          STAGING_DOMAIN: "stage-python-simulator.microbit.org"
+          STAGING_CLOUDFRONT_DISTRIBUTION_ID: "E10B3FPUWOJLVL"
     steps:
       - checkout
       - *restore_npm_cache

@@ -33,7 +33,7 @@ INC += -I$(BUILD)
 
 # Compiler settings.
 CWARN += -Wall -Wpointer-arith -Wuninitialized -Wno-array-bounds
-CFLAGS += $(INC) $(CWARN) -std=c99 $(CFLAGS_MOD) $(CFLAGS_ARCH) $(COPT) $(CFLAGS_EXTRA)
+CFLAGS += $(INC) $(CWARN) -std=c99 -funsigned-char $(CFLAGS_MOD) $(CFLAGS_ARCH) $(COPT) $(CFLAGS_EXTRA)
 
 # Debugging/Optimization
 ifdef DEBUG

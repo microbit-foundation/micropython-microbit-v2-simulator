@@ -141,3 +141,12 @@ The following sections documents the messages supported via postMessage.
 
 <td>Set a sensor value.
 </table>
+
+## Web Assembly debugging
+
+Steps for WASM debugging in Chrome:
+
+- Add the source folder
+- Install the C/C++ debug extension: https://helpgoo.gle/wasm-debugging-extension
+- Enable "WebAssembly Debugging: Enable DWARF support" in DevTools Experiments.
+- DEBUG=1 make

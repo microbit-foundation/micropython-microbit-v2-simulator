@@ -48,6 +48,10 @@ JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
 JSFLAGS += --pre-js $(BUILD)/pre.js
 
+ifdef DEBUG
+JSFLAGS += -g
+endif
+
 SRC_C += \
 	drv_radio.c \
 	microbitfs.c \

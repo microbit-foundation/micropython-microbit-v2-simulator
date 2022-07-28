@@ -4,6 +4,7 @@ import { EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
 import svgText from "../microbit-drawing.svg";
 import { MICROBIT_HAL_PIN_FACE } from "./constants";
+import { AudioUI } from "./audio";
 
 export function createBoard(onSensorChange: () => void) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
@@ -222,45 +223,6 @@ export class ButtonUI {
   initialize() {}
 
   dispose() {}
-}
-
-export class AudioUI {
-  private oscillator: OscillatorNode | undefined;
-  private context: AudioContext | undefined;
-
-  constructor(private frequency: number = 440) {
-    this.frequency = 440;
-  }
-
-  initialize() {
-    this.context = new AudioContext();
-  }
-
-  dispose() {
-    this.context?.close();
-    this.oscillator = undefined;
-  }
-
-  setPeriodUs(periodUs: number) {
-    this.frequency = 1000000 / periodUs;
-    if (this.oscillator) {
-      this.oscillator.frequency.value = this.frequency;
-    }
-  }
-
-  setAmplitudeU10(amplitudeU10: number) {
-    if (this.oscillator) {
-      this.oscillator.stop();
-      this.oscillator = undefined;
-    }
-    if (amplitudeU10) {
-      this.oscillator = this.context!.createOscillator();
-      this.oscillator.type = "sine";
-      this.oscillator.connect(this.context!.destination);
-      this.oscillator.frequency.value = this.frequency;
-      this.oscillator.start();
-    }
-  }
 }
 
 export class AccelerometerUI {

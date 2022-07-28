@@ -218,6 +218,30 @@ mergeInto(LibraryManager.library, {
         board.accelerometer.setRange(r)
     },
 
+    mp_js_hal_audio_init: function(sample_rate) {
+        board.audio.default.init(sample_rate);
+    },
+
+    mp_js_hal_audio_write_data: function(buf, num_samples) {
+        board.audio.default.writeData(
+            conversions.convertAudioBuffer(buf, 
+                board.audio.default.createBuffer(num_samples)
+            )
+        );
+    },
+
+    mp_js_hal_audio_speech_init: function(sample_rate) {
+        board.audio.speech.init(sample_rate);
+    },
+
+    mp_js_hal_audio_speech_write_data: function(buf, num_samples) {
+        board.audio.speech.writeData(
+            conversions.convertAudioBuffer(buf, 
+                board.audio.speech.createBuffer(num_samples)
+            )
+        );
+    },
+
     mp_js_hal_audio_period_us: function(period_us) {
         board.audio.setPeriodUs(period_us);
     },

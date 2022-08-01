@@ -57,8 +57,8 @@ mergeInto(LibraryManager.library, {
                     case "sensor_set": {
                         const sensor = board.getSensor(data.sensor);
                         const value = data.value;
-                        if (sensor && value) {
-                          sensor.value = sensor.type === "range" ? parseInt(value, 10) : value;
+                        if (sensor) {
+                            sensor.setValue(value);
                         }
                         break;
                     }

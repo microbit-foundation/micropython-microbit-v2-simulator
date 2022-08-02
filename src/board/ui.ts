@@ -5,19 +5,20 @@ import { clamp } from "./util";
 import svgText from "../microbit-drawing.svg";
 import { MICROBIT_HAL_PIN_FACE } from "./constants";
 import { AudioUI } from "./audio";
+import { WebAssemblyOperations } from "./listener";
+import { FileSystem } from "./fs";
 
-export function createBoard(onSensorChange: () => void) {
+export function createBoard(
+  operations: WebAssemblyOperations,
+  fs: FileSystem,
+  onSensorChange: () => void
+) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
   const svg = document.querySelector("svg");
   if (!svg) {
     throw new Error("No SVG");
   }
-  return new BoardUI(svg, onSensorChange);
-}
-
-interface BoardOptions {
-  defaultAudioCallback: () => void;
-  speechAudioCallback: () => void;
+  return new BoardUI(operations, fs, svg, onSensorChange);
 }
 
 export class BoardUI {
@@ -28,10 +29,18 @@ export class BoardUI {
   private temperature: RangeSensor;
   private accelerometer: AccelerometerUI;
 
+  // Perhaps we can remove this?
+  public serialInputBuffer: number[] = [];
+
   public sensors: Sensor[];
   private sensorsById: Map<string, Sensor>;
 
-  constructor(private svg: SVGElement, onSensorChange: () => void) {
+  constructor(
+    private operations: WebAssemblyOperations,
+    private fs: FileSystem,
+    private svg: SVGElement,
+    onSensorChange: () => void
+  ) {
     this.display = new DisplayUI(
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
@@ -63,12 +72,47 @@ export class BoardUI {
     return this.sensorsById.get(id);
   }
 
-  initialize(options: BoardOptions) {
-    this.audio.initialize(options);
+  initializeWebAssembly() {
+    this.operations.initialize();
+  }
+
+  initialize() {
+    this.audio.initialize({
+      defaultAudioCallback: this.operations.defaultAudioCallback!,
+      speechAudioCallback: this.operations.speechAudioCallback!,
+    });
     this.buttons.forEach((b) => b.initialize());
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();
     this.accelerometer.initialize();
+    this.serialInputBuffer = [];
+  }
+
+  async stop(): Promise<void> {
+    await this.operations.stop();
+    window.board.serialInputBuffer.push(3, 4);
+  }
+
+  async restart(): Promise<void> {
+    await this.operations.stop();
+    this.operations.start();
+  }
+
+  async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
+    await this.operations.stop();
+    this.fs.clear();
+    Object.entries(filesystem).forEach(([name, value]) => {
+      const idx = this.fs.create(name);
+      this.fs.write(idx, value);
+    });
+    console.log(this.fs);
+    return this.operations.start();
+  }
+
+  writeSerial(text: string) {
+    for (let i = 0; i < text.length; i++) {
+      this.serialInputBuffer.push(text.charCodeAt(i));
+    }
   }
 
   dispose() {
@@ -77,6 +121,7 @@ export class BoardUI {
     this.pins.forEach((p) => p.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
+    this.serialInputBuffer = [];
   }
 }
 

@@ -71,6 +71,10 @@ export class FileSystem {
       this.remove(idx);
     }
   }
+
+  toString() {
+    return this._content.toString();
+  }
 }
 
 const EMPTY_ARRAY = new Uint8Array(0);

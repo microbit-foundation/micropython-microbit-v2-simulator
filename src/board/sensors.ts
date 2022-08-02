@@ -1,5 +1,7 @@
-export class Sensor {
+export abstract class Sensor {
   constructor(public type: string, public id: string) {}
+
+  abstract setValue(value: any): void;
 
   protected valueError(value: any) {
     return new Error(

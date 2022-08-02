@@ -28,7 +28,10 @@ mergeInto(LibraryManager.library, {
     mp_js_hal_init: async function() {
         MP_JS_EPOCH = (new Date()).getTime();
         stdin_buffer = [];
-        board.initialize();
+        board.initialize({
+            defaultAudioCallback: window.microbit_hal_audio_ready_callback,
+            speechAudioCallback: window.microbit_hal_audio_speech_ready_callback,
+        });
 
         messageListener = (e) => {
             if (e.source === window.parent) {

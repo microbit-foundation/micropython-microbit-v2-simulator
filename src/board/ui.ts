@@ -15,6 +15,11 @@ export function createBoard(onSensorChange: () => void) {
   return new BoardUI(svg, onSensorChange);
 }
 
+interface BoardOptions {
+  defaultAudioCallback: () => void;
+  speechAudioCallback: () => void;
+}
+
 export class BoardUI {
   private display: DisplayUI;
   private buttons: ButtonUI[];
@@ -58,8 +63,8 @@ export class BoardUI {
     return this.sensorsById.get(id);
   }
 
-  initialize() {
-    this.audio.initialize();
+  initialize(options: BoardOptions) {
+    this.audio.initialize(options);
     this.buttons.forEach((b) => b.initialize());
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();

@@ -1,3 +1,8 @@
+interface AudioUIOptions {
+  defaultAudioCallback: () => void;
+  speechAudioCallback: () => void;
+}
+
 export class AudioUI {
   private frequency: number = 440;
   private context: AudioContext | undefined;
@@ -8,19 +13,13 @@ export class AudioUI {
 
   constructor() {}
 
-  initialize() {
+  initialize({ defaultAudioCallback, speechAudioCallback }: AudioUIOptions) {
     this.context = new AudioContext({
       // Match the regular audio rate.
       sampleRate: 7812 * 4,
     });
-    this.default = new BufferedAudio(
-      this.context,
-      window.microbit_hal_audio_ready_callback
-    );
-    this.speech = new BufferedAudio(
-      this.context,
-      microbit_hal_audio_speech_ready_callback
-    );
+    this.default = new BufferedAudio(this.context, defaultAudioCallback);
+    this.speech = new BufferedAudio(this.context, speechAudioCallback);
   }
 
   setPeriodUs(periodUs: number) {

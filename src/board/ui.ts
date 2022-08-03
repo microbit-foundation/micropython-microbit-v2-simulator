@@ -72,7 +72,7 @@ export class BoardUI {
     return this.sensorsById.get(id);
   }
 
-  initializeWebAssembly() {
+  initializedWebAssembly() {
     this.operations.initialize();
   }
 

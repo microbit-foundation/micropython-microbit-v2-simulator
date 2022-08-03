@@ -27,7 +27,7 @@
 var Module = {};
 
 Module.onRuntimeInitialized = () => {
-  window.board.initializeWebAssembly();
+  window.board.initializedWebAssembly();
   window.parent.postMessage({
     kind: "ready",
     sensors: window.board.sensors,

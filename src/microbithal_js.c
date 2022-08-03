@@ -454,6 +454,7 @@ void microbit_hal_audio_select_speaker(bool enable) {
 
 // Input value has range 0-255 inclusive.
 void microbit_hal_audio_set_volume(int value) {
+    mp_js_hal_audio_set_volume(value);
     /*
     if (value >= 255) {
         uBit.audio.setVolume(128);

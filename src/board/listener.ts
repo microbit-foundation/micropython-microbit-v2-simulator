@@ -78,6 +78,14 @@ export const createMessageListener = (board: BoardUI) => (e: MessageEvent) => {
         board.reset();
         break;
       }
+      case "mute": {
+        board.mute()
+        break;
+      }
+      case "unmute": {
+        board.unmute()
+        break;
+      }
       case "serial_input": {
         if (typeof data.data !== "string") {
           throw new Error("Invalid serial_input data field.");

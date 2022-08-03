@@ -118,6 +118,14 @@ export class BoardUI {
     return this.start();
   }
 
+  mute() {
+    this.audio.mute();
+  }
+
+  unmute() {
+    this.audio.unmute();
+  }
+
   writeSerial(text: string) {
     for (let i = 0; i < text.length; i++) {
       this.serialInputBuffer.push(text.charCodeAt(i));

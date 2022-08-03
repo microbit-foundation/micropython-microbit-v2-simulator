@@ -101,6 +101,8 @@
               <button id="run">Run</button>
               <button id="stop">Stop</button>
               <button id="reset">Reset</button>
+              <button id="mute">Mute</button>
+              <button id="unmute">Unmute</button>
             </div>
           </div>
         </div>
@@ -199,6 +201,24 @@
         simulator.postMessage(
           {
             kind: "reset",
+          },
+          "*"
+        );
+      });
+
+      document.querySelector("#mute").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "mute",
+          },
+          "*"
+        );
+      });
+
+      document.querySelector("#unmute").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "unmute",
           },
           "*"
         );

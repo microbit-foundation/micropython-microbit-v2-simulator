@@ -8,6 +8,8 @@ import { AudioUI } from "./audio";
 import { WebAssemblyOperations } from "./listener";
 import { FileSystem } from "./fs";
 
+const stoppedOpactity = "0.5";
+
 export function createBoard(
   operations: WebAssemblyOperations,
   fs: FileSystem,
@@ -15,9 +17,11 @@ export function createBoard(
 ) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
   const svg = document.querySelector("svg");
+  // We start stopped.
   if (!svg) {
     throw new Error("No SVG");
   }
+  svg.style.opacity = stoppedOpactity;
   return new BoardUI(operations, fs, svg, onSensorChange);
 }
 
@@ -88,14 +92,20 @@ export class BoardUI {
     this.serialInputBuffer.length = 0;
   }
 
+  private start() {
+    this.operations.start();
+    this.svg.style.opacity = "unset";
+  }
+
   async stop(): Promise<void> {
     const interrupt = () => this.serialInputBuffer.push(3, 4); // Ctrl-C, Ctrl-D.
     await this.operations.stop(interrupt);
+    this.svg.style.opacity = stoppedOpactity;
   }
 
   async restart(): Promise<void> {
     await this.stop();
-    this.operations.start();
+    this.start();
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
@@ -105,7 +115,7 @@ export class BoardUI {
       const idx = this.fs.create(name);
       this.fs.write(idx, value);
     });
-    return this.operations.start();
+    return this.start();
   }
 
   writeSerial(text: string) {

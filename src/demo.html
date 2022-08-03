@@ -45,23 +45,6 @@
       iframe {
         padding: 0.5em 2em;
       }
-      #simulator-container {
-        position: relative
-      }
-      #overlay {
-        margin: 0.5em auto;
-        box-sizing: border-box;
-        width: calc(100% - 4em);
-        height: 100%;
-        background-color: gray;
-        opacity: 0.5;
-        position: absolute;
-        top: 0;
-        left: 2em;
-      }
-      .hidden {
-        display: none
-      }
       #sensors {
         padding: 0.5em 2em;
       }
@@ -82,16 +65,13 @@
       <h1>MicroPython-micro:bit simulator example embedding</h1>
       <div class="row">
         <div class="simulator column">
-          <div id="simulator-container">
-            <iframe
+          <iframe
             id="simulator"
             src="simulator.html"
             title="Simulator"
             frameborder="0"
             scrolling="no"
-            ></iframe>
-            <div id="overlay"></div>
-          </div>
+          ></iframe>
           <div id="sensors" class="column"></div>
         </div>
         <div class="column">
@@ -204,9 +184,8 @@
           },
           "*"
         );
-        document.querySelector("#overlay").classList.add("hidden")
       });
-      
+
       document.querySelector("#stop").addEventListener("click", async () => {
         simulator.postMessage(
           {
@@ -214,7 +193,6 @@
           },
           "*"
         );
-        document.querySelector("#overlay").classList.remove("hidden")
       });
 
       document.querySelector("#restart").addEventListener("click", async () => {
@@ -224,7 +202,6 @@
           },
           "*"
         );
-        document.querySelector("#overlay").classList.add("hidden")
       });
 
       function createSensorUI(sensors) {

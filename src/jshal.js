@@ -42,11 +42,7 @@ mergeInto(LibraryManager.library, {
     },
 
     mp_js_hal_stdin_pop_char: function() {
-        if (board.serialInputBuffer.length > 0) {
-            return board.serialInputBuffer.shift();
-        } else {
-            return -1;
-        }
+        return board.readSerial();
     },
 
     mp_js_hal_stdout_tx_strn: function(ptr, len) {

@@ -39,10 +39,10 @@ export class WebAssemblyOperations {
     this.stoppedPromise = this.main!();
   }
 
-  async stop(): Promise<void> {
+  async stop(interrupt: () => void): Promise<void> {
     if (this.stoppedPromise) {
       this._requestStop!();
-      window.board.serialInputBuffer.push(3, 4);
+      interrupt();
       await this.stoppedPromise;
       this.stoppedPromise = undefined;
     }

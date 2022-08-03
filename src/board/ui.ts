@@ -85,21 +85,21 @@ export class BoardUI {
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();
     this.accelerometer.initialize();
-    this.serialInputBuffer = [];
+    this.serialInputBuffer.length = 0;
   }
 
   async stop(): Promise<void> {
-    await this.operations.stop();
-    window.board.serialInputBuffer.push(3, 4);
+    const interrupt = () => this.serialInputBuffer.push(3, 4); // Ctrl-C, Ctrl-D.
+    await this.operations.stop(interrupt);
   }
 
   async restart(): Promise<void> {
-    await this.operations.stop();
+    await this.stop();
     this.operations.start();
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
-    await this.operations.stop();
+    await this.stop();
     this.fs.clear();
     Object.entries(filesystem).forEach(([name, value]) => {
       const idx = this.fs.create(name);
@@ -114,13 +114,20 @@ export class BoardUI {
     }
   }
 
+  /**
+   * Read a character code from the serial buffer or -1 if none.
+   */
+  readSerial(): number {
+    return this.serialInputBuffer.shift() ?? -1;
+  }
+
   dispose() {
     this.audio.dispose();
     this.buttons.forEach((b) => b.dispose());
     this.pins.forEach((p) => p.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
-    this.serialInputBuffer = [];
+    this.serialInputBuffer.length = 0;
   }
 }
 

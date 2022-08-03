@@ -45,6 +45,23 @@
       iframe {
         padding: 0.5em 2em;
       }
+      #simulator-container {
+        position: relative
+      }
+      #overlay {
+        margin: 0.5em auto;
+        box-sizing: border-box;
+        width: calc(100% - 4em);
+        height: 100%;
+        background-color: gray;
+        opacity: 0.5;
+        position: absolute;
+        top: 0;
+        left: 2em;
+      }
+      .hidden {
+        display: none
+      }
       #sensors {
         padding: 0.5em 2em;
       }
@@ -54,6 +71,10 @@
         justify-content: space-between;
         align-items: center;
       }
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
     </style>
   </head>
   <body>
@@ -61,13 +82,16 @@
       <h1>MicroPython-micro:bit simulator example embedding</h1>
       <div class="row">
         <div class="simulator column">
-          <iframe
+          <div id="simulator-container">
+            <iframe
             id="simulator"
             src="simulator.html"
             title="Simulator"
             frameborder="0"
             scrolling="no"
-          ></iframe>
+            ></iframe>
+            <div id="overlay"></div>
+          </div>
           <div id="sensors" class="column"></div>
         </div>
         <div class="column">
@@ -93,7 +117,11 @@
               autocomplete="false"
             >
             </textarea>
-            <button id="run">Run</button>
+            <div class="actions">
+              <button id="run">Run</button>
+              <button id="stop">Stop</button>
+              <button id="restart">Restart</button>
+            </div>
           </div>
         </div>
       </div>
@@ -176,6 +204,27 @@
           },
           "*"
         );
+        document.querySelector("#overlay").classList.add("hidden")
+      });
+      
+      document.querySelector("#stop").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "stop",
+          },
+          "*"
+        );
+        document.querySelector("#overlay").classList.remove("hidden")
+      });
+
+      document.querySelector("#restart").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "restart",
+          },
+          "*"
+        );
+        document.querySelector("#overlay").classList.add("hidden")
       });
 
       function createSensorUI(sensors) {

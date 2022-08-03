@@ -86,7 +86,7 @@ export const createMessageListener = (board: BoardUI) => (e: MessageEvent) => {
         break;
       }
       case "sensor_set": {
-        const sensor = window.board.getSensor(data.sensor);
+        const sensor = board.getSensor(data.sensor);
         const value = data.value;
         if (!sensor) {
           throw new Error(`Invalid set_sensor sensor field: ${data.sensor}`);

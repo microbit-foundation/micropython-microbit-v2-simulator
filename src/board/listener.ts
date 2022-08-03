@@ -74,8 +74,8 @@ export const createMessageListener = (board: BoardUI) => (e: MessageEvent) => {
         board.stop();
         break;
       }
-      case "restart": {
-        board.restart();
+      case "reset": {
+        board.reset();
         break;
       }
       case "serial_input": {

@@ -100,7 +100,7 @@
             <div class="actions">
               <button id="run">Run</button>
               <button id="stop">Stop</button>
-              <button id="restart">Restart</button>
+              <button id="reset">Reset</button>
             </div>
           </div>
         </div>
@@ -195,10 +195,10 @@
         );
       });
 
-      document.querySelector("#restart").addEventListener("click", async () => {
+      document.querySelector("#reset").addEventListener("click", async () => {
         simulator.postMessage(
           {
-            kind: "restart",
+            kind: "reset",
           },
           "*"
         );

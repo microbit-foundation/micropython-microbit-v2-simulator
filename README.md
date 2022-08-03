@@ -1,7 +1,6 @@
-MicroPython-micro:bit simulator
-===============================
+# MicroPython-micro:bit simulator
 
-This is a variant of codal_port which is compiled with Emscripten.  It
+This is a variant of codal_port which is compiled with Emscripten. It
 provides a simulated micro:bit REPL in the browser.
 
 To build, first fetch the submodules (don't use recursive fetch):
@@ -39,11 +38,11 @@ via an iframe.
 The page to embed is http://localhost:8000/simulator.html
 
 The iframe provides the micro:bit board user interface and some limited
-interactions. It does not provide a terminal for serial output or the 
+interactions. It does not provide a terminal for serial output or the
 REPL or any UI for the sensors.
 
 [demo.html](./src/demo.html) is an example of embedding the simulator.
-It connects the iframe to a terminal and provides a simple interface for 
+It connects the iframe to a terminal and provides a simple interface for
 sensors.
 
 The following sections documents the messages supported via postMessage.
@@ -62,17 +61,17 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
-  "kind": "ready", 
-  "sensors": [ 
-    { 
-      "id": "lightLevel", 
-      "type": "range", 
-      "min": 0, 
+{
+  "kind": "ready",
+  "sensors": [
+    {
+      "id": "lightLevel",
+      "type": "range",
+      "min": 0,
       "max": 255
     }
     // More sensors here.
-  ] 
+  ]
 }
 ```
 
@@ -82,15 +81,14 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
+{
   "kind": "serial_output",
-  "data": "text" 
+  "data": "text"
 }
 ```
 
 <td>Serial output suitable for a terminal or other use.
 </table>
-
 
 ## Messages supported by the iframe
 
@@ -106,7 +104,7 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
+{
   "kind": "flash",
   "filesystem": {
     "main.py": new TextEncoder().encode("# your program here")
@@ -121,7 +119,7 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
+{
   "kind": "stop"
 }
 ```
@@ -133,7 +131,7 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
+{
   "kind": "restart"
 }
 ```
@@ -145,7 +143,7 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
+{
   "kind": "serial_input",
   "data": "text"
 }
@@ -157,10 +155,10 @@ The following sections documents the messages supported via postMessage.
 <td>
 
 ```javascript
-{ 
+{
   "kind": "sensor_set",
   "sensor": "lightLevel",
-  "value": 255 
+  "value": 255
 }
 ```
 

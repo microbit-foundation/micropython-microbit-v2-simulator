@@ -103,7 +103,7 @@ export class BoardUI {
     this.svg.style.opacity = stoppedOpactity;
   }
 
-  async restart(): Promise<void> {
+  async reset(): Promise<void> {
     await this.stop();
     this.start();
   }

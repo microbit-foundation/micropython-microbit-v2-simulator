@@ -129,16 +129,16 @@ The following sections documents the messages supported via postMessage.
 <td>Stop the program.<tr>
 
 <tr>
-<td>restart
+<td>reset
 <td>
 
 ```javascript
 { 
-  "kind": "restart"
+  "kind": "reset"
 }
 ```
 
-<td>Restart the program.<tr>
+<td>Reset the program.<tr>
 
 <tr>
 <td>serial_input

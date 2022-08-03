@@ -105,7 +105,6 @@ export class BoardUI {
       const idx = this.fs.create(name);
       this.fs.write(idx, value);
     });
-    console.log(this.fs);
     return this.operations.start();
   }
 

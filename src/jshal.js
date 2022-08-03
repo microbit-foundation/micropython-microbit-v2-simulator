@@ -27,60 +27,14 @@
 mergeInto(LibraryManager.library, {
     mp_js_hal_init: async function() {
         MP_JS_EPOCH = (new Date()).getTime();
-        stdin_buffer = [];
         board.initialize({
             defaultAudioCallback: window.microbit_hal_audio_ready_callback,
             speechAudioCallback: window.microbit_hal_audio_speech_ready_callback,
         });
-
-        messageListener = (e) => {
-            if (e.source === window.parent) {
-                const { data } = e;
-                switch (data.kind) {
-                    case "flash": {
-                        if (data.filesystem) {
-                            fs.clear();
-                            Object.entries(data.filesystem).forEach(([name, value]) => {
-                                const idx = fs.create(name);
-                                fs.write(idx, value)
-                            });
-                            // Ctrl-C, Ctrl-D to restart.
-                            // Can/should we do this programatically?
-                            stdin_buffer.push(3, 4);
-                        }
-                        break;
-                    }
-                    case "serial_input": {
-                        const text = data.data;
-                        for (let i = 0; i < text.length; i++) {
-                            stdin_buffer.push(text.charCodeAt(i));
-                        }
-                        break;
-                    }
-                    case "sensor_set": {
-                        const sensor = board.getSensor(data.sensor);
-                        const value = data.value;
-                        if (sensor) {
-                            sensor.setValue(value);
-                        }
-                        break;
-                    }
-                }
-            }
-        };
-        window.addEventListener("message", messageListener);
-        window.parent.postMessage({
-            kind: "ready",
-            sensors: board.sensors,
-        }, "*")
     },
 
     mp_js_hal_deinit: function() {
         board.dispose();
-        if (messageListener) {
-            window.removeEventListener("message", messageListener);
-            messageListener = null;
-        }
     },
 
     mp_js_hal_ticks_ms: function() {
@@ -88,11 +42,7 @@ mergeInto(LibraryManager.library, {
     },
 
     mp_js_hal_stdin_pop_char: function() {
-        if (stdin_buffer.length > 0) {
-            return stdin_buffer.shift();
-        } else {
-            return -1;
-        }
+        return board.readSerial();
     },
 
     mp_js_hal_stdout_tx_strn: function(ptr, len) {

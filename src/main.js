@@ -26,24 +26,10 @@
 
 var Module = {};
 
-var mainProgram = async function() {
-    // Prior to this we have initialized window.{fs, board} via pre.ts
-    window.microbit_hal_audio_ready_callback = Module.cwrap(
-      "microbit_hal_audio_ready_callback",
-      "null",
-      [],
-      {}
-    );
-
-    window.microbit_hal_audio_speech_ready_callback = Module.cwrap(
-      "microbit_hal_audio_speech_ready_callback",
-      "null",
-      [],
-      {}
-    );
-
-    mp_js_main = Module.cwrap('mp_js_main', 'null', ['number'], {async: true});
-    mp_js_main(64 * 1024);
-}
-
-Module["onRuntimeInitialized"] = mainProgram;
+Module.onRuntimeInitialized = () => {
+  window.board.initializedWebAssembly();
+  window.parent.postMessage({
+    kind: "ready",
+    sensors: window.board.sensors,
+  }, "*")
+};

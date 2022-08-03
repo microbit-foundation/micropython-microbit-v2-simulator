@@ -54,6 +54,10 @@
         justify-content: space-between;
         align-items: center;
       }
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
     </style>
   </head>
   <body>
@@ -93,7 +97,11 @@
               autocomplete="false"
             >
             </textarea>
-            <button id="run">Run</button>
+            <div class="actions">
+              <button id="run">Run</button>
+              <button id="stop">Stop</button>
+              <button id="restart">Restart</button>
+            </div>
           </div>
         </div>
       </div>
@@ -173,6 +181,24 @@
             filesystem: {
               "main.py": new TextEncoder().encode(program.value),
             },
+          },
+          "*"
+        );
+      });
+
+      document.querySelector("#stop").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "stop",
+          },
+          "*"
+        );
+      });
+
+      document.querySelector("#restart").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "restart",
           },
           "*"
         );

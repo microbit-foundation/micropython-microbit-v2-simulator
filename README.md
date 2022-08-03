@@ -115,6 +115,31 @@ The following sections documents the messages supported via postMessage.
 ```
 
 <td>Update the micro:bit filesystem and restart the program.
+
+<tr>
+<td>stop
+<td>
+
+```javascript
+{ 
+  "kind": "stop"
+}
+```
+
+<td>Stop the program.<tr>
+
+<tr>
+<td>restart
+<td>
+
+```javascript
+{ 
+  "kind": "restart"
+}
+```
+
+<td>Restart the program.<tr>
+
 <tr>
 <td>serial_input
 <td>

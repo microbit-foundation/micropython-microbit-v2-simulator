@@ -125,7 +125,7 @@ class BufferedAudio {
     source.onended = this.callback;
     source.connect(this.destination);
     const currentTime = this.context.currentTime;
-    let first = this.nextStartTime < currentTime;
+    const first = this.nextStartTime < currentTime;
     const startTime = first ? currentTime : this.nextStartTime;
     this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
     // For audio frames, we're frequently out of data. Speech is smooth.

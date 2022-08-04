@@ -57,6 +57,7 @@ int mp_js_hal_accelerometer_get_z(void);
 int mp_js_hal_accelerometer_get_gesture(void);
 void mp_js_hal_accelerometer_set_range(int r);
 
+void mp_js_hal_audio_set_volume(int value);
 void mp_js_hal_audio_init(uint32_t sample_rate);
 void mp_js_hal_audio_write_data(const uint8_t *buf, size_t num_samples);
 void mp_js_hal_audio_speech_init(uint32_t sample_rate);

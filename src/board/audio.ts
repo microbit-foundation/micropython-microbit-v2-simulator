@@ -5,11 +5,12 @@ interface AudioUIOptions {
 
 export class AudioUI {
   private frequency: number = 440;
-  private programVolume: number = 0;
+  // You can mute the sim before it's running so we can't immediately write to the muteNode.
   private muted: boolean = false;
   private context: AudioContext | undefined;
   private oscillator: OscillatorNode | undefined;
-  private gainNode: GainNode | undefined;
+  private volumeNode: GainNode | undefined;
+  private muteNode: GainNode | undefined;
 
   default: BufferedAudio | undefined;
   speech: BufferedAudio | undefined;
@@ -21,49 +22,47 @@ export class AudioUI {
       // Match the regular audio rate.
       sampleRate: 7812 * 4,
     });
-    this.programVolume = 128;
-    this.gainNode = this.context.createGain();
-    this.gainNode.connect(this.context.destination);
-    this.setVolume(this.programVolume, true);
+
+    this.muteNode = this.context.createGain();
+    this.muteNode.gain.setValueAtTime(
+      this.muted ? 0 : 1,
+      this.context.currentTime
+    );
+    this.muteNode.connect(this.context.destination);
+    this.volumeNode = this.context.createGain();
+    this.volumeNode.connect(this.muteNode);
+
     this.default = new BufferedAudio(
       this.context,
-      this.gainNode,
+      this.volumeNode,
       defaultAudioCallback
     );
     this.speech = new BufferedAudio(
       this.context,
-      this.gainNode,
+      this.volumeNode,
       speechAudioCallback
     );
   }
 
   mute() {
     this.muted = true;
-    this.setVolume(0, true);
+    if (this.muteNode) {
+      this.muteNode.gain.setValueAtTime(0, this.context!.currentTime);
+    }
   }
 
   unmute() {
     this.muted = false;
-    this.setVolume(this.programVolume, true);
+    if (this.muteNode) {
+      this.muteNode!.gain.setValueAtTime(1, this.context!.currentTime);
+    }
   }
 
-  /**
-   * Maps device volume range to sensible Web Audio gain output.
-   * @param volume 0 - 255
-   * @returns 0 - 1
-   */
-  private convertDeviceVolumeToGain(volume: number) {
-    return volume / 255;
-  }
-
-  setVolume(volume: number, deviceOverride: boolean = false) {
-    if (!deviceOverride) {
-      this.programVolume = volume;
-    }
-    if (this.gainNode && this.context) {
-      const value = this.muted ? 0 : this.convertDeviceVolumeToGain(volume);
-      this.gainNode.gain.setValueAtTime(value, this.context.currentTime);
-    }
+  setVolume(volume: number) {
+    this.volumeNode!.gain.setValueAtTime(
+      volume / 255,
+      this.context!.currentTime
+    );
   }
 
   setPeriodUs(periodUs: number) {
@@ -81,7 +80,7 @@ export class AudioUI {
     if (amplitudeU10) {
       this.oscillator = this.context!.createOscillator();
       this.oscillator.type = "sine";
-      this.oscillator.connect(this.context!.destination);
+      this.oscillator.connect(this.volumeNode!);
       this.oscillator.frequency.value = this.frequency;
       this.oscillator.start();
     }
@@ -102,7 +101,7 @@ class BufferedAudio {
 
   constructor(
     private context: AudioContext,
-    private gainNode: GainNode,
+    private destination: AudioNode,
     private callback: () => void
   ) {}
 
@@ -124,7 +123,7 @@ class BufferedAudio {
       buffer,
     });
     source.onended = this.callback;
-    source.connect(this.gainNode);
+    source.connect(this.destination);
     const currentTime = this.context.currentTime;
     let first = this.nextStartTime < currentTime;
     const startTime = first ? currentTime : this.nextStartTime;

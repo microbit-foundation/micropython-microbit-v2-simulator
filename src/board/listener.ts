@@ -79,11 +79,11 @@ export const createMessageListener = (board: BoardUI) => (e: MessageEvent) => {
         break;
       }
       case "mute": {
-        board.mute()
+        board.mute();
         break;
       }
       case "unmute": {
-        board.unmute()
+        board.unmute();
         break;
       }
       case "serial_input": {

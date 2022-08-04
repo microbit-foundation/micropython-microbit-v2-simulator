@@ -173,7 +173,7 @@ mergeInto(LibraryManager.library, {
     board.accelerometer.setRange(r);
   },
 
-  mp_js_hal_audio_set_volume: function(value) {
+  mp_js_hal_audio_set_volume: function (value) {
     board.audio.setVolume(value);
   },
 

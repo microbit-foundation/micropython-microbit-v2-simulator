@@ -23,19 +23,28 @@ export class AudioUI {
     });
     this.programVolume = 128;
     this.gainNode = this.context.createGain();
-    this.setVolume(this.programVolume, true)
-    this.default = new BufferedAudio(this.context, this.gainNode, defaultAudioCallback);
-    this.speech = new BufferedAudio(this.context,this.gainNode, speechAudioCallback);
+    this.gainNode.connect(this.context.destination);
+    this.setVolume(this.programVolume, true);
+    this.default = new BufferedAudio(
+      this.context,
+      this.gainNode,
+      defaultAudioCallback
+    );
+    this.speech = new BufferedAudio(
+      this.context,
+      this.gainNode,
+      speechAudioCallback
+    );
   }
 
   mute() {
     this.muted = true;
-    this.setVolume(0, true)
+    this.setVolume(0, true);
   }
 
   unmute() {
     this.muted = false;
-    this.setVolume(this.programVolume, true)
+    this.setVolume(this.programVolume, true);
   }
 
   /**
@@ -44,19 +53,16 @@ export class AudioUI {
    * @returns 0 - 1
    */
   private convertDeviceVolumeToGain(volume: number) {
-    if (!volume) {
-      return 0
-    }
     return volume / 255;
   }
 
   setVolume(volume: number, deviceOverride: boolean = false) {
-    if(!deviceOverride) {
-      this.programVolume = volume
+    if (!deviceOverride) {
+      this.programVolume = volume;
     }
     if (this.gainNode && this.context) {
       const value = this.muted ? 0 : this.convertDeviceVolumeToGain(volume);
-      this.gainNode.gain.setValueAtTime(value, this.context.currentTime)
+      this.gainNode.gain.setValueAtTime(value, this.context.currentTime);
     }
   }
 
@@ -94,7 +100,11 @@ class BufferedAudio {
   nextStartTime: number = -1;
   private sampleRate: number = -1;
 
-  constructor(private context: AudioContext, private gainNode: GainNode, private callback: () => void) {}
+  constructor(
+    private context: AudioContext,
+    private gainNode: GainNode,
+    private callback: () => void
+  ) {}
 
   init(sampleRate: number) {
     this.sampleRate = sampleRate;
@@ -114,7 +124,6 @@ class BufferedAudio {
       buffer,
     });
     source.onended = this.callback;
-    this.gainNode.connect(this.context.destination);
     source.connect(this.gainNode);
     const currentTime = this.context.currentTime;
     let first = this.nextStartTime < currentTime;

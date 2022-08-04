@@ -5,7 +5,7 @@ interface AudioUIOptions {
 
 export class AudioUI {
   private frequency: number = 440;
-  private programVolume: number = 128;
+  private programVolume: number = 0;
   private muted: boolean = false;
   private context: AudioContext | undefined;
   private oscillator: OscillatorNode | undefined;
@@ -21,6 +21,7 @@ export class AudioUI {
       // Match the regular audio rate.
       sampleRate: 7812 * 4,
     });
+    this.programVolume = 128;
     this.gainNode = this.context.createGain();
     this.setVolume(this.programVolume, true)
     this.default = new BufferedAudio(this.context, this.gainNode, defaultAudioCallback);

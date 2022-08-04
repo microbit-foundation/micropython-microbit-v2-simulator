@@ -7,6 +7,7 @@ export class WebAssemblyOperations {
 
   defaultAudioCallback: (() => void) | undefined;
   speechAudioCallback: (() => void) | undefined;
+  gestureCallback: ((gesture: number) => void) | undefined;
 
   initialize() {
     const cwrap = (window as any).Module.cwrap;
@@ -23,6 +24,13 @@ export class WebAssemblyOperations {
       "microbit_hal_audio_speech_ready_callback",
       "null",
       [],
+      {}
+    );
+
+    this.gestureCallback = cwrap(
+      "microbit_hal_gesture_callback",
+      "null",
+      ["number"],
       {}
     );
 
@@ -53,7 +61,7 @@ export const onSensorChange = () =>
   window.parent.postMessage(
     {
       kind: "sensor_change",
-      sensors: window.board.sensors,
+      sensors: window.board.sensors.map((s) => s.toSerializable()),
     },
     "*"
   );

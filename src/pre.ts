@@ -1,18 +1,16 @@
-import { createBoard, BoardUI } from "./board/ui";
-import { FileSystem } from "./board/fs";
-import * as constants from "./board/constants";
 import * as conversions from "./board/conversions";
+import { FileSystem } from "./board/fs";
 import {
   createMessageListener,
   onSensorChange,
   WebAssemblyOperations,
 } from "./board/listener";
+import { BoardUI, createBoard } from "./board/ui";
 
 declare global {
   interface Window {
     board: BoardUI;
     fs: FileSystem;
-    constants: typeof constants;
     conversions: typeof conversions;
 
     HEAPU8: Uint8Array;
@@ -26,7 +24,6 @@ window.board = createBoard(
   window.fs,
   onSensorChange
 );
-window.constants = constants;
 window.conversions = conversions;
 
 window.addEventListener("message", createMessageListener(window.board));

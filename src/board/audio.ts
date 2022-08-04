@@ -37,21 +37,25 @@ export class AudioUI {
     this.setVolume(this.programVolume, true)
   }
 
-  private convertVolumeValue(volume: number) {
+  /**
+   * Maps device volume range to sensible Web Audio gain output.
+   * @param volume 0 - 255
+   * @returns 0 - 1
+   */
+  private convertDeviceVolumeToGain(volume: number) {
     if (!volume) {
       return 0
     }
     return volume / 255;
   }
 
-  setVolume(volume: number, override: boolean = false) {
-    if(!override) {
+  setVolume(volume: number, deviceOverride: boolean = false) {
+    if(!deviceOverride) {
       this.programVolume = volume
     }
-    const value = this.muted ? 0 : this.convertVolumeValue(volume);
-    if (this.gainNode) {
-      // Start time hacked to zero temporarily.
-      this.gainNode.gain.setValueAtTime(value, this.context?.currentTime || 0)
+    if (this.gainNode && this.context) {
+      const value = this.muted ? 0 : this.convertDeviceVolumeToGain(volume);
+      this.gainNode.gain.setValueAtTime(value, this.context.currentTime)
     }
   }
 

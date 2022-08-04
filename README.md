@@ -139,6 +139,30 @@ The following sections documents the messages supported via postMessage.
 <td>Reset the program.<tr>
 
 <tr>
+<td>mute
+<td>
+
+```javascript
+{
+  "kind": "mute"
+}
+```
+
+<td>Mute the simulator.<tr>
+
+<tr>
+<td>unmute
+<td>
+
+```javascript
+{
+  "kind": "unmute"
+}
+```
+
+<td>Unmute the simulator.<tr>
+
+<tr>
 <td>serial_input
 <td>
 

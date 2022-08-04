@@ -25,186 +25,189 @@
  */
 
 mergeInto(LibraryManager.library, {
-    mp_js_hal_init: async function() {
-        MP_JS_EPOCH = (new Date()).getTime();
-        board.initialize({
-            defaultAudioCallback: window.microbit_hal_audio_ready_callback,
-            speechAudioCallback: window.microbit_hal_audio_speech_ready_callback,
-        });
-    },
+  mp_js_hal_init: async function () {
+    MP_JS_EPOCH = new Date().getTime();
+    board.initialize({
+      defaultAudioCallback: window.microbit_hal_audio_ready_callback,
+      speechAudioCallback: window.microbit_hal_audio_speech_ready_callback,
+    });
+  },
 
-    mp_js_hal_deinit: function() {
-        board.dispose();
-    },
+  mp_js_hal_deinit: function () {
+    board.dispose();
+  },
 
-    mp_js_hal_ticks_ms: function() {
-        return (new Date()).getTime() - MP_JS_EPOCH;
-    },
+  mp_js_hal_ticks_ms: function () {
+    return new Date().getTime() - MP_JS_EPOCH;
+  },
 
-    mp_js_hal_stdin_pop_char: function() {
-        return board.readSerial();
-    },
+  mp_js_hal_stdin_pop_char: function () {
+    return board.readSerial();
+  },
 
-    mp_js_hal_stdout_tx_strn: function(ptr, len) {
-        const data = UTF8ToString(ptr, len);
-        window.parent.postMessage({
-            kind: "serial_output",
-            data
-        }, "*");
-    },
+  mp_js_hal_stdout_tx_strn: function (ptr, len) {
+    const data = UTF8ToString(ptr, len);
+    window.parent.postMessage(
+      {
+        kind: "serial_output",
+        data,
+      },
+      "*"
+    );
+  },
 
-    mp_js_hal_filesystem_find: function(name, len) {
-        return fs.find(UTF8ToString(name, len));
-    },
+  mp_js_hal_filesystem_find: function (name, len) {
+    return fs.find(UTF8ToString(name, len));
+  },
 
-    mp_js_hal_filesystem_create: function(name, len) {
-        const filename = UTF8ToString(name, len);
-        return fs.create(filename);
-    },
+  mp_js_hal_filesystem_create: function (name, len) {
+    const filename = UTF8ToString(name, len);
+    return fs.create(filename);
+  },
 
-    mp_js_hal_filesystem_name: function(idx, buf) {
-        const name = fs.name(idx);
-        if (name === undefined) {
-            return -1;
-        }
-        const len = lengthBytesUTF8(name);
-        stringToUTF8(name, buf, len + 1);
-        return len;
-    },
+  mp_js_hal_filesystem_name: function (idx, buf) {
+    const name = fs.name(idx);
+    if (name === undefined) {
+      return -1;
+    }
+    const len = lengthBytesUTF8(name);
+    stringToUTF8(name, buf, len + 1);
+    return len;
+  },
 
-    mp_js_hal_filesystem_size: function(idx) {
-        return fs.size(idx);
-    },
+  mp_js_hal_filesystem_size: function (idx) {
+    return fs.size(idx);
+  },
 
-    mp_js_hal_filesystem_remove: function(idx) {
-        return fs.remove(idx);
-    },
+  mp_js_hal_filesystem_remove: function (idx) {
+    return fs.remove(idx);
+  },
 
-    mp_js_hal_filesystem_readbyte: function(idx, offset) {
-        return fs.readbyte(idx, offset);
-    },
+  mp_js_hal_filesystem_readbyte: function (idx, offset) {
+    return fs.readbyte(idx, offset);
+  },
 
-    mp_js_hal_filesystem_write: function(idx, buf, len) {
-        const data = new Uint8Array(HEAP8.buffer, buf, len);
-        return fs.write(idx, data);
-    },
+  mp_js_hal_filesystem_write: function (idx, buf, len) {
+    const data = new Uint8Array(HEAP8.buffer, buf, len);
+    return fs.write(idx, data);
+  },
 
-    mp_js_hal_temperature: function() {
-        return board.temperature.value;
-    },
+  mp_js_hal_temperature: function () {
+    return board.temperature.value;
+  },
 
-    mp_js_hal_button_get_presses: function(button) {
-        return board.buttons[button].getAndClearPresses()
-    },
+  mp_js_hal_button_get_presses: function (button) {
+    return board.buttons[button].getAndClearPresses();
+  },
 
-    mp_js_hal_button_is_pressed: function(button) {
-        return board.buttons[button].isPressed();
-    },
+  mp_js_hal_button_is_pressed: function (button) {
+    return board.buttons[button].isPressed();
+  },
 
-    mp_js_hal_pin_is_touched: function(pin) {
-        return board.pins[pin].isTouched();
-    },
+  mp_js_hal_pin_is_touched: function (pin) {
+    return board.pins[pin].isTouched();
+  },
 
-    mp_js_hal_display_get_pixel: function(x, y) {
-        return board.display.getPixel(x, y);
-    },
+  mp_js_hal_display_get_pixel: function (x, y) {
+    return board.display.getPixel(x, y);
+  },
 
-    mp_js_hal_display_set_pixel: function(x, y, value) {
-        board.display.setPixel(x, y, value);
-    },
+  mp_js_hal_display_set_pixel: function (x, y, value) {
+    board.display.setPixel(x, y, value);
+  },
 
-    mp_js_hal_display_clear: function() {
-        board.display.clear();
-    },
+  mp_js_hal_display_clear: function () {
+    board.display.clear();
+  },
 
-    mp_js_hal_display_read_light_level: function() {
-        return board.display.lightLevel.value;
-    },
+  mp_js_hal_display_read_light_level: function () {
+    return board.display.lightLevel.value;
+  },
 
-    mp_js_hal_accelerometer_get_x: function() {
-        return board.accelerometer.x.value;
-    },
+  mp_js_hal_accelerometer_get_x: function () {
+    return board.accelerometer.x.value;
+  },
 
-    mp_js_hal_accelerometer_get_y: function() {
-        return board.accelerometer.y.value;
-    },
+  mp_js_hal_accelerometer_get_y: function () {
+    return board.accelerometer.y.value;
+  },
 
-    mp_js_hal_accelerometer_get_z: function() {
-        return board.accelerometer.z.value;
-    },
+  mp_js_hal_accelerometer_get_z: function () {
+    return board.accelerometer.z.value;
+  },
 
-    mp_js_hal_accelerometer_get_gesture: function() {
-        // Equivalent to gesture_name_map.
-        // Is there a way to access e.g. MICROBIT_HAL_ACCELEROMETER_EVT_NONE ?
-        switch (board.accelerometer.gesture.value) {
-            case "none":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_NONE;
-            case "up":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP;
-            case "down":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_DOWN;
-            case "left":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT;
-            case "right":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT;
-            case "face up":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FACE_UP;
-            case "face down":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FACE_DOWN;
-            case "freefall":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FREEFALL;
-            case "2g":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_2G;
-            case "3g":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_3G;
-            case "6g":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_6G
-            case "8g":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_8G
-            case "shake":
-                return constants.MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE;
-        }
+  mp_js_hal_accelerometer_get_gesture: function () {
+    // Equivalent to gesture_name_map.
+    // Is there a way to access e.g. MICROBIT_HAL_ACCELEROMETER_EVT_NONE ?
+    switch (board.accelerometer.gesture.value) {
+      case "none":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_NONE;
+      case "up":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP;
+      case "down":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_DOWN;
+      case "left":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT;
+      case "right":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT;
+      case "face up":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FACE_UP;
+      case "face down":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FACE_DOWN;
+      case "freefall":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_FREEFALL;
+      case "2g":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_2G;
+      case "3g":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_3G;
+      case "6g":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_6G;
+      case "8g":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_8G;
+      case "shake":
+        return constants.MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE;
+    }
+  },
 
-    },
+  mp_js_hal_accelerometer_set_range: function (r) {
+    board.accelerometer.setRange(r);
+  },
 
-    mp_js_hal_accelerometer_set_range: function(r) {
-        board.accelerometer.setRange(r)
-    },
+  mp_js_hal_audio_set_volume: function(value) {
+    board.audio.setVolume(value);
+  },
 
-    mp_js_hal_audio_set_volume: function(value) {
-        board.audio.setVolume(value)
-    },
+  mp_js_hal_audio_init: function (sample_rate) {
+    board.audio.default.init(sample_rate);
+  },
 
-    mp_js_hal_audio_init: function(sample_rate) {
-        board.audio.default.init(sample_rate);
-    },
+  mp_js_hal_audio_write_data: function (buf, num_samples) {
+    board.audio.default.writeData(
+      conversions.convertAudioBuffer(
+        buf,
+        board.audio.default.createBuffer(num_samples)
+      )
+    );
+  },
 
-    mp_js_hal_audio_write_data: function(buf, num_samples) {
-        board.audio.default.writeData(
-            conversions.convertAudioBuffer(buf, 
-                board.audio.default.createBuffer(num_samples)
-            )
-        );
-    },
+  mp_js_hal_audio_speech_init: function (sample_rate) {
+    board.audio.speech.init(sample_rate);
+  },
 
-    mp_js_hal_audio_speech_init: function(sample_rate) {
-        board.audio.speech.init(sample_rate);
-    },
+  mp_js_hal_audio_speech_write_data: function (buf, num_samples) {
+    board.audio.speech.writeData(
+      conversions.convertAudioBuffer(
+        buf,
+        board.audio.speech.createBuffer(num_samples)
+      )
+    );
+  },
 
-    mp_js_hal_audio_speech_write_data: function(buf, num_samples) {
-        board.audio.speech.writeData(
-            conversions.convertAudioBuffer(buf, 
-                board.audio.speech.createBuffer(num_samples)
-            )
-        );
-    },
+  mp_js_hal_audio_period_us: function (period_us) {
+    board.audio.setPeriodUs(period_us);
+  },
 
-    mp_js_hal_audio_period_us: function(period_us) {
-        board.audio.setPeriodUs(period_us);
-    },
-
-    mp_js_hal_audio_amplitude_u10: function(amplitude_u10) {
-        board.audio.setAmplitudeU10(amplitude_u10);
-    },
-
+  mp_js_hal_audio_amplitude_u10: function (amplitude_u10) {
+    board.audio.setAmplitudeU10(amplitude_u10);
+  },
 });

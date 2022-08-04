@@ -28,8 +28,11 @@ var Module = {};
 
 Module.onRuntimeInitialized = () => {
   window.board.initializedWebAssembly();
-  window.parent.postMessage({
-    kind: "ready",
-    sensors: window.board.sensors,
-  }, "*")
+  window.parent.postMessage(
+    {
+      kind: "ready",
+      sensors: window.board.sensors,
+    },
+    "*"
+  );
 };

@@ -22,29 +22,7 @@ export function createBoard(
   if (!svg) {
     throw new Error("No SVG");
   }
-  const stoppedOverlay = createStoppedOverlay();
-  svg.insertAdjacentElement("afterend", stoppedOverlay);
-  return new BoardUI(operations, fs, svg, stoppedOverlay, onSensorChange);
-}
-
-function createStoppedOverlay() {
-  const stoppedOverlay = document.createElement("div");
-  stoppedOverlay.classList.add("play-button-container");
-  const playButton = document.createElement("button");
-  playButton.classList.add("play-button");
-  const color = getButtonColor();
-  if (color) {
-    playButton.style.color = color;
-    playButton.style.borderColor = color;
-  }
-  playButton.insertAdjacentHTML("beforeend", playIcon);
-  stoppedOverlay.appendChild(playButton);
-  return stoppedOverlay;
-}
-
-function getButtonColor(): string | null {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("color");
+  return new BoardUI(operations, fs, svg, onSensorChange);
 }
 
 export class BoardUI {
@@ -61,11 +39,13 @@ export class BoardUI {
   public sensors: Sensor[];
   private sensorsById: Map<string, Sensor>;
 
+  private stoppedOverlay: HTMLDivElement;
+  private playButton: HTMLButtonElement;
+
   constructor(
     private operations: WebAssemblyOperations,
     private fs: FileSystem,
     private svg: SVGElement,
-    private stoppedOverlay: HTMLDivElement,
     onSensorChange: () => void
   ) {
     this.display = new DisplayUI(
@@ -93,10 +73,12 @@ export class BoardUI {
     this.sensors.forEach((sensor) => {
       this.sensorsById.set(sensor.id, sensor);
     });
+    this.stoppedOverlay = document.querySelector(".play-button-container")!;
+    this.playButton = document.querySelector(".play-button")!;
+    this.initializePlayButton();
     // We start stopped.
     this.displayStoppedState();
-    const playButton = this.stoppedOverlay.querySelector("button");
-    playButton!.addEventListener("click", () =>
+    this.playButton.addEventListener("click", () =>
       window.parent.postMessage(
         {
           kind: "request_flash",
@@ -124,6 +106,16 @@ export class BoardUI {
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
     this.serialInputBuffer.length = 0;
+  }
+
+  private initializePlayButton() {
+    const params = new URLSearchParams(window.location.search);
+    const color = params.get("color");
+    if (color) {
+      this.playButton.style.color = color;
+      this.playButton.style.borderColor = color;
+    }
+    this.playButton.style.display = "flex";
   }
 
   private displayRunningState() {

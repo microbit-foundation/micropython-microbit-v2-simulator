@@ -3,6 +3,7 @@
 import { EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
 import svgText from "../microbit-drawing.svg";
+import playIcon from "../microbit-face-icon.svg";
 import { MICROBIT_HAL_PIN_FACE } from "./constants";
 import { AudioUI } from "./audio";
 import { WebAssemblyOperations } from "./listener";
@@ -22,8 +23,29 @@ export function createBoard(
   if (!svg) {
     throw new Error("No SVG");
   }
-  svg.style.opacity = stoppedOpactity;
-  return new BoardUI(operations, fs, svg, onSensorChange);
+  const playButton = createPlayButton();
+  svg.insertAdjacentElement("afterend", playButton);
+  return new BoardUI(operations, fs, svg, playButton, onSensorChange);
+}
+
+function createPlayButton() {
+  const playButton = document.createElement("button");
+  playButton.style.position = "absolute";
+  playButton.style.display = "flex";
+  playButton.style.justifyContent = "center";
+  playButton.style.alignItems = "center";
+  playButton.style.width = "100%";
+  playButton.style.height = "100%";
+  playButton.style.top = "0";
+  playButton.style.left = "0";
+  playButton.style.backgroundColor = "transparent";
+  playButton.style.border = "none";
+  playButton.style.cursor = "pointer";
+  const iconContainer = document.createElement("div");
+  iconContainer.style.width = "100px";
+  iconContainer.insertAdjacentHTML("beforeend", playIcon);
+  playButton.appendChild(iconContainer);
+  return playButton;
 }
 
 export class BoardUI {
@@ -44,6 +66,7 @@ export class BoardUI {
     private operations: WebAssemblyOperations,
     private fs: FileSystem,
     private svg: SVGElement,
+    private playButton: HTMLButtonElement,
     onSensorChange: () => void
   ) {
     this.display = new DisplayUI(
@@ -71,6 +94,15 @@ export class BoardUI {
     this.sensors.forEach((sensor) => {
       this.sensorsById.set(sensor.id, sensor);
     });
+    this.displayStoppedState();
+    this.playButton.addEventListener("click", () =>
+      window.parent.postMessage(
+        {
+          kind: "request_flash",
+        },
+        "*"
+      )
+    );
   }
 
   getSensor(id: string): Sensor | undefined {
@@ -93,15 +125,33 @@ export class BoardUI {
     this.serialInputBuffer.length = 0;
   }
 
+  private displayRunningState() {
+    this.svg.style.opacity = "unset";
+    const svgButtons = this.svg.querySelectorAll("[role='button']");
+    for (const button of svgButtons) {
+      button.setAttribute("tabindex", "0");
+    }
+    this.playButton.style.display = "none";
+  }
+
+  private displayStoppedState() {
+    this.svg.style.opacity = stoppedOpactity;
+    const svgButtons = this.svg.querySelectorAll("[role='button']");
+    for (const button of svgButtons) {
+      button.setAttribute("tabindex", "-1");
+    }
+    this.playButton.style.display = "flex";
+  }
+
   private start() {
     this.operations.start();
-    this.svg.style.opacity = "unset";
+    this.displayRunningState();
   }
 
   async stop(): Promise<void> {
     const interrupt = () => this.serialInputBuffer.push(3, 4); // Ctrl-C, Ctrl-D.
     await this.operations.stop(interrupt);
-    this.svg.style.opacity = stoppedOpactity;
+    this.displayStoppedState();
   }
 
   async reset(): Promise<void> {

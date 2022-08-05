@@ -3,6 +3,13 @@ export abstract class Sensor {
 
   abstract setValue(value: any): void;
 
+  /**
+   * @returns A representation of the sensor that is serializable (for postMessage).
+   */
+  toSerializable(): object {
+    return this;
+  }
+
   protected valueError(value: any) {
     return new Error(
       `${this.id} given invalid value: ${JSON.stringify(value)}`
@@ -45,6 +52,8 @@ export class RangeSensor extends Sensor {
 
 export class EnumSensor extends Sensor {
   public value: string;
+  public onchange: (v: string) => void = () => {};
+
   constructor(id: string, public choices: string[], initial: string) {
     super("enum", id);
     this.id = id;
@@ -57,5 +66,15 @@ export class EnumSensor extends Sensor {
       throw this.valueError(value);
     }
     this.value = value;
+    this.onchange(value);
+  }
+
+  toSerializable() {
+    return {
+      type: "enum",
+      id: this.id,
+      choices: this.choices,
+      value: this.value,
+    };
   }
 }

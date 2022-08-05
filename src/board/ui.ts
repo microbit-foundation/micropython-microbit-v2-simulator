@@ -7,6 +7,7 @@ import { MICROBIT_HAL_PIN_FACE } from "./constants";
 import { AudioUI } from "./audio";
 import { WebAssemblyOperations } from "./listener";
 import { FileSystem } from "./fs";
+import { convertAccelerometerStringToNumber } from "./conversions";
 
 const stoppedOpactity = "0.5";
 
@@ -88,7 +89,7 @@ export class BoardUI {
     this.buttons.forEach((b) => b.initialize());
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();
-    this.accelerometer.initialize();
+    this.accelerometer.initialize(this.operations.gestureCallback!);
     this.serialInputBuffer.length = 0;
   }
 
@@ -345,7 +346,10 @@ export class AccelerometerUI {
     this.onSensorChange();
   }
 
-  initialize() {}
+  initialize(gestureCallback: (v: number) => void) {
+    this.gesture.onchange = (v: string) =>
+      gestureCallback(convertAccelerometerStringToNumber(v));
+  }
 
   dispose() {}
 }

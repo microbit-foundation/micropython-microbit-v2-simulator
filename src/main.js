@@ -31,7 +31,7 @@ Module.onRuntimeInitialized = () => {
   window.parent.postMessage(
     {
       kind: "ready",
-      sensors: window.board.sensors,
+      sensors: window.board.sensors.map((s) => s.toSerializable()),
     },
     "*"
   );

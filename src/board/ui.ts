@@ -19,7 +19,6 @@ export function createBoard(
 ) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
   const svg = document.querySelector("svg");
-  // We start stopped.
   if (!svg) {
     throw new Error("No SVG");
   }
@@ -94,6 +93,7 @@ export class BoardUI {
     this.sensors.forEach((sensor) => {
       this.sensorsById.set(sensor.id, sensor);
     });
+    // We start stopped.
     this.displayStoppedState();
     this.playButton.addEventListener("click", () =>
       window.parent.postMessage(

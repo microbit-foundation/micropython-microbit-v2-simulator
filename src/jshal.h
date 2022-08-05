@@ -39,6 +39,8 @@ void mp_js_hal_filesystem_remove(int idx);
 int mp_js_hal_filesystem_readbyte(int idx, size_t offset);
 int mp_js_hal_filesystem_write(int idx, const char *buf, size_t len);
 
+void mp_js_hal_reset(void);
+
 int mp_js_hal_temperature(void);
 
 int mp_js_hal_button_get_presses(int button);

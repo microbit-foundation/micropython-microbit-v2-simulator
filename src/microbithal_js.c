@@ -55,7 +55,7 @@ void microbit_hal_idle(void) {
 }
 
 void microbit_hal_reset(void) {
-    //microbit_reset();
+    mp_js_hal_reset();
 }
 
 void microbit_hal_panic(int code) {

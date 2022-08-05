@@ -92,6 +92,10 @@ mergeInto(LibraryManager.library, {
     return fs.write(idx, data);
   },
 
+  mp_js_hal_reset: function () {
+    return board.reset();
+  },
+
   mp_js_hal_temperature: function () {
     return board.temperature.value;
   },

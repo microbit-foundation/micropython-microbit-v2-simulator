@@ -42,11 +42,9 @@ function createStoppedOverlay() {
   return stoppedOverlay;
 }
 
-function getButtonColor() {
+function getButtonColor(): string | null {
   const params = new URLSearchParams(window.location.search);
-  if (params.has("color")) {
-    return params.get("color");
-  }
+  return params.get("color");
 }
 
 export class BoardUI {

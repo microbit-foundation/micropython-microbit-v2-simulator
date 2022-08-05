@@ -3,7 +3,7 @@
 import { EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
 import svgText from "../microbit-drawing.svg";
-import playIcon from "../microbit-face-icon.svg";
+import playIcon from "../play.svg";
 import { MICROBIT_HAL_PIN_FACE } from "./constants";
 import { AudioUI } from "./audio";
 import { WebAssemblyOperations } from "./listener";
@@ -22,19 +22,31 @@ export function createBoard(
   if (!svg) {
     throw new Error("No SVG");
   }
-  const playButton = createPlayButton();
-  svg.insertAdjacentElement("afterend", playButton);
-  return new BoardUI(operations, fs, svg, playButton, onSensorChange);
+  const stoppedOverlay = createStoppedOverlay();
+  svg.insertAdjacentElement("afterend", stoppedOverlay);
+  return new BoardUI(operations, fs, svg, stoppedOverlay, onSensorChange);
 }
 
-function createPlayButton() {
+function createStoppedOverlay() {
+  const stoppedOverlay = document.createElement("div");
+  stoppedOverlay.classList.add("play-button-container");
   const playButton = document.createElement("button");
   playButton.classList.add("play-button");
-  const iconContainer = document.createElement("div");
-  iconContainer.classList.add("play-icon-container");
-  iconContainer.insertAdjacentHTML("beforeend", playIcon);
-  playButton.appendChild(iconContainer);
-  return playButton;
+  const color = getButtonColor();
+  if (color) {
+    playButton.style.color = color;
+    playButton.style.borderColor = color;
+  }
+  playButton.insertAdjacentHTML("beforeend", playIcon);
+  stoppedOverlay.appendChild(playButton);
+  return stoppedOverlay;
+}
+
+function getButtonColor() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("color")) {
+    return params.get("color");
+  }
 }
 
 export class BoardUI {
@@ -55,7 +67,7 @@ export class BoardUI {
     private operations: WebAssemblyOperations,
     private fs: FileSystem,
     private svg: SVGElement,
-    private playButton: HTMLButtonElement,
+    private stoppedOverlay: HTMLDivElement,
     onSensorChange: () => void
   ) {
     this.display = new DisplayUI(
@@ -85,7 +97,8 @@ export class BoardUI {
     });
     // We start stopped.
     this.displayStoppedState();
-    this.playButton.addEventListener("click", () =>
+    const playButton = this.stoppedOverlay.querySelector("button");
+    playButton!.addEventListener("click", () =>
       window.parent.postMessage(
         {
           kind: "request_flash",
@@ -121,7 +134,7 @@ export class BoardUI {
     for (const button of svgButtons) {
       button.setAttribute("tabindex", "0");
     }
-    this.playButton.style.display = "none";
+    this.stoppedOverlay.style.display = "none";
   }
 
   private displayStoppedState() {
@@ -130,7 +143,7 @@ export class BoardUI {
     for (const button of svgButtons) {
       button.setAttribute("tabindex", "-1");
     }
-    this.playButton.style.display = "flex";
+    this.stoppedOverlay.style.display = "flex";
   }
 
   private start() {

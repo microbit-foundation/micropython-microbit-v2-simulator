@@ -29,19 +29,9 @@ export function createBoard(
 
 function createPlayButton() {
   const playButton = document.createElement("button");
-  playButton.style.position = "absolute";
-  playButton.style.display = "flex";
-  playButton.style.justifyContent = "center";
-  playButton.style.alignItems = "center";
-  playButton.style.width = "100%";
-  playButton.style.height = "100%";
-  playButton.style.top = "0";
-  playButton.style.left = "0";
-  playButton.style.backgroundColor = "transparent";
-  playButton.style.border = "none";
-  playButton.style.cursor = "pointer";
+  playButton.classList.add("play-button");
   const iconContainer = document.createElement("div");
-  iconContainer.style.width = "100px";
+  iconContainer.classList.add("play-icon-container");
   iconContainer.insertAdjacentHTML("beforeend", playIcon);
   playButton.appendChild(iconContainer);
   return playButton;

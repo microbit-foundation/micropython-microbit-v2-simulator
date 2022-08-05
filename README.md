@@ -39,7 +39,8 @@ The page to embed is http://localhost:8000/simulator.html
 
 The iframe provides the micro:bit board user interface and some limited
 interactions. It does not provide a terminal for serial output or the
-REPL or any UI for the sensors.
+REPL or any UI for the sensors. A value for color can be passed to the simulator
+via a query string and is used to style the play button. E.g., http://localhost:8000/simulator.html?color=blue
 
 [demo.html](./src/demo.html) is an example of embedding the simulator.
 It connects the iframe to a terminal and provides a simple interface for

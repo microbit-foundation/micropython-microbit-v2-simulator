@@ -67,7 +67,7 @@
         <div class="simulator column">
           <iframe
             id="simulator"
-            src="simulator.html"
+            src="simulator.html?color=%230075ff"
             title="Simulator"
             frameborder="0"
             scrolling="no"
@@ -152,6 +152,17 @@
             }
             case "sensor_change": {
               createSensorUI(data.sensors);
+            }
+            case "request_flash": {
+              simulator.postMessage(
+                {
+                  kind: "flash",
+                  filesystem: {
+                    "main.py": new TextEncoder().encode(program.value),
+                  },
+                },
+                "*"
+              );
             }
           }
         }

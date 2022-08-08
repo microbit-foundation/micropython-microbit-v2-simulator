@@ -31,6 +31,7 @@ export class BoardUI {
   private pins: PinUI[];
   private audio = new AudioUI();
   private temperature: RangeSensor;
+  private microphone: MicrophoneUI;
   private accelerometer: AccelerometerUI;
 
   // Perhaps we can remove this?
@@ -63,10 +64,14 @@ export class BoardUI {
     this.audio = new AudioUI();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new AccelerometerUI(onSensorChange);
+    this.microphone = new MicrophoneUI(
+      this.svg.querySelector("#LitMicrophone")!
+    );
 
     this.sensors = [
       this.display.lightLevel,
       this.temperature,
+      this.microphone.soundLevel,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -105,6 +110,7 @@ export class BoardUI {
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
+    this.microphone.initialize(this.operations.soundLevelCallback!);
     this.serialInputBuffer.length = 0;
   }
 
@@ -189,6 +195,7 @@ export class BoardUI {
     this.pins.forEach((p) => p.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
+    this.microphone.dispose();
     this.serialInputBuffer.length = 0;
   }
 }
@@ -395,6 +402,65 @@ export class AccelerometerUI {
   }
 
   dispose() {}
+}
+
+export class MicrophoneUI {
+  public soundLevel: RangeSensor = new RangeSensor(
+    "soundLevel",
+    0,
+    255,
+    0,
+    undefined
+  );
+  private lowThreshold: number;
+  private highThreshold: number;
+  private thresholdState: "lowThreshold" | "highThreshold" | "none";
+  constructor(private element: SVGElement) {
+    this.lowThreshold = 75;
+    this.highThreshold = 150;
+    this.thresholdState = "none";
+  }
+
+  microphoneOn() {
+    this.element.style.display = "unset";
+  }
+
+  private microphoneOff() {
+    this.element.style.display = "unset";
+  }
+
+  setLowThreshold(value: number) {
+    this.lowThreshold = value;
+  }
+
+  setHighThreshold(value: number) {
+    this.highThreshold = value;
+  }
+
+  initialize(soundLevelCallback: (v: number | string) => void) {
+    this.soundLevel.onchange = (v: number | string) => {
+      if (
+        (this.thresholdState === "none" ||
+          this.thresholdState === "lowThreshold") &&
+        v >= this.highThreshold
+      ) {
+        this.thresholdState = "highThreshold";
+        return soundLevelCallback(2);
+      }
+      if (
+        (this.thresholdState === "none" ||
+          this.thresholdState === "highThreshold") &&
+        v <= this.lowThreshold
+      ) {
+        this.thresholdState = "lowThreshold";
+        return soundLevelCallback(1);
+      }
+    };
+  }
+
+  dispose() {
+    this.microphoneOff();
+  }
 }
 
 export class PinUI {

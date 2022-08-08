@@ -19,6 +19,7 @@ export abstract class Sensor {
 
 export class RangeSensor extends Sensor {
   public value: number;
+  public onchange?: (v: number | string) => void = () => {};
   constructor(
     id: string,
     public min: number,
@@ -47,6 +48,20 @@ export class RangeSensor extends Sensor {
       throw this.valueError(value);
     }
     this.value = proposed;
+    if (this.onchange) {
+      this.onchange(value);
+    }
+  }
+
+  toSerializable() {
+    return {
+      type: "range",
+      id: this.id,
+      min: this.min,
+      max: this.max,
+      value: this.value,
+      unit: this.unit,
+    };
   }
 }
 

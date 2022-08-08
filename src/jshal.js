@@ -194,7 +194,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_microphone_set_threshold: function (kind, value) {
     board.microphone.setThreshold(
-      conversions.convertSoundEventNumberToString(number),
+      conversions.convertSoundEventNumberToString(kind),
       value
     );
   },

@@ -8,7 +8,7 @@ export class WebAssemblyOperations {
   defaultAudioCallback: (() => void) | undefined;
   speechAudioCallback: (() => void) | undefined;
   gestureCallback: ((gesture: number) => void) | undefined;
-  soundLevelCallback: ((soundLevel: number | string) => void) | undefined;
+  soundLevelCallback: ((soundLevel: number) => void) | undefined;
 
   initialize() {
     const cwrap = (window as any).Module.cwrap;

@@ -192,12 +192,11 @@ mergeInto(LibraryManager.library, {
     board.microphone.microphoneOn();
   },
 
-  mp_js_hal_microphone_set_threshold: function () {
-    if (kind === 0) {
-      board.microphone.setLowThreshold(value);
-    } else {
-      board.microphone.setHighThreshold(value);
-    }
+  mp_js_hal_microphone_set_threshold: function (kind, value) {
+    board.microphone.setThreshold(
+      conversions.convertSoundEventNumberToString(number),
+      value
+    );
   },
 
   mp_js_hal_microphone_get_level: function () {

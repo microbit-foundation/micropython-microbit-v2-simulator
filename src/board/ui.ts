@@ -412,13 +412,14 @@ export class MicrophoneUI {
     0,
     undefined
   );
+  // In future we might try to expose these so they can be drawn as
+  // marks on the sensor.
   private lowThreshold: number;
   private highThreshold: number;
-  private thresholdState: "lowThreshold" | "highThreshold" | "none";
+
   constructor(private element: SVGElement) {
     this.lowThreshold = 75;
     this.highThreshold = 150;
-    this.thresholdState = "none";
   }
 
   microphoneOn() {
@@ -429,31 +430,20 @@ export class MicrophoneUI {
     this.element.style.display = "unset";
   }
 
-  setLowThreshold(value: number) {
-    this.lowThreshold = value;
+  setThreshold(threshold: "low" | "high", value: number) {
+    if (threshold === "low") {
+      this.lowThreshold = value;
+    } else {
+      this.highThreshold = value;
+    }
   }
 
-  setHighThreshold(value: number) {
-    this.highThreshold = value;
-  }
-
-  initialize(soundLevelCallback: (v: number | string) => void) {
-    this.soundLevel.onchange = (v: number | string) => {
-      if (
-        (this.thresholdState === "none" ||
-          this.thresholdState === "lowThreshold") &&
-        v >= this.highThreshold
-      ) {
-        this.thresholdState = "highThreshold";
-        return soundLevelCallback(2);
-      }
-      if (
-        (this.thresholdState === "none" ||
-          this.thresholdState === "highThreshold") &&
-        v <= this.lowThreshold
-      ) {
-        this.thresholdState = "lowThreshold";
-        return soundLevelCallback(1);
+  initialize(soundLevelCallback: (v: number) => void) {
+    this.soundLevel.onchange = (prev: number, curr: number) => {
+      if (prev > this.lowThreshold && curr <= this.lowThreshold) {
+        soundLevelCallback(convertAccelerometerStringToNumber("low"));
+      } else if (prev < this.highThreshold && curr >= this.highThreshold) {
+        soundLevelCallback(convertAccelerometerStringToNumber("high"));
       }
     };
   }

@@ -8,6 +8,7 @@ export class WebAssemblyOperations {
   defaultAudioCallback: (() => void) | undefined;
   speechAudioCallback: (() => void) | undefined;
   gestureCallback: ((gesture: number) => void) | undefined;
+  soundLevelCallback: ((soundLevel: number) => void) | undefined;
 
   initialize() {
     const cwrap = (window as any).Module.cwrap;
@@ -29,6 +30,13 @@ export class WebAssemblyOperations {
 
     this.gestureCallback = cwrap(
       "microbit_hal_gesture_callback",
+      "null",
+      ["number"],
+      {}
+    );
+
+    this.soundLevelCallback = cwrap(
+      "microbit_hal_level_detector_callback",
       "null",
       ["number"],
       {}

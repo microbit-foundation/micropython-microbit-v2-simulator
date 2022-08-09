@@ -1,14 +1,16 @@
 // Matches microbithal.h
 
+import svgText from "../microbit-drawing.svg";
+import { AudioUI } from "./audio";
+import { MICROBIT_HAL_PIN_FACE } from "./constants";
+import {
+  convertAccelerometerStringToNumber,
+  convertSoundEventStringToNumber,
+} from "./conversions";
+import { FileSystem } from "./fs";
+import { WebAssemblyOperations } from "./listener";
 import { EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
-import svgText from "../microbit-drawing.svg";
-import playIcon from "../play.svg";
-import { MICROBIT_HAL_PIN_FACE } from "./constants";
-import { AudioUI } from "./audio";
-import { WebAssemblyOperations } from "./listener";
-import { FileSystem } from "./fs";
-import { convertAccelerometerStringToNumber } from "./conversions";
 
 const stoppedOpactity = "0.5";
 
@@ -31,6 +33,7 @@ export class BoardUI {
   private pins: PinUI[];
   private audio = new AudioUI();
   private temperature: RangeSensor;
+  private microphone: MicrophoneUI;
   private accelerometer: AccelerometerUI;
 
   // Perhaps we can remove this?
@@ -63,10 +66,14 @@ export class BoardUI {
     this.audio = new AudioUI();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new AccelerometerUI(onSensorChange);
+    this.microphone = new MicrophoneUI(
+      this.svg.querySelector("#LitMicrophone")!
+    );
 
     this.sensors = [
       this.display.lightLevel,
       this.temperature,
+      this.microphone.soundLevel,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -105,6 +112,7 @@ export class BoardUI {
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
+    this.microphone.initialize(this.operations.soundLevelCallback!);
     this.serialInputBuffer.length = 0;
   }
 
@@ -189,6 +197,7 @@ export class BoardUI {
     this.pins.forEach((p) => p.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
+    this.microphone.dispose();
     this.serialInputBuffer.length = 0;
   }
 }
@@ -395,6 +404,55 @@ export class AccelerometerUI {
   }
 
   dispose() {}
+}
+
+export class MicrophoneUI {
+  public soundLevel: RangeSensor = new RangeSensor(
+    "soundLevel",
+    0,
+    255,
+    0,
+    undefined
+  );
+  // In future we might try to expose these so they can be drawn as
+  // marks on the sensor.
+  private lowThreshold: number;
+  private highThreshold: number;
+
+  constructor(private element: SVGElement) {
+    this.lowThreshold = 75;
+    this.highThreshold = 150;
+  }
+
+  microphoneOn() {
+    this.element.style.display = "unset";
+  }
+
+  private microphoneOff() {
+    this.element.style.display = "unset";
+  }
+
+  setThreshold(threshold: "low" | "high", value: number) {
+    if (threshold === "low") {
+      this.lowThreshold = value;
+    } else {
+      this.highThreshold = value;
+    }
+  }
+
+  initialize(soundLevelCallback: (v: number) => void) {
+    this.soundLevel.onchange = (prev: number, curr: number) => {
+      if (prev > this.lowThreshold && curr <= this.lowThreshold) {
+        soundLevelCallback(convertSoundEventStringToNumber("low"));
+      } else if (prev < this.highThreshold && curr >= this.highThreshold) {
+        soundLevelCallback(convertSoundEventStringToNumber("high"));
+      }
+    };
+  }
+
+  dispose() {
+    this.microphoneOff();
+  }
 }
 
 export class PinUI {

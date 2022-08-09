@@ -187,4 +187,20 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_audio_amplitude_u10: function (amplitude_u10) {
     board.audio.setAmplitudeU10(amplitude_u10);
   },
+
+  mp_js_hal_microphone_init: function () {
+    board.microphone.microphoneOn();
+  },
+
+  mp_js_hal_microphone_set_threshold: function (kind, value) {
+    board.microphone.setThreshold(
+      // `+ 1` is temporary, see https://github.com/microbit-foundation/micropython-microbit-v2/pull/109
+      conversions.convertSoundEventNumberToString(kind + 1),
+      value
+    );
+  },
+
+  mp_js_hal_microphone_get_level: function () {
+    return board.microphone.soundLevel.value;
+  },
 });

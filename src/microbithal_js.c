@@ -503,6 +503,9 @@ void microbit_hal_audio_speech_write_data(const uint8_t *buf, size_t num_samples
 }
 
 void microbit_hal_microphone_init(void) {
+    // This does not implement the use of an external microphone.
+    // It turns on the microphone indicator light on the sim board.
+    mp_js_hal_microphone_init();
     /*
     if (mic == NULL) {
         mic = uBit.adc.getChannel(uBit.io.microphone);
@@ -518,6 +521,7 @@ void microbit_hal_microphone_init(void) {
 }
 
 void microbit_hal_microphone_set_threshold(int kind, int value) {
+    mp_js_hal_microphone_set_threshold(kind, value);
     /*
     value = value * SOUND_LEVEL_MAXIMUM / 255;
     if (kind == 0) {
@@ -529,6 +533,7 @@ void microbit_hal_microphone_set_threshold(int kind, int value) {
 }
 
 int microbit_hal_microphone_get_level(void) {
+    return mp_js_hal_microphone_get_level();
     /*
     if (level == NULL) {
         return -1;
@@ -538,5 +543,4 @@ int microbit_hal_microphone_get_level(void) {
         return l;
     }
     */
-    return 0;
 }

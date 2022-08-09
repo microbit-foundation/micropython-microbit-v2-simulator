@@ -1,14 +1,16 @@
 // Matches microbithal.h
 
+import svgText from "../microbit-drawing.svg";
+import { AudioUI } from "./audio";
+import { MICROBIT_HAL_PIN_FACE } from "./constants";
+import {
+  convertAccelerometerStringToNumber,
+  convertSoundEventStringToNumber,
+} from "./conversions";
+import { FileSystem } from "./fs";
+import { WebAssemblyOperations } from "./listener";
 import { EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
-import svgText from "../microbit-drawing.svg";
-import playIcon from "../play.svg";
-import { MICROBIT_HAL_PIN_FACE } from "./constants";
-import { AudioUI } from "./audio";
-import { WebAssemblyOperations } from "./listener";
-import { FileSystem } from "./fs";
-import { convertAccelerometerStringToNumber } from "./conversions";
 
 const stoppedOpactity = "0.5";
 
@@ -441,9 +443,9 @@ export class MicrophoneUI {
   initialize(soundLevelCallback: (v: number) => void) {
     this.soundLevel.onchange = (prev: number, curr: number) => {
       if (prev > this.lowThreshold && curr <= this.lowThreshold) {
-        soundLevelCallback(convertAccelerometerStringToNumber("low"));
+        soundLevelCallback(convertSoundEventStringToNumber("low"));
       } else if (prev < this.highThreshold && curr >= this.highThreshold) {
-        soundLevelCallback(convertAccelerometerStringToNumber("high"));
+        soundLevelCallback(convertSoundEventStringToNumber("high"));
       }
     };
   }

@@ -194,7 +194,8 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_microphone_set_threshold: function (kind, value) {
     board.microphone.setThreshold(
-      conversions.convertSoundEventNumberToString(kind),
+      // `+ 1` is temporary, see https://github.com/microbit-foundation/micropython-microbit-v2/pull/109
+      conversions.convertSoundEventNumberToString(kind + 1),
       value
     );
   },

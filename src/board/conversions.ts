@@ -12,6 +12,7 @@ import {
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT,
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT,
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP,
+  MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_HIGH,
   MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW,
 } from "./constants";
 
@@ -30,7 +31,7 @@ export function convertSoundEventStringToNumber(value: "low" | "high"): number {
     case "low":
       return MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW;
     case "high":
-      return MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW;
+      return MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_HIGH;
     default:
       throw new Error(`Invalid value ${value}`);
   }
@@ -40,7 +41,7 @@ export function convertSoundEventNumberToString(value: number): "low" | "high" {
   switch (value) {
     case MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW:
       return "low";
-    case MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW:
+    case MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_HIGH:
       return "high";
     default:
       throw new Error(`Invalid value ${value}`);

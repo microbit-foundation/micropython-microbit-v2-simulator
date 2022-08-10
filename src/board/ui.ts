@@ -429,7 +429,7 @@ export class MicrophoneUI {
   }
 
   private microphoneOff() {
-    this.element.style.display = "unset";
+    this.element.style.display = "none";
   }
 
   setThreshold(threshold: "low" | "high", value: number) {

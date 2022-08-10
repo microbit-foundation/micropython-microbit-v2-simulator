@@ -203,4 +203,16 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_microphone_get_level: function () {
     return board.microphone.soundLevel.value;
   },
+
+  mp_js_hal_audio_play_expression_by_name: function (name) {
+    return board.audio.playSoundExpression(UTF8ToString(name));
+  },
+
+  mp_js_hal_audio_stop_expression: function () {
+    return board.audio.stopSoundExpression();
+  },
+
+  mp_js_hal_audio_is_expression_active: function () {
+    return board.audio.isSoundExpressionActive();
+  },
 });

@@ -107,6 +107,7 @@ export class BoardUI {
     this.audio.initialize({
       defaultAudioCallback: this.operations.defaultAudioCallback!,
       speechAudioCallback: this.operations.speechAudioCallback!,
+      soundExpressionDoneCallback: this.operations.soundExpressionDoneCallback!
     });
     this.buttons.forEach((b) => b.initialize());
     this.pins.forEach((p) => p.initialize());

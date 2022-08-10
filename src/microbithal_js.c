@@ -458,32 +458,20 @@ void microbit_hal_audio_set_volume(int value) {
 }
 
 void microbit_hal_sound_synth_callback(int event) {
-    /*
-    if (event == DEVICE_SOUND_EMOJI_SYNTHESIZER_EVT_DONE) {
-        --sound_synth_active_count;
-    }
-    */
+    // We don't use this callback. Instead microbit_hal_audio_is_expression_active
+    // calls through to JS which has this state.
 }
 
 bool microbit_hal_audio_is_expression_active(void) {
-    /*
-    return sound_synth_active_count > 0;
-    */
-    return 0;
+    return mp_js_hal_audio_is_expression_active();
 }
 
 void microbit_hal_audio_play_expression_by_name(const char *name) {
-    /*
-    ++sound_synth_active_count;
-    uBit.audio.soundExpressions.stop();
-    uBit.audio.soundExpressions.playAsync(name);
-    */
+    mp_js_hal_audio_play_expression_by_name(name);
 }
 
 void microbit_hal_audio_stop_expression(void) {
-    /*
-    uBit.audio.soundExpressions.stop();
-    */
+    mp_js_hal_audio_stop_expression();
 }
 
 void microbit_hal_audio_init(uint32_t sample_rate) {

@@ -1,6 +1,6 @@
-import { replaceBuiltinSound } from "./audio/built-in-sounds";
-import { SoundEmojiSynthesizer } from "./audio/sound-emoji-synthesizer";
-import { parseSoundEffects, SoundEffect } from "./audio/sound-expressions";
+import { replaceBuiltinSound } from "./built-in-sounds";
+import { SoundEmojiSynthesizer } from "./sound-emoji-synthesizer";
+import { parseSoundEffects } from "./sound-expressions";
 
 interface AudioUIOptions {
   defaultAudioCallback: () => void;

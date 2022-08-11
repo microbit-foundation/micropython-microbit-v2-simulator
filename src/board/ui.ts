@@ -55,8 +55,8 @@ export class BoardUI {
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
     this.buttons = [
-      new ButtonUI(this.svg.querySelector("#ButtonA")!, "A"),
-      new ButtonUI(this.svg.querySelector("#ButtonB")!, "B"),
+      new ButtonUI(this.svg.querySelector("#ButtonA")!, "buttonA"),
+      new ButtonUI(this.svg.querySelector("#ButtonB")!, "buttonB"),
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new PinUI(
@@ -74,6 +74,8 @@ export class BoardUI {
       this.display.lightLevel,
       this.temperature,
       this.microphone.soundLevel,
+      this.buttons[0].button,
+      this.buttons[1].button,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -269,7 +271,7 @@ export class DisplayUI {
 }
 
 export class ButtonUI {
-  private _isPressed: boolean = false;
+  public button: RangeSensor;
   private _presses: number = 0;
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
@@ -277,8 +279,14 @@ export class ButtonUI {
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(private element: SVGElement, label: string) {
-    this._isPressed = false;
     this._presses = 0;
+    this.button = new RangeSensor(label, 0, 1, 0, undefined);
+    this.button.onchange = (_, curr: number): void => {
+      if (curr) {
+        this._presses++;
+      }
+      this.render();
+    };
 
     this.element.setAttribute("role", "button");
     this.element.setAttribute("tabindex", "0");
@@ -318,24 +326,19 @@ export class ButtonUI {
   }
 
   press() {
-    this._isPressed = true;
-    this._presses++;
-
-    this.render();
+    this.button.setValue(1);
   }
 
   release() {
-    this._isPressed = false;
-
-    this.render();
+    this.button.setValue(0);
   }
 
   isPressed() {
-    return this._isPressed;
+    return !!this.button.value;
   }
 
   render() {
-    const fill = this._isPressed ? "#d3b12c" : "none";
+    const fill = !!this.button.value ? "#d3b12c" : "none";
     this.element.querySelectorAll("circle").forEach((c) => {
       c.style.fill = fill;
     });
@@ -350,6 +353,7 @@ export class ButtonUI {
   initialize() {}
 
   dispose() {
+    this.release();
     this._presses = 0;
   }
 }

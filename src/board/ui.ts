@@ -349,7 +349,9 @@ export class ButtonUI {
 
   initialize() {}
 
-  dispose() {}
+  dispose() {
+    this._presses = 0;
+  }
 }
 
 export class AccelerometerUI {

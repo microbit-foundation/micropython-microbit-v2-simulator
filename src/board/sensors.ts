@@ -94,3 +94,34 @@ export class EnumSensor extends Sensor {
     };
   }
 }
+
+export class ButtonSensor extends Sensor {
+  public value: boolean;
+
+  constructor(
+    id: string,
+    initial: boolean,
+    public onchange: (v: boolean) => void
+  ) {
+    super("button", id);
+    this.id = id;
+    this.value = initial;
+    this.onchange = onchange;
+  }
+
+  setValue(value: any): void {
+    if (typeof value !== "boolean") {
+      throw this.valueError(value);
+    }
+    this.value = value;
+    this.onchange(value);
+  }
+
+  toSerializable() {
+    return {
+      type: "button",
+      id: this.id,
+      value: this.value,
+    };
+  }
+}

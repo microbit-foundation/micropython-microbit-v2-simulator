@@ -9,7 +9,7 @@ import {
 } from "./conversions";
 import { FileSystem } from "./fs";
 import { WebAssemblyOperations } from "./listener";
-import { EnumSensor, RangeSensor, Sensor } from "./sensors";
+import { ButtonSensor, EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
 
 const stoppedOpactity = "0.5";
@@ -55,8 +55,8 @@ export class BoardUI {
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
     this.buttons = [
-      new ButtonUI(this.svg.querySelector("#ButtonA")!, "A"),
-      new ButtonUI(this.svg.querySelector("#ButtonB")!, "B"),
+      new ButtonUI(this.svg.querySelector("#ButtonA")!, "buttonA"),
+      new ButtonUI(this.svg.querySelector("#ButtonB")!, "buttonB"),
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new PinUI(
@@ -74,6 +74,8 @@ export class BoardUI {
       this.display.lightLevel,
       this.temperature,
       this.microphone.soundLevel,
+      this.buttons[0].button,
+      this.buttons[1].button,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -269,6 +271,7 @@ export class DisplayUI {
 }
 
 export class ButtonUI {
+  public button: ButtonSensor;
   private _isPressed: boolean = false;
   private _presses: number = 0;
   private keyListener: (e: KeyboardEvent) => void;
@@ -279,6 +282,11 @@ export class ButtonUI {
   constructor(private element: SVGElement, label: string) {
     this._isPressed = false;
     this._presses = 0;
+    this.button = new ButtonSensor(
+      label,
+      this._isPressed,
+      this.onchange.bind(this)
+    );
 
     this.element.setAttribute("role", "button");
     this.element.setAttribute("tabindex", "0");
@@ -317,6 +325,15 @@ export class ButtonUI {
     this.element.addEventListener("mouseleave", this.mouseLeaveListener);
   }
 
+  onchange(value: boolean): void {
+    if (value) {
+      this.press();
+    } else {
+      this.release();
+    }
+    this._isPressed = value;
+  }
+
   press() {
     this._isPressed = true;
     this._presses++;
@@ -349,7 +366,10 @@ export class ButtonUI {
 
   initialize() {}
 
-  dispose() {}
+  dispose() {
+    this.release();
+    this._presses = 0;
+  }
 }
 
 export class AccelerometerUI {

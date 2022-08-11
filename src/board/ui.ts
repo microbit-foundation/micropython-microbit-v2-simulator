@@ -9,7 +9,7 @@ import {
 } from "./conversions";
 import { FileSystem } from "./fs";
 import { WebAssemblyOperations } from "./listener";
-import { ButtonSensor, EnumSensor, RangeSensor, Sensor } from "./sensors";
+import { EnumSensor, RangeSensor, Sensor } from "./sensors";
 import { clamp } from "./util";
 
 const stoppedOpactity = "0.5";
@@ -271,8 +271,7 @@ export class DisplayUI {
 }
 
 export class ButtonUI {
-  public button: ButtonSensor;
-  private _isPressed: boolean = false;
+  public button: RangeSensor;
   private _presses: number = 0;
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
@@ -280,13 +279,14 @@ export class ButtonUI {
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(private element: SVGElement, label: string) {
-    this._isPressed = false;
     this._presses = 0;
-    this.button = new ButtonSensor(
-      label,
-      this._isPressed,
-      this.onchange.bind(this)
-    );
+    this.button = new RangeSensor(label, 0, 1, 0, undefined);
+    this.button.onchange = (_, curr: number): void => {
+      if (curr) {
+        this._presses++;
+      }
+      this.render();
+    };
 
     this.element.setAttribute("role", "button");
     this.element.setAttribute("tabindex", "0");
@@ -325,34 +325,20 @@ export class ButtonUI {
     this.element.addEventListener("mouseleave", this.mouseLeaveListener);
   }
 
-  onchange(value: boolean): void {
-    if (value) {
-      this.press();
-    } else {
-      this.release();
-    }
-    this._isPressed = value;
-  }
-
   press() {
-    this._isPressed = true;
-    this._presses++;
-
-    this.render();
+    this.button.setValue(1);
   }
 
   release() {
-    this._isPressed = false;
-
-    this.render();
+    this.button.setValue(0);
   }
 
   isPressed() {
-    return this._isPressed;
+    return !!this.button.value;
   }
 
   render() {
-    const fill = this._isPressed ? "#d3b12c" : "none";
+    const fill = !!this.button.value ? "#d3b12c" : "none";
     this.element.querySelectorAll("circle").forEach((c) => {
       c.style.fill = fill;
     });

@@ -66,6 +66,9 @@ void mp_js_hal_audio_speech_init(uint32_t sample_rate);
 void mp_js_hal_audio_speech_write_data(const uint8_t *buf, size_t num_samples);
 void mp_js_hal_audio_period_us(int period);
 void mp_js_hal_audio_amplitude_u10(int amplitude);
+void mp_js_hal_audio_play_expression_by_name(const char *name);
+void mp_js_hal_audio_stop_expression(void);
+bool mp_js_hal_audio_is_expression_active(void);
 
 void mp_js_hal_microphone_init(void);
 void mp_js_hal_microphone_set_threshold(int kind, int value);

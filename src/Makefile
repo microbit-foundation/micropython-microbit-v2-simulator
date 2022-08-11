@@ -44,7 +44,7 @@ COPT += -O3 -DNDEBUG
 endif
 
 JSFLAGS += -s ASYNCIFY
-JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_mp_js_request_stop','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback', '_microbit_hal_level_detector_callback']"
+JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_mp_js_request_stop','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
 JSFLAGS += --pre-js $(BUILD)/pre.js
 

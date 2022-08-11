@@ -1,3 +1,7 @@
+import { replaceBuiltinSound } from "./built-in-sounds";
+import { SoundEmojiSynthesizer } from "./sound-emoji-synthesizer";
+import { parseSoundEffects } from "./sound-expressions";
+
 interface AudioUIOptions {
   defaultAudioCallback: () => void;
   speechAudioCallback: () => void;
@@ -14,13 +18,15 @@ export class AudioUI {
 
   default: BufferedAudio | undefined;
   speech: BufferedAudio | undefined;
+  soundExpression: BufferedAudio | undefined;
+  currentSoundExpressionCallback: undefined | (() => void);
 
   constructor() {}
 
   initialize({ defaultAudioCallback, speechAudioCallback }: AudioUIOptions) {
     this.context = new AudioContext({
-      // Match the regular audio rate.
-      sampleRate: 7812 * 4,
+      // The highest rate is the sound expression synth.
+      sampleRate: 44100,
     });
 
     this.muteNode = this.context.createGain();
@@ -42,6 +48,49 @@ export class AudioUI {
       this.volumeNode,
       speechAudioCallback
     );
+    this.soundExpression = new BufferedAudio(
+      this.context,
+      this.volumeNode,
+      () => {
+        if (this.currentSoundExpressionCallback) {
+          this.currentSoundExpressionCallback();
+        }
+      }
+    );
+  }
+
+  playSoundExpression(expression: string) {
+    const soundEffects = parseSoundEffects(replaceBuiltinSound(expression));
+    const onDone = () => {
+      this.stopSoundExpression();
+    };
+    const synth = new SoundEmojiSynthesizer(0, onDone);
+    synth.play(soundEffects);
+
+    const callback = () => {
+      const source = synth.pull();
+      const target = new AudioBuffer({
+        sampleRate: synth.sampleRate,
+        numberOfChannels: 1,
+        length: source.length,
+      });
+      const channel = target.getChannelData(0);
+      for (let i = 0; i < source.length; i++) {
+        // Buffer is (0, 1023) we need to map it to (-1, 1)
+        channel[i] = (source[i] - 512) / 512;
+      }
+      this.soundExpression!.writeData(target);
+    };
+    this.currentSoundExpressionCallback = callback;
+    callback();
+  }
+
+  stopSoundExpression(): void {
+    this.currentSoundExpressionCallback = undefined;
+  }
+
+  isSoundExpressionActive(): boolean {
+    return !!this.currentSoundExpressionCallback;
   }
 
   mute() {

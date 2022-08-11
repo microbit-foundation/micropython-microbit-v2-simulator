@@ -4,7 +4,6 @@ import { parseSoundEffects, SoundEffect } from "./audio/sound-expressions";
 interface AudioUIOptions {
   defaultAudioCallback: () => void;
   speechAudioCallback: () => void;
-  soundExpressionDoneCallback: () => void;
 }
 
 export class AudioUI {
@@ -19,16 +18,11 @@ export class AudioUI {
   default: BufferedAudio | undefined;
   speech: BufferedAudio | undefined;
   soundExpression: BufferedAudio | undefined;
-  soundExpressionDoneCallback: undefined | (() => void);
   currentSoundExpressionCallback: undefined | (() => void);
 
   constructor() {}
 
-  initialize({
-    defaultAudioCallback,
-    speechAudioCallback,
-    soundExpressionDoneCallback,
-  }: AudioUIOptions) {
+  initialize({ defaultAudioCallback, speechAudioCallback }: AudioUIOptions) {
     this.context = new AudioContext({
       // The highest rate is the sound expression synth.
       sampleRate: 44100,
@@ -62,7 +56,6 @@ export class AudioUI {
         }
       }
     );
-    this.soundExpressionDoneCallback = soundExpressionDoneCallback;
   }
 
   playSoundExpression(expression: string) {

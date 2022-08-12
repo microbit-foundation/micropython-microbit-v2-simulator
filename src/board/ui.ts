@@ -55,8 +55,16 @@ export class BoardUI {
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
     this.buttons = [
-      new ButtonUI(this.svg.querySelector("#ButtonA")!, "buttonA"),
-      new ButtonUI(this.svg.querySelector("#ButtonB")!, "buttonB"),
+      new ButtonUI(
+        this.svg.querySelector("#ButtonA")!,
+        "buttonA",
+        onSensorChange
+      ),
+      new ButtonUI(
+        this.svg.querySelector("#ButtonB")!,
+        "buttonB",
+        onSensorChange
+      ),
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new PinUI(
@@ -273,15 +281,21 @@ export class DisplayUI {
 export class ButtonUI {
   public button: RangeSensor;
   private _presses: number = 0;
+  private _mouseDown: boolean = false;
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
   private mouseUpListener: (e: MouseEvent) => void;
   private mouseLeaveListener: (e: MouseEvent) => void;
 
-  constructor(private element: SVGElement, label: string) {
+  constructor(
+    private element: SVGElement,
+    label: string,
+    private onSensorChange: () => void
+  ) {
     this._presses = 0;
     this.button = new RangeSensor(label, 0, 1, 0, undefined);
     this.button.onchange = (_, curr: number): void => {
+      this.onSensorChange();
       if (curr) {
         this._presses++;
       }
@@ -308,14 +322,18 @@ export class ButtonUI {
 
     this.mouseDownListener = (e) => {
       e.preventDefault();
+      this._mouseDown = true;
       this.press();
     };
     this.mouseUpListener = (e) => {
       e.preventDefault();
+      this._mouseDown = false;
       this.release();
     };
     this.mouseLeaveListener = (e) => {
-      this.release();
+      if (this._mouseDown) {
+        this.release();
+      }
     };
 
     this.element.addEventListener("mousedown", this.mouseDownListener);

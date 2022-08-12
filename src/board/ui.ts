@@ -344,11 +344,15 @@ export class ButtonUI {
   }
 
   press() {
-    this.button.setValue(1);
+    this.button.setValue(
+      this.button.value === this.button.min ? this.button.max : this.button.min
+    );
   }
 
   release() {
-    this.button.setValue(0);
+    this.button.setValue(
+      this.button.value === this.button.max ? this.button.min : this.button.max
+    );
   }
 
   isPressed() {
@@ -371,7 +375,6 @@ export class ButtonUI {
   initialize() {}
 
   dispose() {
-    this.release();
     this._presses = 0;
   }
 }

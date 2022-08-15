@@ -66,6 +66,35 @@ export class RangeSensor extends Sensor {
   }
 }
 
+export class RangeSensorWithThresholds extends RangeSensor {
+  constructor(
+    id: string,
+    public min: number,
+    public max: number,
+    public initial: number,
+    public unit: string | undefined,
+    public lowThreshold: number,
+    public highThreshold: number
+  ) {
+    super(id, min, max, initial, unit);
+    this.lowThreshold = lowThreshold;
+    this.highThreshold = highThreshold;
+  }
+
+  toSerializable() {
+    return {
+      type: "range",
+      id: this.id,
+      min: this.min,
+      max: this.max,
+      value: this.value,
+      unit: this.unit,
+      lowThreshold: this.lowThreshold,
+      highThreshold: this.highThreshold,
+    };
+  }
+}
+
 export class EnumSensor extends Sensor {
   public value: string;
   public onchange: (v: string) => void = () => {};

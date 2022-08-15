@@ -9,7 +9,12 @@ import {
 } from "./conversions";
 import { FileSystem } from "./fs";
 import { WebAssemblyOperations } from "./listener";
-import { EnumSensor, RangeSensor, Sensor } from "./sensors";
+import {
+  EnumSensor,
+  RangeSensor,
+  RangeSensorWithThresholds,
+  Sensor,
+} from "./sensors";
 import { clamp } from "./util";
 
 const stoppedOpactity = "0.5";
@@ -75,7 +80,8 @@ export class BoardUI {
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new AccelerometerUI(onSensorChange);
     this.microphone = new MicrophoneUI(
-      this.svg.querySelector("#LitMicrophone")!
+      this.svg.querySelector("#LitMicrophone")!,
+      onSensorChange
     );
 
     this.sensors = [
@@ -434,22 +440,20 @@ export class AccelerometerUI {
 }
 
 export class MicrophoneUI {
-  public soundLevel: RangeSensor = new RangeSensor(
+  public soundLevel: RangeSensorWithThresholds = new RangeSensorWithThresholds(
     "soundLevel",
     0,
     255,
     0,
-    undefined
+    undefined,
+    75,
+    150
   );
-  // In future we might try to expose these so they can be drawn as
-  // marks on the sensor.
-  private lowThreshold: number;
-  private highThreshold: number;
 
-  constructor(private element: SVGElement) {
-    this.lowThreshold = 75;
-    this.highThreshold = 150;
-  }
+  constructor(
+    private element: SVGElement,
+    private onSensorChange: () => void
+  ) {}
 
   microphoneOn() {
     this.element.style.display = "unset";
@@ -460,18 +464,26 @@ export class MicrophoneUI {
   }
 
   setThreshold(threshold: "low" | "high", value: number) {
+    const proposed = value > 255 ? 255 : value < 0 ? 0 : value;
     if (threshold === "low") {
-      this.lowThreshold = value;
+      this.soundLevel.lowThreshold = proposed;
     } else {
-      this.highThreshold = value;
+      this.soundLevel.highThreshold = proposed;
     }
+    this.onSensorChange();
   }
 
   initialize(soundLevelCallback: (v: number) => void) {
     this.soundLevel.onchange = (prev: number, curr: number) => {
-      if (prev > this.lowThreshold && curr <= this.lowThreshold) {
+      if (
+        prev > this.soundLevel.lowThreshold &&
+        curr <= this.soundLevel.lowThreshold
+      ) {
         soundLevelCallback(convertSoundEventStringToNumber("low"));
-      } else if (prev < this.highThreshold && curr >= this.highThreshold) {
+      } else if (
+        prev < this.soundLevel.highThreshold &&
+        curr >= this.soundLevel.highThreshold
+      ) {
         soundLevelCallback(convertSoundEventStringToNumber("high"));
       }
     };

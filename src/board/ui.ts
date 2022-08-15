@@ -464,10 +464,11 @@ export class MicrophoneUI {
   }
 
   setThreshold(threshold: "low" | "high", value: number) {
+    const proposed = value > 255 ? 255 : value < 0 ? 0 : value;
     if (threshold === "low") {
-      this.soundLevel.lowThreshold = value;
+      this.soundLevel.lowThreshold = proposed;
     } else {
-      this.soundLevel.highThreshold = value;
+      this.soundLevel.highThreshold = proposed;
     }
     this.onSensorChange();
   }

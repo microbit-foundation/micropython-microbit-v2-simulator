@@ -78,13 +78,13 @@ export class BoardUI {
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new PinUI(
+      this.svg.querySelector("#Logo")!,
       "pinLogo",
-      onSensorChange,
-      this.svg.querySelector("#Logo")!
+      onSensorChange
     );
-    this.pins[MICROBIT_HAL_PIN_P0] = new PinUI("pin0", onSensorChange, null);
-    this.pins[MICROBIT_HAL_PIN_P1] = new PinUI("pin1", onSensorChange, null);
-    this.pins[MICROBIT_HAL_PIN_P2] = new PinUI("pin2", onSensorChange, null);
+    this.pins[MICROBIT_HAL_PIN_P0] = new PinUI(null, "pin0", onSensorChange);
+    this.pins[MICROBIT_HAL_PIN_P1] = new PinUI(null, "pin1", onSensorChange);
+    this.pins[MICROBIT_HAL_PIN_P2] = new PinUI(null, "pin2", onSensorChange);
     this.audio = new AudioUI();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new AccelerometerUI(onSensorChange);
@@ -529,9 +529,9 @@ export class PinUI {
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(
+    private element: SVGElement | null,
     label: string,
-    private onSensorChange: () => void,
-    private element: SVGElement | null
+    private onSensorChange: () => void
   ) {
     this.pin = new RangeSensor(label, 0, 1, 0, undefined);
     this.pin.onchange = (): void => {

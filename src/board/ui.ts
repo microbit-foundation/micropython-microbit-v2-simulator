@@ -2,7 +2,12 @@
 
 import svgText from "../microbit-drawing.svg";
 import { AudioUI } from "./audio";
-import { MICROBIT_HAL_PIN_FACE } from "./constants";
+import {
+  MICROBIT_HAL_PIN_FACE,
+  MICROBIT_HAL_PIN_P0,
+  MICROBIT_HAL_PIN_P1,
+  MICROBIT_HAL_PIN_P2,
+} from "./constants";
 import {
   convertAccelerometerStringToNumber,
   convertSoundEventStringToNumber,
@@ -73,9 +78,13 @@ export class BoardUI {
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new PinUI(
-      this.svg.querySelector("#Logo")!,
-      "pin_logo"
+      "pinLogo",
+      onSensorChange,
+      this.svg.querySelector("#Logo")!
     );
+    this.pins[MICROBIT_HAL_PIN_P0] = new PinUI("pin0", onSensorChange, null);
+    this.pins[MICROBIT_HAL_PIN_P1] = new PinUI("pin1", onSensorChange, null);
+    this.pins[MICROBIT_HAL_PIN_P2] = new PinUI("pin2", onSensorChange, null);
     this.audio = new AudioUI();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new AccelerometerUI(onSensorChange);
@@ -90,6 +99,10 @@ export class BoardUI {
       this.microphone.soundLevel,
       this.buttons[0].button,
       this.buttons[1].button,
+      this.pins[MICROBIT_HAL_PIN_FACE].pin,
+      this.pins[MICROBIT_HAL_PIN_P0].pin,
+      this.pins[MICROBIT_HAL_PIN_P1].pin,
+      this.pins[MICROBIT_HAL_PIN_P2].pin,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -288,6 +301,7 @@ export class ButtonUI {
   public button: RangeSensor;
   private _presses: number = 0;
   private _mouseDown: boolean = false;
+  private _internalChange: boolean = false;
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
   private mouseUpListener: (e: MouseEvent) => void;
@@ -301,7 +315,10 @@ export class ButtonUI {
     this._presses = 0;
     this.button = new RangeSensor(label, 0, 1, 0, undefined);
     this.button.onchange = (_, curr: number): void => {
-      this.onSensorChange();
+      if (this._internalChange == true) {
+        this.onSensorChange();
+        this._internalChange = false;
+      }
       if (curr) {
         this._presses++;
       }
@@ -319,8 +336,10 @@ export class ButtonUI {
         case " ":
           e.preventDefault();
           if (e.type === "keydown") {
+            this._internalChange = true;
             this.press();
           } else {
+            this._internalChange = true;
             this.release();
           }
       }
@@ -329,15 +348,21 @@ export class ButtonUI {
     this.mouseDownListener = (e) => {
       e.preventDefault();
       this._mouseDown = true;
+      this._internalChange = true;
       this.press();
     };
     this.mouseUpListener = (e) => {
       e.preventDefault();
-      this._mouseDown = false;
-      this.release();
+      if (this._mouseDown) {
+        this._mouseDown = false;
+        this._internalChange = true;
+        this.release();
+      }
     };
     this.mouseLeaveListener = (e) => {
       if (this._mouseDown) {
+        this._mouseDown = false;
+        this._internalChange = true;
         this.release();
       }
     };
@@ -495,21 +520,34 @@ export class MicrophoneUI {
 }
 
 export class PinUI {
-  private _isTouched: boolean;
+  public pin: RangeSensor;
+  private _mouseDown: boolean = false;
+  private _internalChange: boolean = false;
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
   private mouseUpListener: (e: MouseEvent) => void;
   private mouseLeaveListener: (e: MouseEvent) => void;
 
-  constructor(private element: SVGElement, private label: string) {
-    this.label = label;
-    this._isTouched = false;
+  constructor(
+    label: string,
+    private onSensorChange: () => void,
+    private element: SVGElement | null
+  ) {
+    this.pin = new RangeSensor(label, 0, 1, 0, undefined);
+    this.pin.onchange = (): void => {
+      if (this._internalChange == true) {
+        this.onSensorChange();
+        this._internalChange = false;
+      }
+      this.render();
+    };
 
-    this.element = element;
-    this.element.setAttribute("role", "button");
-    this.element.setAttribute("tabindex", "0");
-    this.element.ariaLabel = label;
-    this.element.style.cursor = "pointer";
+    if (this.element) {
+      this.element.setAttribute("role", "button");
+      this.element.setAttribute("tabindex", "0");
+      this.element.ariaLabel = label;
+      this.element.style.cursor = "pointer";
+    }
 
     this.keyListener = (e) => {
       switch (e.key) {
@@ -517,8 +555,10 @@ export class PinUI {
         case " ":
           e.preventDefault();
           if (e.type === "keydown") {
+            this._internalChange = true;
             this.press();
           } else {
+            this._internalChange = true;
             this.release();
           }
       }
@@ -526,42 +566,58 @@ export class PinUI {
 
     this.mouseDownListener = (e) => {
       e.preventDefault();
+      this._mouseDown = true;
+      this._internalChange = true;
       this.press();
     };
     this.mouseUpListener = (e) => {
       e.preventDefault();
-      this.release();
+      if (this._mouseDown) {
+        this._mouseDown = false;
+        this._internalChange = true;
+        this.release();
+      }
     };
     this.mouseLeaveListener = (e) => {
-      this.release();
+      if (this._mouseDown) {
+        this._mouseDown = false;
+        this._internalChange = true;
+        this.release();
+      }
     };
 
-    this.element.addEventListener("mousedown", this.mouseDownListener);
-    this.element.addEventListener("mouseup", this.mouseUpListener);
-    this.element.addEventListener("keydown", this.keyListener);
-    this.element.addEventListener("keyup", this.keyListener);
-    this.element.addEventListener("mouseleave", this.mouseLeaveListener);
+    if (this.element) {
+      this.element.addEventListener("mousedown", this.mouseDownListener);
+      this.element.addEventListener("mouseup", this.mouseUpListener);
+      this.element.addEventListener("keydown", this.keyListener);
+      this.element.addEventListener("keyup", this.keyListener);
+      this.element.addEventListener("mouseleave", this.mouseLeaveListener);
+    }
   }
 
   press() {
-    this._isTouched = true;
-    this.render();
+    this.pin.setValue(
+      this.pin.value === this.pin.min ? this.pin.max : this.pin.min
+    );
   }
 
   release() {
-    this._isTouched = false;
-    this.render();
+    this.pin.setValue(
+      this.pin.value === this.pin.max ? this.pin.min : this.pin.max
+    );
   }
 
   isTouched() {
-    return this._isTouched;
+    return !!this.pin.value;
   }
 
   render() {
-    const fill = this._isTouched ? "red" : "url(#an)";
-    this.element.querySelectorAll("path").forEach((p) => {
-      p.style.fill = fill;
-    });
+    if (this.element) {
+      const fill = !!this.pin.value ? "red" : "url(#an)";
+      this.element.querySelectorAll("path").forEach((p) => {
+        p.style.fill = fill;
+      });
+    }
   }
 
   initialize() {}

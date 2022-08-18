@@ -26,35 +26,42 @@
 
 #include "py/runtime.h"
 #include "drv_radio.h"
+#include "jshal.h"
 
 void microbit_radio_enable(microbit_radio_config_t *config) {
     // TODO: enable the radio, based on the given config.
-
+    uint8_t group = config->prefix0;
+    mp_js_radio_enable(group);
     // Set to non-NULL to indicate to modradio that the radio is enabled.
     MP_STATE_PORT(radio_buf) = (void *)1;
 }
 
 void microbit_radio_disable(void) {
     // TODO: disable the radio.
-
+    mp_js_radio_disable();
     // Set to NULL to indicate to modradio that the radio is disabled.
     MP_STATE_PORT(radio_buf) = NULL;
 }
 
 void microbit_radio_update_config(microbit_radio_config_t *config) {
     // TODO: change radio configuration based on config argument.
+    uint8_t group = config->prefix0;
+    mp_js_radio_update_config(group);
 }
 
 // This assumes the radio is enabled.
 void microbit_radio_send(const void *buf, size_t len, const void *buf2, size_t len2) {
     // TODO: send packet over the radio, packet defined by concatenation of buf and buf2.
+    mp_js_radio_send(buf, len, buf2, len2);
 }
 
 const uint8_t *microbit_radio_peek(void) {
     // TODO: return a pointer to the next available packet, or NULL if none available.
-    return NULL; // no packet
+    return mp_js_radio_peek();
+    // return NULL; // no packet
 }
 
 void microbit_radio_pop(void) {
     // TODO: pop the next available packet, if there is one.
+    mp_js_radio_pop();
 }

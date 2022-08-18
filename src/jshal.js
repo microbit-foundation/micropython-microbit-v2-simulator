@@ -215,4 +215,30 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_audio_is_expression_active: function () {
     return board.audio.isSoundExpressionActive();
   },
+
+  mp_js_radio_enable: function (group) {
+    board.radio.setGroup(group);
+    board.radio.enable();
+  },
+
+  mp_js_radio_disable: function () {
+    board.radio.disable();
+  },
+
+  mp_js_radio_update_config: function (group) {
+    board.radio.setGroup(group);
+  },
+
+  mp_js_radio_send: function (buf, len, buf2, len2) {
+    board.radio.send(buf2);
+  },
+
+  mp_js_radio_peek: function () {
+    // Todo
+    return null;
+  },
+
+  mp_js_radio_pop: function () {
+    // Todo
+  },
 });

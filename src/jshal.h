@@ -73,3 +73,10 @@ bool mp_js_hal_audio_is_expression_active(void);
 void mp_js_hal_microphone_init(void);
 void mp_js_hal_microphone_set_threshold(int kind, int value);
 int mp_js_hal_microphone_get_level(void);
+
+void mp_js_radio_enable(uint8_t group);
+void mp_js_radio_disable(void);
+void mp_js_radio_update_config(uint8_t group);
+void mp_js_radio_send(const void *buf, size_t len, const void  *buf2, size_t len2);
+uint8_t *mp_js_radio_peek(void);
+void mp_js_radio_pop(void);

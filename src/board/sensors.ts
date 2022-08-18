@@ -123,3 +123,40 @@ export class EnumSensor extends Sensor {
     };
   }
 }
+
+export interface RadioMessage {
+  group: number;
+  message: string;
+  source: "code" | "user";
+}
+
+export class RadioSensor extends Sensor {
+  public value: RadioMessage[];
+  public group: number = 0;
+  public enabled: boolean = false;
+  public onchange: (v: RadioMessage[]) => void = () => {};
+
+  constructor(id: string) {
+    super("radio", id);
+    this.id = id;
+    this.value = [];
+  }
+
+  setValue(value: any): void {
+    if (!Array.isArray(value)) {
+      throw this.valueError(value);
+    }
+    this.value = value;
+    this.onchange(value);
+  }
+
+  toSerializable() {
+    return {
+      type: "radio",
+      id: this.id,
+      value: this.value,
+      group: this.group,
+      enabled: this.enabled,
+    };
+  }
+}

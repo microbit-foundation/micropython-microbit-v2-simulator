@@ -16,6 +16,8 @@ import { FileSystem } from "./fs";
 import { WebAssemblyOperations } from "./listener";
 import {
   EnumSensor,
+  RadioMessage,
+  RadioSensor,
   RangeSensor,
   RangeSensorWithThresholds,
   Sensor,
@@ -45,6 +47,7 @@ export class BoardUI {
   private temperature: RangeSensor;
   private microphone: MicrophoneUI;
   private accelerometer: AccelerometerUI;
+  private radio: RadioUI;
 
   // Perhaps we can remove this?
   public serialInputBuffer: number[] = [];
@@ -92,6 +95,7 @@ export class BoardUI {
       this.svg.querySelector("#LitMicrophone")!,
       onSensorChange
     );
+    this.radio = new RadioUI(onSensorChange);
 
     this.sensors = [
       this.display.lightLevel,
@@ -103,6 +107,7 @@ export class BoardUI {
       this.pins[MICROBIT_HAL_PIN_P0].pin,
       this.pins[MICROBIT_HAL_PIN_P1].pin,
       this.pins[MICROBIT_HAL_PIN_P2].pin,
+      this.radio.radio,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -142,6 +147,7 @@ export class BoardUI {
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
     this.microphone.initialize(this.operations.soundLevelCallback!);
+    this.radio.initialize();
     this.serialInputBuffer.length = 0;
   }
 
@@ -227,6 +233,7 @@ export class BoardUI {
     this.display.dispose();
     this.accelerometer.dispose();
     this.microphone.dispose();
+    this.radio.dispose();
     this.serialInputBuffer.length = 0;
   }
 }
@@ -618,6 +625,51 @@ export class PinUI {
         p.style.fill = fill;
       });
     }
+  }
+
+  initialize() {}
+
+  dispose() {}
+}
+
+export class RadioUI {
+  public radio: RadioSensor;
+
+  constructor(private onSensorChange: () => void) {
+    this.radio = new RadioSensor("radio");
+    this.radio.onchange = (v: RadioMessage[]): void => {
+      const latestMessage = v[v.length - 1];
+      if (latestMessage.source === "user") {
+        // Must send this message to the sim,
+        // so that radio.receive() will work subsequently.
+      }
+    };
+  }
+
+  send(buf: string) {
+    const radioMessages = [...this.radio.value];
+    radioMessages.push({
+      group: this.radio.group,
+      message: buf,
+      source: "code",
+    });
+    this.radio.setValue(radioMessages);
+    this.onSensorChange();
+  }
+
+  setGroup(group: number) {
+    this.radio.group = group;
+    this.onSensorChange();
+  }
+
+  enable() {
+    this.radio.enabled = true;
+    this.onSensorChange();
+  }
+
+  disable() {
+    this.radio.enabled = false;
+    this.onSensorChange();
   }
 
   initialize() {}

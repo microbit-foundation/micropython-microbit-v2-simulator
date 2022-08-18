@@ -22,7 +22,7 @@ import {
   RangeSensorWithThresholds,
   Sensor,
 } from "./sensors";
-import { clamp } from "./util";
+import { capRadioMessages, clamp } from "./util";
 
 const stoppedOpactity = "0.5";
 
@@ -638,22 +638,25 @@ export class RadioUI {
   constructor(private onSensorChange: () => void) {
     this.radio = new RadioSensor("radio");
     this.radio.onchange = (v: RadioMessage[]): void => {
-      const latestMessage = v[v.length - 1];
-      if (latestMessage.source === "user") {
-        // Must send this message to the sim,
-        // so that radio.receive() will work subsequently.
+      if (v.length) {
+        const latestMessage = v[v.length - 1];
+        if (latestMessage.source === "user") {
+          // Must send this message to the sim,
+          // so that radio.receive() will work subsequently.
+        }
       }
     };
   }
 
   send(buf: string) {
     const radioMessages = [...this.radio.value];
-    radioMessages.push({
+    const cappedRadioMessages = capRadioMessages(radioMessages);
+    cappedRadioMessages.push({
       group: this.radio.group,
       message: buf,
       source: "code",
     });
-    this.radio.setValue(radioMessages);
+    this.radio.setValue(cappedRadioMessages);
     this.onSensorChange();
   }
 

@@ -674,5 +674,8 @@ export class RadioUI {
 
   initialize() {}
 
-  dispose() {}
+  dispose() {
+    this.radio.setValue([]);
+    this.disable();
+  }
 }

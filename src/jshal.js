@@ -230,7 +230,11 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_radio_send: function (buf, len, buf2, len2) {
-    board.radio.send(UTF8ToString(buf2));
+    if (len2 === 0) {
+      board.radio.send(UTF8ToString(buf));
+    } else {
+      board.radio.send(UTF8ToString(buf2));
+    }
   },
 
   mp_js_radio_peek: function () {

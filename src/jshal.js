@@ -238,11 +238,14 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_radio_peek: function () {
-    // Todo
+    const message = board.radio.peek();
+    if (message) {
+      // To do, need string message as uint8_t
+    }
     return null;
   },
 
   mp_js_radio_pop: function () {
-    // Todo
+    board.radio.pop();
   },
 });

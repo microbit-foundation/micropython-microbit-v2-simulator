@@ -634,6 +634,7 @@ export class PinUI {
 
 export class RadioUI {
   public radio: RadioSensor;
+  public messageQueue: RadioMessage[] = [];
 
   constructor(private onSensorChange: () => void) {
     this.radio = new RadioSensor("radio");
@@ -641,11 +642,18 @@ export class RadioUI {
       if (v.length) {
         const latestMessage = v[v.length - 1];
         if (latestMessage.source === "user") {
-          // Must send this message to the sim,
-          // so that radio.receive() will work subsequently.
+          this.messageQueue.push(latestMessage);
         }
       }
     };
+  }
+
+  peek() {
+    return this.messageQueue[0]?.message;
+  }
+
+  pop() {
+    this.messageQueue.shift();
   }
 
   send(data: string) {
@@ -680,5 +688,6 @@ export class RadioUI {
   dispose() {
     this.radio.setValue([]);
     this.disable();
+    this.messageQueue = [];
   }
 }

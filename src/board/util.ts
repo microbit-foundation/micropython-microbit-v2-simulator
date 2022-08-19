@@ -23,7 +23,7 @@ export function capRadioMessages(
   });
   for (const group in radioMessagesByGroup) {
     const messages = radioMessagesByGroup[group];
-    while (messages.length > 11) {
+    while (messages.length > 101) {
       messages.shift();
     }
     cappedRadioMessages.push(...messages);

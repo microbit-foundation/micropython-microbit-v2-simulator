@@ -648,12 +648,12 @@ export class RadioUI {
     };
   }
 
-  send(buf: string) {
+  send(data: string) {
     const radioMessages = [...this.radio.value];
     const cappedRadioMessages = capRadioMessages(radioMessages);
     cappedRadioMessages.push({
       group: this.radio.group,
-      message: buf,
+      message: data,
       source: "code",
     });
     this.radio.setValue(cappedRadioMessages);

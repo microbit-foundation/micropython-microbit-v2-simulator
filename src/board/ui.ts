@@ -636,7 +636,7 @@ interface RadioConfig {
 }
 
 export class RadioUI {
-  private rxQueue: (Uint8Array | undefined)[] | undefined;
+  private rxQueue: Uint8Array[] | undefined;
   private config: RadioConfig | undefined;
 
   peek(): Uint8Array | undefined {
@@ -658,7 +658,7 @@ export class RadioUI {
   }
 
   receive(data: Uint8Array) {
-    if (this.rxQueue?.length === this.config?.queue) {
+    if (this.rxQueue!.length === this.config!.queue) {
       // Drop the message as the queue is full.
     } else {
       // Add extra information to make a radio packet in the expected format
@@ -686,13 +686,23 @@ export class RadioUI {
   }
 
   updateConfig(config: RadioConfig) {
-    // Maybe needs to be conditional?
-    this.disable();
-    this.enable(config);
+    // This needs to just change the config, not trash the receive buffer.
+    // This is somewhat odd as you can have a message in the buffer from
+    // a different radio group.
+    if (
+      !this.config ||
+      config.queue !== this.config.queue ||
+      config.group !== this.config.group
+    ) {
+      throw new Error(
+        "If queue or payload change then should call disable/enable."
+      );
+    }
+    this.config = config;
   }
 
   enable(config: RadioConfig) {
-    // Can you call more than once?
+    this.config = config;
     this.rxQueue = [];
   }
 

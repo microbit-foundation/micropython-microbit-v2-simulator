@@ -99,6 +99,7 @@ void mp_js_main(int heap_size) {
 
         mp_printf(MP_PYTHON_PRINTER, "MPY: soft reboot\n");
         //microbit_soft_timer_deinit();
+        microbit_hal_deinit();
         gc_sweep_all();
         mp_deinit();
     }

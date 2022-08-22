@@ -35,7 +35,7 @@
 // 4 bytes time
 #define RADIO_PACKET_OVERHEAD (1 + 1 + 4)
 
-static uint8_t rx_buf_size = -1;
+static uint8_t rx_buf_size = 0;
 
 void microbit_radio_enable(microbit_radio_config_t *config) {
     microbit_radio_disable();
@@ -55,7 +55,7 @@ void microbit_radio_disable(void) {
     if (MP_STATE_PORT(radio_buf) != NULL) {
         m_del(uint8_t, MP_STATE_PORT(radio_buf), rx_buf_size);
         MP_STATE_PORT(radio_buf) = NULL;
-        rx_buf_size = -1;
+        rx_buf_size = 0;
     }
 }
 

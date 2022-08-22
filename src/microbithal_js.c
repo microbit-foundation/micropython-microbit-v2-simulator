@@ -23,6 +23,16 @@ void microbit_hal_init(void) {
     mp_js_hal_init();
 }
 
+// Sim only deinit.
+void microbit_hal_deinit(void) {
+    // If we don't do this then the radio has a reference to the previous heap.
+    // Can be revisited if we stop/restart in way that resets WASM state.
+    extern void microbit_radio_disable(void);
+    microbit_radio_disable();
+
+    mp_js_hal_deinit();
+}
+
 static void microbit_hal_process_events(void) {
     // Call microbit_hal_timer_callback() every 6ms.
     static uint32_t last_ms = 0;

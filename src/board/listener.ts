@@ -113,10 +113,7 @@ export const createMessageListener = (board: BoardUI) => (e: MessageEvent) => {
         break;
       }
       case "radio_input": {
-        if (
-          typeof data.data !== "string" &&
-          !(data.data instanceof Uint8Array)
-        ) {
+        if (!(data.data instanceof Uint8Array)) {
           throw new Error("Invalid radio_input data field.");
         }
         board.radio.receive(data.data);

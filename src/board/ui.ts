@@ -16,13 +16,11 @@ import { FileSystem } from "./fs";
 import { WebAssemblyOperations } from "./listener";
 import {
   EnumSensor,
-  RadioMessage,
-  RadioSensor,
   RangeSensor,
   RangeSensorWithThresholds,
   Sensor,
 } from "./sensors";
-import { capRadioMessages, clamp } from "./util";
+import { clamp } from "./util";
 
 const stoppedOpactity = "0.5";
 
@@ -47,7 +45,7 @@ export class BoardUI {
   private temperature: RangeSensor;
   private microphone: MicrophoneUI;
   private accelerometer: AccelerometerUI;
-  private radio: RadioUI;
+  radio: RadioUI;
 
   // Perhaps we can remove this?
   public serialInputBuffer: number[] = [];
@@ -59,7 +57,7 @@ export class BoardUI {
   private playButton: HTMLButtonElement;
 
   constructor(
-    private operations: WebAssemblyOperations,
+    public operations: WebAssemblyOperations,
     private fs: FileSystem,
     private svg: SVGElement,
     onSensorChange: () => void
@@ -95,7 +93,7 @@ export class BoardUI {
       this.svg.querySelector("#LitMicrophone")!,
       onSensorChange
     );
-    this.radio = new RadioUI(onSensorChange);
+    this.radio = new RadioUI();
 
     this.sensors = [
       this.display.lightLevel,
@@ -107,7 +105,6 @@ export class BoardUI {
       this.pins[MICROBIT_HAL_PIN_P0].pin,
       this.pins[MICROBIT_HAL_PIN_P1].pin,
       this.pins[MICROBIT_HAL_PIN_P2].pin,
-      this.radio.radio,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -632,62 +629,80 @@ export class PinUI {
   dispose() {}
 }
 
+interface RadioConfig {
+  maxPayload: number;
+  queue: number;
+  group: number;
+}
+
 export class RadioUI {
-  public radio: RadioSensor;
-  public messageQueue: RadioMessage[] = [];
+  private rxQueue: (Uint8Array | undefined)[] | undefined;
+  private config: RadioConfig | undefined;
 
-  constructor(private onSensorChange: () => void) {
-    this.radio = new RadioSensor("radio");
-    this.radio.onchange = (v: RadioMessage[]): void => {
-      if (v.length) {
-        const latestMessage = v[v.length - 1];
-        if (latestMessage.source === "user") {
-          this.messageQueue.push(latestMessage);
-        }
-      }
-    };
-  }
-
-  peek() {
-    return this.messageQueue[0]?.message;
+  peek(): Uint8Array | undefined {
+    return this.rxQueue![0];
   }
 
   pop() {
-    this.messageQueue.shift();
+    this.rxQueue!.shift();
   }
 
-  send(data: string) {
-    const radioMessages = [...this.radio.value];
-    const cappedRadioMessages = capRadioMessages(radioMessages);
-    cappedRadioMessages.push({
-      group: this.radio.group,
-      message: data,
-      source: "code",
-    });
-    this.radio.setValue(cappedRadioMessages);
-    this.onSensorChange();
+  send(data: Uint8Array) {
+    window.parent.postMessage(
+      {
+        kind: "radio_output",
+        data,
+      },
+      "*"
+    );
   }
 
-  setGroup(group: number) {
-    this.radio.group = group;
-    this.onSensorChange();
+  receive(data: Uint8Array) {
+    if (this.rxQueue?.length === this.config?.queue) {
+      // Drop the message as the queue is full.
+    } else {
+      // Add extra information to make a radio packet in the expected format
+      // rather than just data. Clients must prepend \x01\x00\x01 if desired.
+      const len = data.length;
+      const size =
+        1 + // len
+        len +
+        1 + // RSSI
+        4; // time
+      const rssi = 127; // What's a reasonable value?
+      const time = 0; // Function needs moving so we can call it.
+
+      const packet = new Uint8Array(size);
+      packet[0] = len;
+      packet.set(data, 1);
+      packet[1 + len] = rssi;
+      packet[1 + len + 1] = time & 0xff;
+      packet[1 + len + 2] = (time >> 8) & 0xff;
+      packet[1 + len + 3] = (time >> 16) & 0xff;
+      packet[1 + len + 4] = (time >> 24) & 0xff;
+
+      this.rxQueue!.push(packet);
+    }
   }
 
-  enable() {
-    this.radio.enabled = true;
-    this.onSensorChange();
+  updateConfig(config: RadioConfig) {
+    // Maybe needs to be conditional?
+    this.disable();
+    this.enable(config);
+  }
+
+  enable(config: RadioConfig) {
+    // Can you call more than once?
+    this.rxQueue = [];
   }
 
   disable() {
-    this.radio.enabled = false;
-    this.onSensorChange();
+    this.rxQueue = undefined;
   }
 
   initialize() {}
 
   dispose() {
-    this.radio.setValue([]);
     this.disable();
-    this.messageQueue = [];
   }
 }

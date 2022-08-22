@@ -27,10 +27,7 @@
 mergeInto(LibraryManager.library, {
   mp_js_hal_init: async function () {
     MP_JS_EPOCH = new Date().getTime();
-    board.initialize({
-      defaultAudioCallback: window.microbit_hal_audio_ready_callback,
-      speechAudioCallback: window.microbit_hal_audio_speech_ready_callback,
-    });
+    board.initialize();
   },
 
   mp_js_hal_deinit: function () {
@@ -216,31 +213,31 @@ mergeInto(LibraryManager.library, {
     return board.audio.isSoundExpressionActive();
   },
 
-  mp_js_radio_enable: function (group) {
-    board.radio.setGroup(group);
-    board.radio.enable();
+  mp_js_radio_enable: function (group, max_payload, queue) {
+    board.radio.enable({ group, maxPayload: max_payload, queue });
   },
 
   mp_js_radio_disable: function () {
     board.radio.disable();
   },
 
-  mp_js_radio_update_config: function (group) {
-    board.radio.setGroup(group);
+  mp_js_radio_update_config: function (group, max_payload, queue) {
+    board.radio.updateConfig({ group, maxPayload: max_payload, queue });
   },
 
   mp_js_radio_send: function (buf, len, buf2, len2) {
-    if (len2 === 0) {
-      board.radio.send(UTF8ToString(buf));
-    } else {
-      board.radio.send(UTF8ToString(buf2));
-    }
+    const data = new Uint8Array(len + len2);
+    data.set(HEAP8.slice(buf, buf + len));
+    data.set(HEAP8.slice(buf2, buf2 + len2), len);
+    board.radio.send(data);
   },
 
   mp_js_radio_peek: function () {
-    const message = board.radio.peek();
-    if (message) {
-      // To do, need string message as uint8_t
+    const packet = board.radio.peek();
+    if (packet) {
+      const buf = board.operations.radioRxBuffer();
+      HEAP8.set(packet, buf);
+      return buf;
     }
     return null;
   },

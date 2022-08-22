@@ -44,7 +44,7 @@ void microbit_radio_enable(microbit_radio_config_t *config) {
     mp_js_radio_enable(group, config->max_payload, config->queue_len);
 
     // We have an rx buffer of size 1, the queue itself is in the JavaScript.
-    rx_buf_size = config->max_payload;
+    rx_buf_size = config->max_payload + RADIO_PACKET_OVERHEAD;
     MP_STATE_PORT(radio_buf) = m_new(uint8_t, rx_buf_size);
 }
 

@@ -26,7 +26,6 @@
 
 mergeInto(LibraryManager.library, {
   mp_js_hal_init: async function () {
-    MP_JS_EPOCH = new Date().getTime();
     board.initialize();
   },
 
@@ -35,7 +34,7 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_ticks_ms: function () {
-    return new Date().getTime() - MP_JS_EPOCH;
+    return board.ticksMilliseconds();
   },
 
   mp_js_hal_stdin_pop_char: function () {

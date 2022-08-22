@@ -56,6 +56,8 @@ export class BoardUI {
   private stoppedOverlay: HTMLDivElement;
   private playButton: HTMLButtonElement;
 
+  private epoch: number | undefined;
+
   constructor(
     public operations: WebAssemblyOperations,
     private fs: FileSystem,
@@ -93,7 +95,7 @@ export class BoardUI {
       this.svg.querySelector("#LitMicrophone")!,
       onSensorChange
     );
-    this.radio = new RadioUI();
+    this.radio = new RadioUI(this.ticksMilliseconds.bind(this));
 
     this.sensors = [
       this.display.lightLevel,
@@ -135,6 +137,7 @@ export class BoardUI {
   }
 
   initialize() {
+    this.epoch = new Date().getTime();
     this.audio.initialize({
       defaultAudioCallback: this.operations.defaultAudioCallback!,
       speechAudioCallback: this.operations.speechAudioCallback!,
@@ -146,6 +149,10 @@ export class BoardUI {
     this.microphone.initialize(this.operations.soundLevelCallback!);
     this.radio.initialize();
     this.serialInputBuffer.length = 0;
+  }
+
+  ticksMilliseconds() {
+    return new Date().getTime() - this.epoch!;
   }
 
   private initializePlayButton() {
@@ -639,6 +646,8 @@ export class RadioUI {
   private rxQueue: Uint8Array[] | undefined;
   private config: RadioConfig | undefined;
 
+  constructor(private ticksMilliseconds: () => number) {}
+
   peek(): Uint8Array | undefined {
     return this.rxQueue![0];
   }
@@ -669,8 +678,8 @@ export class RadioUI {
         len +
         1 + // RSSI
         4; // time
-      const rssi = 127; // What's a reasonable value?
-      const time = 0; // Function needs moving so we can call it.
+      const rssi = 127; // This is inverted by modradio.
+      const time = this.ticksMilliseconds();
 
       const packet = new Uint8Array(size);
       packet[0] = len;

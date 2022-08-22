@@ -215,4 +215,31 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_audio_is_expression_active: function () {
     return board.audio.isSoundExpressionActive();
   },
+
+  mp_js_hal_log_delete: function (full_erase) {
+    board.dataLogging.delete();
+  },
+
+  mp_js_hal_log_set_mirroring: function (serial) {
+    board.dataLogging.delete();
+  },
+
+  mp_js_hal_log_set_timestamp: function (period) {
+    board.dataLogging.setTimestamp(period);
+  },
+
+  mp_js_hal_log_begin_row: function () {
+    board.dataLogging.beginRow();
+    return 0;
+  },
+
+  mp_js_hal_log_end_row: function () {
+    board.dataLogging.endRow();
+    return 0;
+  },
+
+  mp_js_hal_log_data: function (key, value) {
+    board.dataLogging.setLogData(UTF8ToString(key), UTF8ToString(value));
+    return 0;
+  },
 });

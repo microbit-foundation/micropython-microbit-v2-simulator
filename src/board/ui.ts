@@ -11,11 +11,14 @@ import {
 import {
   convertAccelerometerStringToNumber,
   convertSoundEventStringToNumber,
+  convertTimestampToString,
 } from "./conversions";
 import { FileSystem } from "./fs";
 import { WebAssemblyOperations } from "./listener";
 import {
+  DataLoggingSensor,
   EnumSensor,
+  LogData,
   RangeSensor,
   RangeSensorWithThresholds,
   Sensor,
@@ -45,6 +48,7 @@ export class BoardUI {
   private temperature: RangeSensor;
   private microphone: MicrophoneUI;
   private accelerometer: AccelerometerUI;
+  private dataLogging: DataLoggingUI;
 
   // Perhaps we can remove this?
   public serialInputBuffer: number[] = [];
@@ -92,6 +96,7 @@ export class BoardUI {
       this.svg.querySelector("#LitMicrophone")!,
       onSensorChange
     );
+    this.dataLogging = new DataLoggingUI("log", onSensorChange);
 
     this.sensors = [
       this.display.lightLevel,
@@ -103,6 +108,7 @@ export class BoardUI {
       this.pins[MICROBIT_HAL_PIN_P0].pin,
       this.pins[MICROBIT_HAL_PIN_P1].pin,
       this.pins[MICROBIT_HAL_PIN_P2].pin,
+      this.dataLogging.log,
       ...this.accelerometer.sensors,
     ];
     this.sensorsById = new Map();
@@ -142,6 +148,7 @@ export class BoardUI {
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
     this.microphone.initialize(this.operations.soundLevelCallback!);
+    this.dataLogging.initialize();
     this.serialInputBuffer.length = 0;
   }
 
@@ -227,6 +234,7 @@ export class BoardUI {
     this.display.dispose();
     this.accelerometer.dispose();
     this.microphone.dispose();
+    this.dataLogging.dispose();
     this.serialInputBuffer.length = 0;
   }
 }
@@ -623,4 +631,75 @@ export class PinUI {
   initialize() {}
 
   dispose() {}
+}
+
+export class DataLoggingUI {
+  public log: DataLoggingSensor;
+  private beginRowFlag: boolean = false;
+  private endRowFlag: boolean = true;
+  private logData: LogData[] = [];
+  private startTime: number = 0;
+
+  constructor(label: string, private onSensorChange: () => void) {
+    this.log = new DataLoggingSensor(label);
+  }
+
+  delete() {
+    this.log.delete = true;
+    this.onSensorChange();
+  }
+
+  setMirroring(serial: boolean) {
+    this.log.serial = serial;
+    this.onSensorChange();
+  }
+
+  setTimestamp(period: number) {
+    this.log.period = convertTimestampToString(period);
+    this.onSensorChange();
+  }
+
+  beginRow() {
+    this.endRowFlag = false;
+    this.beginRowFlag = true;
+  }
+
+  endRow() {
+    this.beginRowFlag = false;
+    this.endRowFlag = true;
+    this.sendData();
+  }
+
+  setLogData(key: string, value: string) {
+    if (this.beginRowFlag && !this.endRowFlag) {
+      this.logData.push({ key, value });
+    }
+  }
+
+  sendData() {
+    if (!this.startTime) {
+      this.startTime = Date.now();
+    }
+    this.logData.unshift({
+      key: "timestamp",
+      value: Date.now() - this.startTime,
+    });
+    if (this.log.value) {
+      this.log.setValue([...this.log.value, this.logData]);
+    } else {
+      this.log.setValue([this.logData]);
+    }
+    this.onSensorChange();
+    this.logData = [];
+  }
+
+  initialize() {}
+
+  dispose() {
+    this.log.delete = false;
+    this.log.serial = false;
+    this.log.period = "none";
+    this.logData = [];
+    this.log.setValue(null);
+  }
 }

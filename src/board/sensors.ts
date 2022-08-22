@@ -123,3 +123,38 @@ export class EnumSensor extends Sensor {
     };
   }
 }
+
+export interface LogData {
+  key: string;
+  value: string | number;
+}
+
+export class DataLoggingSensor extends Sensor {
+  public value: LogData[][] | null = null;
+  public period: string = "none";
+  public delete: boolean = false;
+  public serial: boolean = false;
+
+  constructor(id: string) {
+    super("log", id);
+    this.id = id;
+  }
+
+  setValue(value: any): void {
+    if (!Array.isArray(value)) {
+      throw this.valueError(value);
+    }
+    this.value = value;
+  }
+
+  toSerializable() {
+    return {
+      type: "log",
+      id: this.id,
+      value: this.value,
+      period: this.period,
+      serial: this.serial,
+      delete: this.delete,
+    };
+  }
+}

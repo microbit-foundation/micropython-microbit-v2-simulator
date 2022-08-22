@@ -73,3 +73,10 @@ bool mp_js_hal_audio_is_expression_active(void);
 void mp_js_hal_microphone_init(void);
 void mp_js_hal_microphone_set_threshold(int kind, int value);
 int mp_js_hal_microphone_get_level(void);
+
+void mp_js_hal_log_delete(bool full_erase);
+void mp_js_hal_log_set_mirroring(bool serial);
+void mp_js_hal_log_set_timestamp(int period);
+int mp_js_hal_log_begin_row(void);
+int mp_js_hal_log_end_row(void);
+int mp_js_hal_log_data(const char *key, const char *value);

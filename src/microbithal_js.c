@@ -376,18 +376,21 @@ const uint8_t *microbit_hal_get_font_data(char c) {
 }
 
 void microbit_hal_log_delete(bool full_erase) {
+    mp_js_hal_log_delete(full_erase);
     /*
     uBit.log.clear(full_erase);
     */
 }
 
 void microbit_hal_log_set_mirroring(bool serial) {
+    mp_js_hal_log_set_mirroring(serial);
     /*
     uBit.log.setSerialMirroring(serial);
     */
 }
 
 void microbit_hal_log_set_timestamp(int period) {
+    mp_js_hal_log_set_timestamp(period);
     /*
     static_assert(MICROBIT_HAL_LOG_TIMESTAMP_NONE == (int)TimeStampFormat::None);
     static_assert(MICROBIT_HAL_LOG_TIMESTAMP_MILLISECONDS == (int)TimeStampFormat::Milliseconds);
@@ -400,33 +403,33 @@ void microbit_hal_log_set_timestamp(int period) {
 }
 
 int microbit_hal_log_begin_row(void) {
+    return mp_js_hal_log_begin_row();
     /*
     if (uBit.log.beginRow() != DEVICE_OK) {
         return -1;
     }
     return 0;
     */
-    return 0;
 }
 
 int microbit_hal_log_end_row(void) {
+    return mp_js_hal_log_end_row();
     /*
     if (uBit.log.endRow() != DEVICE_OK) {
         return -1;
     }
     return 0;
     */
-    return 0;
 }
 
 int microbit_hal_log_data(const char *key, const char *value) {
+    return mp_js_hal_log_data(key, value);
     /*
     if (uBit.log.logData(key, value) != DEVICE_OK) {
         return -1;
     }
     return 0;
     */
-    return 0;
 }
 
 // This is needed by the microbitfs implementation.

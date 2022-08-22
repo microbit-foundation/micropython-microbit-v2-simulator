@@ -12,6 +12,12 @@ import {
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT,
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT,
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP,
+  MICROBIT_HAL_LOG_TIMESTAMP_DAYS,
+  MICROBIT_HAL_LOG_TIMESTAMP_HOURS,
+  MICROBIT_HAL_LOG_TIMESTAMP_MILLISECONDS,
+  MICROBIT_HAL_LOG_TIMESTAMP_MINUTES,
+  MICROBIT_HAL_LOG_TIMESTAMP_NONE,
+  MICROBIT_HAL_LOG_TIMESTAMP_SECONDS,
   MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_HIGH,
   MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW,
 } from "./constants";
@@ -109,6 +115,25 @@ export function convertAccelerometerNumberToString(value: number): string {
       return "8g";
     case MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE:
       return "shake";
+    default:
+      throw new Error(`Invalid value ${value}`);
+  }
+}
+
+export function convertTimestampToString(value: number): string {
+  switch (value) {
+    case MICROBIT_HAL_LOG_TIMESTAMP_NONE:
+      return "none";
+    case MICROBIT_HAL_LOG_TIMESTAMP_MILLISECONDS:
+      return "milliseconds";
+    case MICROBIT_HAL_LOG_TIMESTAMP_SECONDS:
+      return "seconds";
+    case MICROBIT_HAL_LOG_TIMESTAMP_MINUTES:
+      return "minutes";
+    case MICROBIT_HAL_LOG_TIMESTAMP_HOURS:
+      return "hours";
+    case MICROBIT_HAL_LOG_TIMESTAMP_DAYS:
+      return "days";
     default:
       throw new Error(`Invalid value ${value}`);
   }

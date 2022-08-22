@@ -221,7 +221,7 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_log_set_mirroring: function (serial) {
-    board.dataLogging.delete();
+    board.dataLogging.setMirroring(serial);
   },
 
   mp_js_hal_log_set_timestamp: function (period) {

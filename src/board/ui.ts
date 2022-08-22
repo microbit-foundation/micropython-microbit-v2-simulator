@@ -700,6 +700,6 @@ export class DataLoggingUI {
     this.log.serial = false;
     this.log.period = "none";
     this.logData = [];
-    this.log.setValue(null);
+    this.log.setValue([]);
   }
 }

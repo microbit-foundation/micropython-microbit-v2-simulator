@@ -130,7 +130,7 @@ export interface LogData {
 }
 
 export class DataLoggingSensor extends Sensor {
-  public value: LogData[][] | null = null;
+  public value: LogData[][] = [];
   public period: string = "none";
   public delete: boolean = false;
   public serial: boolean = false;

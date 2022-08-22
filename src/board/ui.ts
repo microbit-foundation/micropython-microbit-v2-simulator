@@ -695,8 +695,8 @@ export class RadioUI {
   }
 
   updateConfig(config: RadioConfig) {
-    // This needs to just change the config, not trash the receive buffer.
-    // This is somewhat odd as you can have a message in the buffer from
+    // This needs to just change the config, not trash the receive queue.
+    // This is somewhat odd as you can have a message in the queue from
     // a different radio group.
     if (
       !this.config ||

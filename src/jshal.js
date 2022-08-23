@@ -38,18 +38,11 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_stdin_pop_char: function () {
-    return board.readSerial();
+    return board.readSerialInput();
   },
 
   mp_js_hal_stdout_tx_strn: function (ptr, len) {
-    const data = UTF8ToString(ptr, len);
-    window.parent.postMessage(
-      {
-        kind: "serial_output",
-        data,
-      },
-      "*"
-    );
+    board.writeSerialOutput(UTF8ToString(ptr, len));
   },
 
   mp_js_hal_filesystem_find: function (name, len) {
@@ -226,17 +219,15 @@ mergeInto(LibraryManager.library, {
 
   mp_js_radio_send: function (buf, len, buf2, len2) {
     const data = new Uint8Array(len + len2);
-    data.set(HEAP8.slice(buf, buf + len));
-    data.set(HEAP8.slice(buf2, buf2 + len2), len);
+    data.set(HEAPU8.slice(buf, buf + len));
+    data.set(HEAPU8.slice(buf2, buf2 + len2), len);
     board.radio.send(data);
   },
 
   mp_js_radio_peek: function () {
     const packet = board.radio.peek();
     if (packet) {
-      const buf = board.operations.radioRxBuffer();
-      HEAP8.set(packet, buf);
-      return buf;
+      return board.operations.writeRadioRxBuffer(packet);
     }
     return null;
   },

@@ -2,12 +2,12 @@ import { replaceBuiltinSound } from "./built-in-sounds";
 import { SoundEmojiSynthesizer } from "./sound-emoji-synthesizer";
 import { parseSoundEffects } from "./sound-expressions";
 
-interface AudioUIOptions {
+interface AudioOptions {
   defaultAudioCallback: () => void;
   speechAudioCallback: () => void;
 }
 
-export class AudioUI {
+export class Audio {
   private frequency: number = 440;
   // You can mute the sim before it's running so we can't immediately write to the muteNode.
   private muted: boolean = false;
@@ -23,7 +23,7 @@ export class AudioUI {
 
   constructor() {}
 
-  initialize({ defaultAudioCallback, speechAudioCallback }: AudioUIOptions) {
+  initialize({ defaultAudioCallback, speechAudioCallback }: AudioOptions) {
     this.context = new AudioContext({
       // The highest rate is the sound expression synth.
       sampleRate: 44100,

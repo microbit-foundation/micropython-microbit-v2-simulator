@@ -1,15 +1,16 @@
 import * as conversions from "./board/conversions";
 import { FileSystem } from "./board/fs";
+import { WebAssemblyOperations } from "./board/wasm";
 import {
+  Board,
+  createBoard,
   createMessageListener,
-  onSensorChange,
-  WebAssemblyOperations,
-} from "./board/listener";
-import { BoardUI, createBoard } from "./board/ui";
+  Notifications,
+} from "./board";
 
 declare global {
   interface Window {
-    board: BoardUI;
+    board: Board;
     fs: FileSystem;
     conversions: typeof conversions;
 
@@ -21,8 +22,8 @@ declare global {
 window.fs = new FileSystem();
 window.board = createBoard(
   new WebAssemblyOperations(),
-  window.fs,
-  onSensorChange
+  new Notifications(window.parent),
+  window.fs
 );
 window.conversions = conversions;
 

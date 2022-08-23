@@ -1,3 +1,5 @@
+// Matches microbithal.h
+
 // These numbers refer to indices in the (private) pin_obj table.
 export const MICROBIT_HAL_PIN_P0 = 0;
 export const MICROBIT_HAL_PIN_P1 = 1;

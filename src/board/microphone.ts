@@ -1,8 +1,8 @@
 import { convertSoundEventStringToNumber } from "./conversions";
-import { RangeSensorWithThresholds } from "./sensors";
+import { RangeSensor } from "./sensors";
 
 export class Microphone {
-  public soundLevel: RangeSensorWithThresholds = new RangeSensorWithThresholds(
+  public soundLevel: RangeSensor = new RangeSensor(
     "soundLevel",
     0,
     255,

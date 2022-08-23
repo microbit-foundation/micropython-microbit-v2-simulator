@@ -77,6 +77,28 @@ The following sections documents the messages supported via postMessage.
 ```
 
 <td>Sent when the simulator is ready for input. Includes a description of the available sensors.
+
+<tr>
+<td>sensor_change
+<td>
+
+```javascript
+{
+  "kind": "sensor_change",
+  "sensors": [
+    {
+      "id": "lightLevel",
+      "type": "range",
+      "min": 0,
+      "max": 255
+    }
+    // More sensors here.
+  ]
+}
+```
+
+<td>Sent when one or more sensors change. Note min/max and threshold values can change.
+
 <tr>
 <td>serial_output
 <td>
@@ -89,6 +111,7 @@ The following sections documents the messages supported via postMessage.
 ```
 
 <td>Serial output suitable for a terminal or other use.
+
 </table>
 
 ## Messages supported by the iframe

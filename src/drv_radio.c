@@ -26,35 +26,61 @@
 
 #include "py/runtime.h"
 #include "drv_radio.h"
+#include "jshal.h"
+
+// Format:
+// 1 byte for len
+// N data bytes as per len
+// 1 byte RSSI
+// 4 bytes time
+#define RADIO_PACKET_OVERHEAD (1 + 1 + 4)
+
+static uint8_t rx_buf_size = 0;
 
 void microbit_radio_enable(microbit_radio_config_t *config) {
-    // TODO: enable the radio, based on the given config.
+    microbit_radio_disable();
 
-    // Set to non-NULL to indicate to modradio that the radio is enabled.
-    MP_STATE_PORT(radio_buf) = (void *)1;
+    uint8_t group = config->prefix0;
+    mp_js_radio_enable(group, config->max_payload, config->queue_len);
+
+    // We have an rx buffer of size 1, the queue itself is in the JavaScript.
+    rx_buf_size = config->max_payload + RADIO_PACKET_OVERHEAD;
+    MP_STATE_PORT(radio_buf) = m_new(uint8_t, rx_buf_size);
 }
 
 void microbit_radio_disable(void) {
-    // TODO: disable the radio.
+    mp_js_radio_disable();
 
-    // Set to NULL to indicate to modradio that the radio is disabled.
-    MP_STATE_PORT(radio_buf) = NULL;
+    // free any old buffers
+    if (MP_STATE_PORT(radio_buf) != NULL) {
+        m_del(uint8_t, MP_STATE_PORT(radio_buf), rx_buf_size);
+        MP_STATE_PORT(radio_buf) = NULL;
+        rx_buf_size = 0;
+    }
+}
+
+// Exposed so JavaScript can write directly into the max_payload sized buffer.
+uint8_t *microbit_radio_rx_buffer() {
+    return MP_STATE_PORT(radio_buf);
 }
 
 void microbit_radio_update_config(microbit_radio_config_t *config) {
-    // TODO: change radio configuration based on config argument.
+    // This is not called if the max_payload or queue length change.
+    // Instead we are disabled then enabled.
+    uint8_t group = config->prefix0;
+    mp_js_radio_update_config(group, config->max_payload, config->queue_len);
 }
 
 // This assumes the radio is enabled.
 void microbit_radio_send(const void *buf, size_t len, const void *buf2, size_t len2) {
-    // TODO: send packet over the radio, packet defined by concatenation of buf and buf2.
+    mp_js_radio_send(buf, len, buf2, len2);
 }
 
 const uint8_t *microbit_radio_peek(void) {
-    // TODO: return a pointer to the next available packet, or NULL if none available.
-    return NULL; // no packet
+    // This call writes to the rx buffer.
+    return mp_js_radio_peek();
 }
 
 void microbit_radio_pop(void) {
-    // TODO: pop the next available packet, if there is one.
+    mp_js_radio_pop();
 }

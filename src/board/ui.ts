@@ -45,6 +45,7 @@ export class BoardUI {
   private temperature: RangeSensor;
   private microphone: MicrophoneUI;
   private accelerometer: AccelerometerUI;
+  radio: RadioUI;
 
   // Perhaps we can remove this?
   public serialInputBuffer: number[] = [];
@@ -55,8 +56,10 @@ export class BoardUI {
   private stoppedOverlay: HTMLDivElement;
   private playButton: HTMLButtonElement;
 
+  private epoch: number | undefined;
+
   constructor(
-    private operations: WebAssemblyOperations,
+    public operations: WebAssemblyOperations,
     private fs: FileSystem,
     private svg: SVGElement,
     onSensorChange: () => void
@@ -92,6 +95,7 @@ export class BoardUI {
       this.svg.querySelector("#LitMicrophone")!,
       onSensorChange
     );
+    this.radio = new RadioUI(this.ticksMilliseconds.bind(this));
 
     this.sensors = [
       this.display.lightLevel,
@@ -133,6 +137,7 @@ export class BoardUI {
   }
 
   initialize() {
+    this.epoch = new Date().getTime();
     this.audio.initialize({
       defaultAudioCallback: this.operations.defaultAudioCallback!,
       speechAudioCallback: this.operations.speechAudioCallback!,
@@ -142,7 +147,12 @@ export class BoardUI {
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
     this.microphone.initialize(this.operations.soundLevelCallback!);
+    this.radio.initialize();
     this.serialInputBuffer.length = 0;
+  }
+
+  ticksMilliseconds() {
+    return new Date().getTime() - this.epoch!;
   }
 
   private initializePlayButton() {
@@ -227,6 +237,7 @@ export class BoardUI {
     this.display.dispose();
     this.accelerometer.dispose();
     this.microphone.dispose();
+    this.radio.dispose();
     this.serialInputBuffer.length = 0;
   }
 }
@@ -623,4 +634,94 @@ export class PinUI {
   initialize() {}
 
   dispose() {}
+}
+
+interface RadioConfig {
+  maxPayload: number;
+  queue: number;
+  group: number;
+}
+
+export class RadioUI {
+  private rxQueue: Uint8Array[] | undefined;
+  private config: RadioConfig | undefined;
+
+  constructor(private ticksMilliseconds: () => number) {}
+
+  peek(): Uint8Array | undefined {
+    return this.rxQueue![0];
+  }
+
+  pop() {
+    this.rxQueue!.shift();
+  }
+
+  send(data: Uint8Array) {
+    window.parent.postMessage(
+      {
+        kind: "radio_output",
+        data,
+      },
+      "*"
+    );
+  }
+
+  receive(data: Uint8Array) {
+    if (this.rxQueue!.length === this.config!.queue) {
+      // Drop the message as the queue is full.
+    } else {
+      // Add extra information to make a radio packet in the expected format
+      // rather than just data. Clients must prepend \x01\x00\x01 if desired.
+      const len = data.length;
+      const size =
+        1 + // len
+        len +
+        1 + // RSSI
+        4; // time
+      const rssi = 127; // This is inverted by modradio.
+      const time = this.ticksMilliseconds();
+
+      const packet = new Uint8Array(size);
+      packet[0] = len;
+      packet.set(data, 1);
+      packet[1 + len] = rssi;
+      packet[1 + len + 1] = time & 0xff;
+      packet[1 + len + 2] = (time >> 8) & 0xff;
+      packet[1 + len + 3] = (time >> 16) & 0xff;
+      packet[1 + len + 4] = (time >> 24) & 0xff;
+
+      this.rxQueue!.push(packet);
+    }
+  }
+
+  updateConfig(config: RadioConfig) {
+    // This needs to just change the config, not trash the receive queue.
+    // This is somewhat odd as you can have a message in the queue from
+    // a different radio group.
+    if (
+      !this.config ||
+      config.queue !== this.config.queue ||
+      config.group !== this.config.group
+    ) {
+      throw new Error(
+        "If queue or payload change then should call disable/enable."
+      );
+    }
+    this.config = config;
+  }
+
+  enable(config: RadioConfig) {
+    this.config = config;
+    this.rxQueue = [];
+  }
+
+  disable() {
+    this.rxQueue = undefined;
+  }
+
+  initialize() {}
+
+  dispose() {
+    this.disable();
+  }
 }

@@ -9,6 +9,7 @@ export class WebAssemblyOperations {
   speechAudioCallback: (() => void) | undefined;
   gestureCallback: ((gesture: number) => void) | undefined;
   soundLevelCallback: ((soundLevel: number) => void) | undefined;
+  radioRxBuffer: (() => number) | undefined;
 
   initialize() {
     const cwrap = (window as any).Module.cwrap;
@@ -41,6 +42,8 @@ export class WebAssemblyOperations {
       ["number"],
       {}
     );
+
+    this.radioRxBuffer = cwrap("microbit_radio_rx_buffer", "null", [], {});
 
     const main = cwrap("mp_js_main", "null", ["number"], {
       async: true,
@@ -107,6 +110,13 @@ export const createMessageListener = (board: BoardUI) => (e: MessageEvent) => {
           throw new Error("Invalid serial_input data field.");
         }
         board.writeSerial(data.data);
+        break;
+      }
+      case "radio_input": {
+        if (!(data.data instanceof Uint8Array)) {
+          throw new Error("Invalid radio_input data field.");
+        }
+        board.radio.receive(data.data);
         break;
       }
       case "sensor_set": {

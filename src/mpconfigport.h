@@ -156,8 +156,4 @@ typedef long mp_off_t;
 // Needed for MICROPY_PY_URANDOM_SEED_INIT_FUNC.
 extern uint32_t rng_generate_random_word(void);
 
-// JS-specific deinit
-extern void mp_js_hal_deinit(void);
-#define MICROPY_PORT_DEINIT_FUNC mp_js_hal_deinit()
-
 #endif

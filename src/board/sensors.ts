@@ -19,13 +19,16 @@ export abstract class Sensor {
 
 export class RangeSensor extends Sensor {
   public value: number;
+
   public onchange?: (prev: number, curr: number) => void = () => {};
   constructor(
     id: string,
     public min: number,
     public max: number,
     public initial: number,
-    public unit: string | undefined
+    public unit: string | undefined,
+    public lowThreshold?: number,
+    public highThreshold?: number
   ) {
     super("range", id);
     this.value = initial;
@@ -55,7 +58,7 @@ export class RangeSensor extends Sensor {
   }
 
   toSerializable() {
-    return {
+    const data: Record<string, any> = {
       type: "range",
       id: this.id,
       min: this.min,
@@ -63,35 +66,13 @@ export class RangeSensor extends Sensor {
       value: this.value,
       unit: this.unit,
     };
-  }
-}
-
-export class RangeSensorWithThresholds extends RangeSensor {
-  constructor(
-    id: string,
-    public min: number,
-    public max: number,
-    public initial: number,
-    public unit: string | undefined,
-    public lowThreshold: number,
-    public highThreshold: number
-  ) {
-    super(id, min, max, initial, unit);
-    this.lowThreshold = lowThreshold;
-    this.highThreshold = highThreshold;
-  }
-
-  toSerializable() {
-    return {
-      type: "range",
-      id: this.id,
-      min: this.min,
-      max: this.max,
-      value: this.value,
-      unit: this.unit,
-      lowThreshold: this.lowThreshold,
-      highThreshold: this.highThreshold,
-    };
+    if (this.lowThreshold !== undefined) {
+      data.lowThreshold = this.lowThreshold;
+    }
+    if (this.highThreshold !== undefined) {
+      data.highThreshold = this.highThreshold;
+    }
+    return data;
   }
 }
 

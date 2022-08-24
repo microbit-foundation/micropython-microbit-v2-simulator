@@ -51,7 +51,7 @@ export class RangeSensor extends Sensor {
     id: string,
     public min: number,
     public max: number,
-    public initial: number,
+    initial: number,
     public unit: string | undefined,
     public lowThreshold?: number,
     public highThreshold?: number

@@ -37,15 +37,11 @@ export class Microphone {
 
   initialize(soundLevelCallback: (v: number) => void) {
     this.soundLevel.onchange = (prev: number, curr: number) => {
-      if (
-        prev > this.soundLevel.lowThreshold &&
-        curr <= this.soundLevel.lowThreshold
-      ) {
+      const low = this.soundLevel.lowThreshold!;
+      const high = this.soundLevel.highThreshold!;
+      if (prev > low && curr <= low) {
         soundLevelCallback(convertSoundEventStringToNumber("low"));
-      } else if (
-        prev < this.soundLevel.highThreshold &&
-        curr >= this.soundLevel.highThreshold
-      ) {
+      } else if (prev < high && curr >= high!) {
         soundLevelCallback(convertSoundEventStringToNumber("high"));
       }
     };

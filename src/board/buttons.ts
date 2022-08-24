@@ -1,32 +1,24 @@
-import { RangeSensor } from "./sensors";
+import { RangeSensor, State } from "./state";
 
 export class Button {
-  public button: RangeSensor;
+  public state: RangeSensor;
+
   private _presses: number = 0;
   private _mouseDown: boolean = false;
-  private _internalChange: boolean = false;
+
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
   private mouseUpListener: (e: MouseEvent) => void;
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(
+    private id: "buttonA" | "buttonB",
     private element: SVGElement,
     label: string,
-    private onSensorChange: () => void
+    private onChange: (change: Partial<State>) => void
   ) {
     this._presses = 0;
-    this.button = new RangeSensor(label, 0, 1, 0, undefined);
-    this.button.onchange = (_, curr: number): void => {
-      if (this._internalChange == true) {
-        this.onSensorChange();
-        this._internalChange = false;
-      }
-      if (curr) {
-        this._presses++;
-      }
-      this.render();
-    };
+    this.state = new RangeSensor(id, 0, 1, 0, undefined);
 
     this.element.setAttribute("role", "button");
     this.element.setAttribute("tabindex", "0");
@@ -39,10 +31,8 @@ export class Button {
         case " ":
           e.preventDefault();
           if (e.type === "keydown") {
-            this._internalChange = true;
             this.press();
           } else {
-            this._internalChange = true;
             this.release();
           }
       }
@@ -51,21 +41,18 @@ export class Button {
     this.mouseDownListener = (e) => {
       e.preventDefault();
       this._mouseDown = true;
-      this._internalChange = true;
       this.press();
     };
     this.mouseUpListener = (e) => {
       e.preventDefault();
       if (this._mouseDown) {
         this._mouseDown = false;
-        this._internalChange = true;
         this.release();
       }
     };
     this.mouseLeaveListener = (e) => {
       if (this._mouseDown) {
         this._mouseDown = false;
-        this._internalChange = true;
         this.release();
       }
     };
@@ -77,24 +64,43 @@ export class Button {
     this.element.addEventListener("mouseleave", this.mouseLeaveListener);
   }
 
+  setValue(value: any) {
+    this.setValueInternal(value, false);
+  }
+
+  private setValueInternal(value: any, internalChange: boolean) {
+    this.state.setValue(value);
+    if (value) {
+      this._presses++;
+    }
+    if (internalChange) {
+      this.onChange({
+        [this.id]: this.state,
+      });
+    }
+    this.render();
+  }
+
   press() {
-    this.button.setValue(
-      this.button.value === this.button.min ? this.button.max : this.button.min
+    this.setValueInternal(
+      this.state.value === this.state.min ? this.state.max : this.state.min,
+      true
     );
   }
 
   release() {
-    this.button.setValue(
-      this.button.value === this.button.max ? this.button.min : this.button.max
+    this.setValueInternal(
+      this.state.value === this.state.max ? this.state.min : this.state.max,
+      true
     );
   }
 
   isPressed() {
-    return !!this.button.value;
+    return !!this.state.value;
   }
 
   render() {
-    const fill = !!this.button.value ? "#d3b12c" : "none";
+    const fill = !!this.state.value ? "#d3b12c" : "none";
     this.element.querySelectorAll("circle").forEach((c) => {
       c.style.fill = fill;
     });

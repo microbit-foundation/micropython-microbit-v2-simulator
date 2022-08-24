@@ -1,3 +1,5 @@
+import { RadioState, State } from "./state";
+
 export interface RadioConfig {
   maxPayload: number;
   queue: number;
@@ -7,9 +9,11 @@ export interface RadioConfig {
 export class Radio {
   private rxQueue: Uint8Array[] | undefined;
   private config: RadioConfig | undefined;
+  state: RadioState = { type: "radio", enabled: false, group: 0 };
 
   constructor(
     private onSend: (data: Uint8Array) => void,
+    private onChange: (changes: Partial<State>) => void,
     private ticksMilliseconds: () => number
   ) {}
 
@@ -29,9 +33,11 @@ export class Radio {
     if (this.rxQueue!.length === this.config!.queue) {
       // Drop the message as the queue is full.
     } else {
+      // Truncate at the payload size as we're writing to a fixed size buffer.
+      const len = Math.min(data.length, this.config!.maxPayload);
+      data = data.slice(0, len);
       // Add extra information to make a radio packet in the expected format
       // rather than just data. Clients must prepend \x01\x00\x01 if desired.
-      const len = data.length;
       const size =
         1 + // len
         len +
@@ -60,27 +66,52 @@ export class Radio {
     if (
       !this.config ||
       config.queue !== this.config.queue ||
-      config.group !== this.config.group
+      config.maxPayload !== this.config.maxPayload
     ) {
       throw new Error(
         "If queue or payload change then should call disable/enable."
       );
     }
-    this.config = config;
+
+    if (this.state.group !== config.group) {
+      this.state.group = config.group;
+      this.onChange({
+        radio: this.state,
+      });
+    }
   }
 
   enable(config: RadioConfig) {
     this.config = config;
     this.rxQueue = [];
+    if (!this.state.enabled) {
+      this.state.enabled = true;
+      this.onChange({
+        radio: this.state,
+      });
+    }
   }
 
   disable() {
     this.rxQueue = undefined;
+
+    if (this.state.enabled) {
+      this.state.enabled = false;
+      this.onChange({
+        radio: this.state,
+      });
+    }
   }
 
   initialize() {}
 
   dispose() {
-    this.disable();
+    this.rxQueue = undefined;
+    this.config = undefined;
+    this.state = {
+      type: "radio",
+      enabled: false,
+      group: 0,
+    };
   }
 }

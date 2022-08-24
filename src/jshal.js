@@ -118,20 +118,20 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_accelerometer_get_x: function () {
-    return board.accelerometer.x.value;
+    return board.accelerometer.state.accelerometerX.value;
   },
 
   mp_js_hal_accelerometer_get_y: function () {
-    return board.accelerometer.y.value;
+    return board.accelerometer.state.accelerometerY.value;
   },
 
   mp_js_hal_accelerometer_get_z: function () {
-    return board.accelerometer.z.value;
+    return board.accelerometer.state.accelerometerZ.value;
   },
 
   mp_js_hal_accelerometer_get_gesture: function () {
     return conversions.convertAccelerometerStringToNumber(
-      board.accelerometer.gesture.value
+      board.accelerometer.state.gesture.value
     );
   },
 

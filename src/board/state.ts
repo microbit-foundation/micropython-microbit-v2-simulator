@@ -76,7 +76,6 @@ export class RangeSensor extends Sensor {
     if (proposed > this.max || proposed < this.min) {
       throw this.valueError(value);
     }
-    const prev = this.value;
     this.value = proposed;
   }
 }

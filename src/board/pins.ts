@@ -1,27 +1,22 @@
-import { RangeSensor } from "./sensors";
+import { RangeSensor, State } from "./state";
 
 export class Pin {
-  public pin: RangeSensor;
+  state: RangeSensor;
+
   private _mouseDown: boolean = false;
-  private _internalChange: boolean = false;
+
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
   private mouseUpListener: (e: MouseEvent) => void;
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(
+    private id: "pin0" | "pin1" | "pin2" | "pinLogo",
     private element: SVGElement | null,
     label: string,
-    private onSensorChange: () => void
+    private onChange: (changes: Partial<State>) => void
   ) {
-    this.pin = new RangeSensor(label, 0, 1, 0, undefined);
-    this.pin.onchange = (): void => {
-      if (this._internalChange == true) {
-        this.onSensorChange();
-        this._internalChange = false;
-      }
-      this.render();
-    };
+    this.state = new RangeSensor(id, 0, 1, 0, undefined);
 
     if (this.element) {
       this.element.setAttribute("role", "button");
@@ -36,10 +31,8 @@ export class Pin {
         case " ":
           e.preventDefault();
           if (e.type === "keydown") {
-            this._internalChange = true;
             this.press();
           } else {
-            this._internalChange = true;
             this.release();
           }
       }
@@ -48,21 +41,18 @@ export class Pin {
     this.mouseDownListener = (e) => {
       e.preventDefault();
       this._mouseDown = true;
-      this._internalChange = true;
       this.press();
     };
     this.mouseUpListener = (e) => {
       e.preventDefault();
       if (this._mouseDown) {
         this._mouseDown = false;
-        this._internalChange = true;
         this.release();
       }
     };
     this.mouseLeaveListener = (e) => {
       if (this._mouseDown) {
         this._mouseDown = false;
-        this._internalChange = true;
         this.release();
       }
     };
@@ -76,25 +66,41 @@ export class Pin {
     }
   }
 
+  setValue(value: any) {
+    this.setValueInternal(value, false);
+  }
+
+  private setValueInternal(value: any, internalChange: boolean) {
+    this.state.setValue(value);
+    if (internalChange) {
+      this.onChange({
+        [this.id]: this.state,
+      });
+    }
+    this.render();
+  }
+
   press() {
-    this.pin.setValue(
-      this.pin.value === this.pin.min ? this.pin.max : this.pin.min
+    this.setValueInternal(
+      this.state.value === this.state.min ? this.state.max : this.state.min,
+      true
     );
   }
 
   release() {
-    this.pin.setValue(
-      this.pin.value === this.pin.max ? this.pin.min : this.pin.max
+    this.setValueInternal(
+      this.state.value === this.state.max ? this.state.min : this.state.max,
+      true
     );
   }
 
   isTouched() {
-    return !!this.pin.value;
+    return !!this.state.value;
   }
 
   render() {
     if (this.element) {
-      const fill = !!this.pin.value ? "red" : "url(#an)";
+      const fill = !!this.state.value ? "red" : "url(#an)";
       this.element.querySelectorAll("path").forEach((p) => {
         p.style.fill = fill;
       });

@@ -64,15 +64,24 @@ The following sections documents the messages supported via postMessage.
 ```javascript
 {
   "kind": "ready",
-  "sensors": [
-    {
+  "state": {
+    "lightLevel": {
       "id": "lightLevel",
       "type": "range",
       "min": 0,
       "max": 255
+    },
+    "soundLevel": {
+      "id": "soundLevel",
+      "type": "range",
+      "min": 0,
+      "max": 255
+      // Microphone sensor has low (quiet) and high (loud) thresholds:
+      "lowThreshold": 50,
+      "highThreshold": 150
     }
-    // More sensors here.
-  ]
+    // Full state continues here.
+  }
 }
 ```
 
@@ -84,20 +93,36 @@ The following sections documents the messages supported via postMessage.
 
 ```javascript
 {
-  "kind": "sensor_change",
-  "sensors": [
-    {
-      "id": "lightLevel",
-      "type": "range",
-      "min": 0,
-      "max": 255
-    }
-    // More sensors here.
+  "kind": "state_change",
+  "change": {
+      "soundLevel": {
+        "id": "soundLevel",
+        "type": "range",
+        "min": 0,
+        "max": 255
+        // Microphone sensor has low (quiet) and high (loud) thresholds:
+        "lowThreshold": 50,
+        "highThreshold": 150
+      }
+      // Optionally, further top-level keys here.
+  }
   ]
 }
 ```
 
-<td>Sent when one or more sensors change. Note min/max and threshold values can change.
+<td>Sent when the simulator state changes. The keys are a subset of the original state. The values are always sent in full.
+
+<tr>
+<td>request_flash
+<td>
+
+```javascript
+{
+  "kind": "request_flash",
+}
+```
+
+<td>Sent when the user requests the simulator starts. The embedder should flash the latest code via the <code>flash</code> message.
 
 <tr>
 <td>serial_output
@@ -111,6 +136,20 @@ The following sections documents the messages supported via postMessage.
 ```
 
 <td>Serial output suitable for a terminal or other use.
+
+<tr>
+<td>radio_output
+<td>
+
+```javascript
+{
+  "kind": "radio_output",
+  "data": new Uint8Array([])
+}
+```
+
+<td>Radio output (sent from the user's program) as bytes.
+If you send string data from the program then it will be prepended with the three bytes 0x01, 0x00, 0x01.
 
 </table>
 
@@ -197,20 +236,36 @@ The following sections documents the messages supported via postMessage.
 }
 ```
 
-<td>Serial input. If the REPL is active it will echo this text via `serial_write`.
+<td>Serial input. If the REPL is active it will echo this text via <code>serial_write</code>.
 <tr>
 <td>sensor_set
 <td>
 
 ```javascript
 {
-  "kind": "sensor_set",
-  "sensor": "lightLevel",
+  "kind": "set_value",
+  "id": "lightLevel",
   "value": 255
 }
 ```
 
-<td>Set a sensor value.
+<td>Set a sensor, button or pin value. The sensor, button or pin is identified by the top-level key in the state. Buttons and pins (touch state) have 0 and 1 values. In future, analog values will be supported for pins.
+
+<tr>
+<td>radio_input
+<td>
+
+```javascript
+{
+  "kind": "radio_input",
+  "data": new Uint8Array([])
+}
+```
+
+<td>Radio input (received by the user's program as if sent from another micro:bit) as bytes.
+If you want to send string data then prepend the byte array with the three bytes <code>0x01</code>, <code>0x00</code>, <code>0x01</code>.
+Otherwise, the user will need to use <code>radio.receive_bytes</code> or <code>radio.receive_full</code>. The input is assumed to be sent to the currently configured radio group.
+
 </table>
 
 ## Web Assembly debugging

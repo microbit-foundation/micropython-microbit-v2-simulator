@@ -136,7 +136,8 @@
         );
       });
 
-      const readyCallbacks = [];
+      // The simulator state used to draw the sensors area.
+      let state = {};
       window.addEventListener("message", (e) => {
         const { data } = e;
         if (e.source === simulator) {
@@ -148,14 +149,17 @@
             case "ready": {
               // We create this here to allow embedders to use
               // relevant styling/widgets.
-              createSensorUI(data.sensors);
-              while (readyCallbacks.length) {
-                readyCallbacks.pop()();
-              }
+              state = data.state;
+              createSensorUI(state);
               break;
             }
-            case "sensor_change": {
-              createSensorUI(data.sensors);
+            case "state_change": {
+              state = {
+                ...state,
+                ...data.change,
+              };
+              createSensorUI(state);
+              break;
             }
             case "request_flash": {
               simulator.postMessage(
@@ -167,6 +171,7 @@
                 },
                 "*"
               );
+              break;
             }
           }
         }
@@ -240,7 +245,7 @@
         );
       });
 
-      function createSensorUI(sensors) {
+      function createSensorUI(state) {
         const createRangeUI = function (sensor) {
           const { min, max, value, type, id } = sensor;
           const labelElt = document.createElement("label");
@@ -252,8 +257,8 @@
           input.addEventListener("change", () => {
             simulator.postMessage(
               {
-                kind: "sensor_set",
-                sensor: id,
+                kind: "set_value",
+                id,
                 value: input.value,
               },
               "*"
@@ -278,8 +283,8 @@
           select.addEventListener("change", () => {
             simulator.postMessage(
               {
-                kind: "sensor_set",
-                sensor: id,
+                kind: "set_value",
+                id,
                 value: select.value,
               },
               "*"
@@ -287,18 +292,29 @@
           });
           return labelElt;
         };
+        const createInfoUI = function (info) {
+          const labelElt = document.createElement("label");
+          const text = labelElt.appendChild(document.createElement("span"));
+          text.innerText = info.type;
+          delete info.type;
+          const infoText = labelElt.appendChild(document.createElement("code"));
+          infoText.innerText = JSON.stringify(info);
+          return labelElt;
+        };
 
         // Create UI for sensors.
         const parent = document.querySelector("#sensors");
         parent.innerHTML = "";
-        for (const sensor of sensors) {
-          switch (sensor.type) {
+        for (const component of Object.values(state)) {
+          switch (component.type) {
             case "range":
-              parent.appendChild(createRangeUI(sensor));
+              parent.appendChild(createRangeUI(component));
               break;
             case "enum":
-              parent.appendChild(createEnumUI(sensor));
+              parent.appendChild(createEnumUI(component));
               break;
+            default:
+              parent.appendChild(createInfoUI(component));
           }
         }
       }

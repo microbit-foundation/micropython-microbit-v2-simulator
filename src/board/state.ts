@@ -1,14 +1,41 @@
+export interface RadioState {
+  type: "radio";
+  enabled: boolean;
+  group: number;
+}
+
+export interface DataLoggingState {
+  type: "dataLogging";
+  logFull: boolean;
+}
+
+export interface State {
+  radio: RadioState;
+
+  dataLogging: DataLoggingState;
+
+  accelerometerX: RangeSensor;
+  accelerometerY: RangeSensor;
+  accelerometerZ: RangeSensor;
+  gesture: EnumSensor;
+
+  pin0: RangeSensor;
+  pin1: RangeSensor;
+  pin2: RangeSensor;
+  pinLogo: RangeSensor;
+
+  temperature: RangeSensor;
+  lightLevel: RangeSensor;
+  soundLevel: RangeSensor;
+
+  buttonA: RangeSensor;
+  buttonB: RangeSensor;
+}
+
 export abstract class Sensor {
   constructor(public type: string, public id: string) {}
 
   abstract setValue(value: any): void;
-
-  /**
-   * @returns A representation of the sensor that is serializable (for postMessage).
-   */
-  toSerializable(): object {
-    return this;
-  }
 
   protected valueError(value: any) {
     return new Error(
@@ -20,12 +47,11 @@ export abstract class Sensor {
 export class RangeSensor extends Sensor {
   public value: number;
 
-  public onchange?: (prev: number, curr: number) => void = () => {};
   constructor(
     id: string,
     public min: number,
     public max: number,
-    public initial: number,
+    initial: number,
     public unit: string | undefined,
     public lowThreshold?: number,
     public highThreshold?: number
@@ -50,35 +76,12 @@ export class RangeSensor extends Sensor {
     if (proposed > this.max || proposed < this.min) {
       throw this.valueError(value);
     }
-    const prev = this.value;
     this.value = proposed;
-    if (this.onchange) {
-      this.onchange(prev, this.value);
-    }
-  }
-
-  toSerializable() {
-    const data: Record<string, any> = {
-      type: "range",
-      id: this.id,
-      min: this.min,
-      max: this.max,
-      value: this.value,
-      unit: this.unit,
-    };
-    if (this.lowThreshold !== undefined) {
-      data.lowThreshold = this.lowThreshold;
-    }
-    if (this.highThreshold !== undefined) {
-      data.highThreshold = this.highThreshold;
-    }
-    return data;
   }
 }
 
 export class EnumSensor extends Sensor {
   public value: string;
-  public onchange: (v: string) => void = () => {};
 
   constructor(id: string, public choices: string[], initial: string) {
     super("enum", id);
@@ -92,15 +95,5 @@ export class EnumSensor extends Sensor {
       throw this.valueError(value);
     }
     this.value = value;
-    this.onchange(value);
-  }
-
-  toSerializable() {
-    return {
-      type: "enum",
-      id: this.id,
-      choices: this.choices,
-      value: this.value,
-    };
   }
 }

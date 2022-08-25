@@ -1,57 +1,81 @@
 import { convertAccelerometerStringToNumber } from "./conversions";
-import { EnumSensor, RangeSensor } from "./sensors";
+import { EnumSensor, RangeSensor, State } from "./state";
 import { clamp } from "./util";
 
+type StateKeys =
+  | "accelerometerX"
+  | "accelerometerY"
+  | "accelerometerZ"
+  | "gesture";
+
+type GestureCallback = (v: number) => void;
+
 export class Accelerometer {
-  private gesture: EnumSensor;
-  private x: RangeSensor;
-  private y: RangeSensor;
-  private z: RangeSensor;
-  constructor(private onSensorChange: () => void) {
-    this.gesture = new EnumSensor(
-      "gesture",
-      [
-        "none",
-        "up",
-        "down",
-        "left",
-        "right",
-        "face up",
-        "face down",
-        "freefall",
-        "3g",
-        "6g",
-        "8g",
-        "shake",
-      ],
-      "none"
-    );
+  state: Pick<
+    State,
+    "accelerometerX" | "accelerometerY" | "accelerometerZ" | "gesture"
+  >;
+
+  private gestureCallback: GestureCallback | undefined;
+
+  constructor(private onChange: (changes: Partial<State>) => void) {
     const min = -2000;
     const max = 2000;
-    this.x = new RangeSensor("accelerometerX", min, max, 0, "mg");
-    this.y = new RangeSensor("accelerometerY", min, max, 0, "mg");
-    this.z = new RangeSensor("accelerometerZ", min, max, 0, "mg");
+    this.state = {
+      accelerometerX: new RangeSensor("accelerometerX", min, max, 0, "mg"),
+      accelerometerY: new RangeSensor("accelerometerY", min, max, 0, "mg"),
+      accelerometerZ: new RangeSensor("accelerometerZ", min, max, 0, "mg"),
+      gesture: new EnumSensor(
+        "gesture",
+        [
+          "none",
+          "up",
+          "down",
+          "left",
+          "right",
+          "face up",
+          "face down",
+          "freefall",
+          "3g",
+          "6g",
+          "8g",
+          "shake",
+        ],
+        "none"
+      ),
+    };
   }
 
-  get sensors() {
-    return [this.gesture, this.x, this.y, this.z];
+  setValue(id: StateKeys, value: any) {
+    this.state[id].setValue(value);
+    if (id === "gesture") {
+      this.gestureCallback!(
+        convertAccelerometerStringToNumber(this.state.gesture.value)
+      );
+    }
   }
 
   setRange(range: number) {
     const min = -1000 * range;
     const max = +1000 * range;
-    for (const sensor of [this.x, this.y, this.z]) {
+    const { accelerometerX, accelerometerY, accelerometerZ } = this.state;
+    for (const sensor of [accelerometerX, accelerometerY, accelerometerZ]) {
       sensor.value = clamp(sensor.value, min, max);
       sensor.min = min;
       sensor.max = max;
     }
-    this.onSensorChange();
+    this.onChange({
+      accelerometerX,
+      accelerometerY,
+      accelerometerZ,
+    });
   }
 
-  initialize(gestureCallback: (v: number) => void) {
-    this.gesture.onchange = (v: string) =>
-      gestureCallback(convertAccelerometerStringToNumber(v));
+  initialize(gestureCallback: GestureCallback) {
+    this.gestureCallback = gestureCallback;
   }
 
-  dispose() {}
+  dispose() {
+    this.gestureCallback = undefined;
+  }
 }

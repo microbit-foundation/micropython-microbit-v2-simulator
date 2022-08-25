@@ -14,7 +14,7 @@ import { WebAssemblyOperations } from "./wasm";
 import { Microphone } from "./microphone";
 import { Pin } from "./pins";
 import { Radio } from "./radio";
-import { RangeSensor, Sensor } from "./sensors";
+import { EnumSensor, RangeSensor, Sensor, State } from "./state";
 
 const stoppedOpactity = "0.5";
 
@@ -32,20 +32,20 @@ export function createBoard(
 }
 
 export class Board {
-  private display: Display;
-  private buttons: Button[];
-  private pins: Pin[];
-  private audio = new Audio();
-  private temperature: RangeSensor;
-  private microphone: Microphone;
-  private accelerometer: Accelerometer;
+  // Components that manage the state.
+  // They keep it in sync with the UI (notifying of changes from user interactions),
+  // and get notified external changes and calls from MicroPython.
+  // Some call WASM callbacks on significant value changes.
+  display: Display;
+  buttons: Button[];
+  pins: Pin[];
+  audio: Audio;
+  temperature: RangeSensor;
+  microphone: Microphone;
+  accelerometer: Accelerometer;
   radio: Radio;
 
-  // Perhaps we can remove this?
   public serialInputBuffer: number[] = [];
-
-  public sensors: Sensor[];
-  private sensorsById: Map<string, Sensor>;
 
   private stoppedOverlay: HTMLDivElement;
   private playButton: HTMLButtonElement;
@@ -61,79 +61,131 @@ export class Board {
     this.display = new Display(
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
-    const onSensorChange = () =>
-      this.notifications.onSensorsChange(this.sensors);
+    const onChange = this.notifications.onStateChange.bind(this.notifications);
     this.buttons = [
       new Button(
-        this.svg.querySelector("#ButtonA")!,
         "buttonA",
-        onSensorChange
+        this.svg.querySelector("#ButtonA")!,
+        "button A",
+        onChange
       ),
       new Button(
-        this.svg.querySelector("#ButtonB")!,
         "buttonB",
-        onSensorChange
+        this.svg.querySelector("#ButtonB")!,
+        "button B",
+        onChange
       ),
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new Pin(
-      this.svg.querySelector("#Logo")!,
       "pinLogo",
-      onSensorChange
+      this.svg.querySelector("#Logo")!,
+      "logo",
+      onChange
     );
-    this.pins[MICROBIT_HAL_PIN_P0] = new Pin(null, "pin0", onSensorChange);
-    this.pins[MICROBIT_HAL_PIN_P1] = new Pin(null, "pin1", onSensorChange);
-    this.pins[MICROBIT_HAL_PIN_P2] = new Pin(null, "pin2", onSensorChange);
+    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, "pin 0", onChange);
+    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, "pin 1", onChange);
+    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, "pin 2", onChange);
     this.audio = new Audio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
-    this.accelerometer = new Accelerometer(onSensorChange);
+    this.accelerometer = new Accelerometer(onChange);
     this.microphone = new Microphone(
       this.svg.querySelector("#LitMicrophone")!,
-      onSensorChange
+      onChange
     );
     this.radio = new Radio(
       this.notifications.onRadioOutput.bind(this.notifications),
+      onChange,
       this.ticksMilliseconds.bind(this)
     );
 
-    this.sensors = [
-      this.display.lightLevel,
-      this.temperature,
-      this.microphone.soundLevel,
-      this.buttons[0].button,
-      this.buttons[1].button,
-      this.pins[MICROBIT_HAL_PIN_FACE].pin,
-      this.pins[MICROBIT_HAL_PIN_P0].pin,
-      this.pins[MICROBIT_HAL_PIN_P1].pin,
-      this.pins[MICROBIT_HAL_PIN_P2].pin,
-      ...this.accelerometer.sensors,
-    ];
-    this.sensorsById = new Map();
-    this.sensors.forEach((sensor) => {
-      this.sensorsById.set(sensor.id, sensor);
-    });
     this.stoppedOverlay = document.querySelector(".play-button-container")!;
     this.playButton = document.querySelector(".play-button")!;
     this.initializePlayButton();
     // We start stopped.
     this.displayStoppedState();
     this.playButton.addEventListener("click", () =>
-      window.parent.postMessage(
-        {
-          kind: "request_flash",
-        },
-        "*"
-      )
+      this.notifications.onRequestFlash()
     );
   }
 
-  getSensor(id: string): Sensor | undefined {
-    return this.sensorsById.get(id);
+  getState(): State {
+    return {
+      radio: this.radio.state,
+      buttonA: this.buttons[0].state,
+      buttonB: this.buttons[1].state,
+      pinLogo: this.pins[MICROBIT_HAL_PIN_FACE].state,
+      pin0: this.pins[MICROBIT_HAL_PIN_P0].state,
+      pin1: this.pins[MICROBIT_HAL_PIN_P1].state,
+      pin2: this.pins[MICROBIT_HAL_PIN_P2].state,
+
+      accelerometerX: this.accelerometer.state.accelerometerX,
+      accelerometerY: this.accelerometer.state.accelerometerY,
+      accelerometerZ: this.accelerometer.state.accelerometerZ,
+      gesture: this.accelerometer.state.gesture,
+
+      lightLevel: this.display.lightLevel,
+      dataLogging: {
+        // Placeholder.
+        type: "dataLogging",
+        logFull: false,
+      },
+      soundLevel: this.microphone.soundLevel,
+      temperature: this.temperature,
+    };
+  }
+
+  setValue(id: string, value: any) {
+    switch (id) {
+      case "accelerometerX":
+      case "accelerometerY":
+      case "accelerometerZ":
+      case "gesture": {
+        this.accelerometer.setValue(id, value);
+        break;
+      }
+      case "buttonA": {
+        this.buttons[0].setValue(value);
+        break;
+      }
+      case "buttonB": {
+        this.buttons[1].setValue(value);
+        break;
+      }
+      case "pinLogo": {
+        this.pins[MICROBIT_HAL_PIN_FACE].setValue(value);
+        break;
+      }
+      case "pin0": {
+        this.pins[MICROBIT_HAL_PIN_P0].setValue(value);
+        break;
+      }
+      case "pin1": {
+        this.pins[MICROBIT_HAL_PIN_P1].setValue(value);
+        break;
+      }
+      case "pin2": {
+        this.pins[MICROBIT_HAL_PIN_P2].setValue(value);
+        break;
+      }
+      case "lightLevel": {
+        this.display.lightLevel.setValue(value);
+        break;
+      }
+      case "soundLevel": {
+        this.microphone.setValue(value);
+        break;
+      }
+      case "temperature": {
+        this.temperature.setValue(value);
+        break;
+      }
+    }
   }
 
   initializedWebAssembly() {
     this.operations.initialize();
-    this.notifications.onReady(this.sensors);
+    this.notifications.onReady(this.getState());
   }
 
   initialize() {
@@ -243,21 +295,28 @@ export class Board {
     this.microphone.dispose();
     this.radio.dispose();
     this.serialInputBuffer.length = 0;
+
+    // Nofify of the state resets.
+    this.notifications.onStateChange(this.getState());
   }
 }
 
 export class Notifications {
   constructor(private target: Pick<Window, "postMessage">) {}
 
-  onReady(sensors: Sensor[]) {
+  onReady(state: State) {
     this.postMessage("ready", {
-      sensors: sensors.map((s) => s.toSerializable()),
+      state,
     });
   }
 
-  onSensorsChange(sensors: Sensor[]) {
-    this.postMessage("sensor_change", {
-      sensors: sensors.map((s) => s.toSerializable()),
+  onRequestFlash() {
+    this.postMessage("request_flash", {});
+  }
+
+  onStateChange(change: Partial<State>) {
+    this.postMessage("state_change", {
+      change,
     });
   }
 
@@ -322,13 +381,12 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
         board.radio.receive(data.data);
         break;
       }
-      case "sensor_set": {
-        const sensor = board.getSensor(data.sensor);
-        const value = data.value;
-        if (!sensor) {
-          throw new Error(`Invalid set_sensor sensor field: ${data.sensor}`);
+      case "set_value": {
+        const { id, value } = data;
+        if (typeof id !== "string") {
+          throw new Error(`Invalid id field type: ${id}`);
         }
-        sensor.setValue(value);
+        board.setValue(id, value);
         break;
       }
     }

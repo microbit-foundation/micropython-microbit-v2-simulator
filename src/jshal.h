@@ -86,3 +86,10 @@ void mp_js_radio_update_config(uint8_t group, uint8_t max_payload, uint8_t queue
 void mp_js_radio_send(const void *buf, size_t len, const void *buf2, size_t len2);
 uint8_t *mp_js_radio_peek(void);
 void mp_js_radio_pop(void);
+
+void mp_js_hal_log_delete(bool full_erase);
+void mp_js_hal_log_set_mirroring(bool serial);
+void mp_js_hal_log_set_timestamp(int period);
+int mp_js_hal_log_begin_row(void);
+int mp_js_hal_log_end_row(void);
+int mp_js_hal_log_data(const char *key, const char *value);

@@ -255,4 +255,29 @@ mergeInto(LibraryManager.library, {
   mp_js_radio_pop: function () {
     board.radio.pop();
   },
+
+  mp_js_hal_log_delete: function (full_erase) {
+    // We don't have a notion of non-full erase.
+    board.dataLogging.delete();
+  },
+
+  mp_js_hal_log_set_mirroring: function (serial) {
+    board.dataLogging.setMirroring(serial);
+  },
+
+  mp_js_hal_log_set_timestamp: function (period) {
+    board.dataLogging.setTimestamp(period);
+  },
+
+  mp_js_hal_log_begin_row: function () {
+    return board.dataLogging.beginRow();
+  },
+
+  mp_js_hal_log_end_row: function () {
+    return board.dataLogging.endRow();
+  },
+
+  mp_js_hal_log_data: function (key, value) {
+    return board.dataLogging.logData(UTF8ToString(key), UTF8ToString(value));
+  },
 });

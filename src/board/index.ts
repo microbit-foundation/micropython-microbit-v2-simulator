@@ -9,6 +9,7 @@ import {
   MICROBIT_HAL_PIN_P1,
   MICROBIT_HAL_PIN_P2,
 } from "./constants";
+import { DataLogging } from "./data-logging";
 import { Display } from "./display";
 import { FileSystem } from "./fs";
 import { Microphone } from "./microphone";
@@ -46,6 +47,7 @@ export class Board {
   accelerometer: Accelerometer;
   compass: Compass;
   radio: Radio;
+  dataLogging: DataLogging;
 
   public serialInputBuffer: number[] = [];
 
@@ -63,7 +65,7 @@ export class Board {
     this.display = new Display(
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
-    const onChange = this.notifications.onStateChange.bind(this.notifications);
+    const onChange = this.notifications.onStateChange;
     this.buttons = [
       new Button(
         "buttonA",
@@ -96,10 +98,19 @@ export class Board {
       this.svg.querySelector("#LitMicrophone")!,
       onChange
     );
+
+    const currentTimeMillis = this.ticksMilliseconds.bind(this);
     this.radio = new Radio(
       this.notifications.onRadioOutput.bind(this.notifications),
       onChange,
-      this.ticksMilliseconds.bind(this)
+      currentTimeMillis
+    );
+    this.dataLogging = new DataLogging(
+      currentTimeMillis,
+      this.notifications.onLogOutput,
+      this.notifications.onSerialOutput,
+      this.notifications.onLogDelete,
+      onChange
     );
 
     this.stoppedOverlay = document.querySelector(".play-button-container")!;
@@ -318,32 +329,48 @@ export class Board {
   }
 }
 
+export interface LogEntry {
+  // The headings, if they've changed since the last entry.
+  // New headings will only be appended.
+  headings?: string[];
+  // The data, corresponding to the headings.
+  data?: string[];
+}
+
 export class Notifications {
   constructor(private target: Pick<Window, "postMessage">) {}
 
-  onReady(state: State) {
+  onReady = (state: State) => {
     this.postMessage("ready", {
       state,
     });
-  }
+  };
 
-  onRequestFlash() {
+  onRequestFlash = () => {
     this.postMessage("request_flash", {});
-  }
+  };
 
-  onStateChange(change: Partial<State>) {
+  onStateChange = (change: Partial<State>) => {
     this.postMessage("state_change", {
       change,
     });
-  }
+  };
 
-  onSerialOutput(data: string) {
+  onSerialOutput = (data: string) => {
     this.postMessage("serial_output", { data });
-  }
+  };
 
-  onRadioOutput(data: Uint8Array) {
+  onRadioOutput = (data: Uint8Array) => {
     this.postMessage("radio_output", { data });
-  }
+  };
+
+  onLogOutput = (data: LogEntry) => {
+    this.postMessage("log_output", data);
+  };
+
+  onLogDelete = () => {
+    this.postMessage("log_delete", {});
+  };
 
   private postMessage(kind: string, data: any) {
     this.target.postMessage(

@@ -2,6 +2,7 @@ import svgText from "../microbit-drawing.svg";
 import { Accelerometer } from "./accelerometer";
 import { Audio } from "./audio";
 import { Button } from "./buttons";
+import { Compass } from "./compass";
 import {
   MICROBIT_HAL_PIN_FACE,
   MICROBIT_HAL_PIN_P0,
@@ -10,11 +11,11 @@ import {
 } from "./constants";
 import { Display } from "./display";
 import { FileSystem } from "./fs";
-import { WebAssemblyOperations } from "./wasm";
 import { Microphone } from "./microphone";
 import { Pin } from "./pins";
 import { Radio } from "./radio";
-import { EnumSensor, RangeSensor, Sensor, State } from "./state";
+import { RangeSensor, State } from "./state";
+import { WebAssemblyOperations } from "./wasm";
 
 const stoppedOpactity = "0.5";
 
@@ -43,6 +44,7 @@ export class Board {
   temperature: RangeSensor;
   microphone: Microphone;
   accelerometer: Accelerometer;
+  compass: Compass;
   radio: Radio;
 
   public serialInputBuffer: number[] = [];
@@ -89,6 +91,7 @@ export class Board {
     this.audio = new Audio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
+    this.compass = new Compass();
     this.microphone = new Microphone(
       this.svg.querySelector("#LitMicrophone")!,
       onChange
@@ -124,6 +127,11 @@ export class Board {
       accelerometerZ: this.accelerometer.state.accelerometerZ,
       gesture: this.accelerometer.state.gesture,
 
+      compassX: this.compass.state.compassX,
+      compassY: this.compass.state.compassY,
+      compassZ: this.compass.state.compassZ,
+      compassHeading: this.compass.state.compassHeading,
+
       lightLevel: this.display.lightLevel,
       dataLogging: {
         // Placeholder.
@@ -142,6 +150,13 @@ export class Board {
       case "accelerometerZ":
       case "gesture": {
         this.accelerometer.setValue(id, value);
+        break;
+      }
+      case "compassX":
+      case "compassY":
+      case "compassZ":
+      case "compassHeading": {
+        this.compass.setValue(id, value);
         break;
       }
       case "buttonA": {
@@ -198,6 +213,7 @@ export class Board {
     this.pins.forEach((p) => p.initialize());
     this.display.initialize();
     this.accelerometer.initialize(this.operations.gestureCallback!);
+    this.compass.initialize();
     this.microphone.initialize(this.operations.soundLevelCallback!);
     this.radio.initialize();
     this.serialInputBuffer.length = 0;
@@ -292,6 +308,7 @@ export class Board {
     this.pins.forEach((p) => p.dispose());
     this.display.dispose();
     this.accelerometer.dispose();
+    this.compass.dispose();
     this.microphone.dispose();
     this.radio.dispose();
     this.serialInputBuffer.length = 0;

@@ -59,6 +59,12 @@ int mp_js_hal_accelerometer_get_z(void);
 int mp_js_hal_accelerometer_get_gesture(void);
 void mp_js_hal_accelerometer_set_range(int r);
 
+int mp_js_hal_compass_get_x(void);
+int mp_js_hal_compass_get_y(void);
+int mp_js_hal_compass_get_z(void);
+int mp_js_hal_compass_get_field_strength(void);
+int mp_js_hal_compass_get_heading(void);
+
 void mp_js_hal_audio_set_volume(int value);
 void mp_js_hal_audio_init(uint32_t sample_rate);
 void mp_js_hal_audio_write_data(const uint8_t *buf, size_t num_samples);

@@ -19,6 +19,11 @@ export interface State {
   accelerometerZ: RangeSensor;
   gesture: EnumSensor;
 
+  compassX: RangeSensor;
+  compassY: RangeSensor;
+  compassZ: RangeSensor;
+  compassHeading: RangeSensor;
+
   pin0: RangeSensor;
   pin1: RangeSensor;
   pin2: RangeSensor;

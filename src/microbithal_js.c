@@ -337,45 +337,30 @@ void microbit_hal_accelerometer_set_range(int r) {
 }
 
 int microbit_hal_compass_is_calibrated(void) {
-    /*
-    return uBit.compass.isCalibrated();
-    */
-    return 0;
+    // Always calibrated in the simulator.
+    return 1;
 }
 
 void microbit_hal_compass_clear_calibration(void) {
-    /*
-    uBit.compass.clearCalibration();
-    */
+    // No calibration to clear.
 }
 
 void microbit_hal_compass_calibrate(void) {
-    /*
-    uBit.compass.calibrate();
-    */
+    // No calibration to set.
 }
 
 void microbit_hal_compass_get_sample(int axis[3]) {
-    /*
-    Sample3D sample = uBit.compass.getSample();
-    axis[0] = sample.x;
-    axis[1] = sample.y;
-    axis[2] = sample.z;
-    */
+    axis[0] = mp_js_hal_compass_get_x();
+    axis[1] = mp_js_hal_compass_get_y();
+    axis[2] = mp_js_hal_compass_get_z();
 }
 
 int microbit_hal_compass_get_field_strength(void) {
-    /*
-    return uBit.compass.getFieldStrength();
-    */
-    return 0;
+    return mp_js_hal_compass_get_field_strength();
 }
 
 int microbit_hal_compass_get_heading(void) {
-    /*
-    return uBit.compass.heading();
-    */
-    return 0;
+    return mp_js_hal_compass_get_heading();
 }
 
 const uint8_t *microbit_hal_get_font_data(char c) {

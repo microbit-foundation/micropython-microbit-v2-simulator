@@ -139,6 +139,26 @@ mergeInto(LibraryManager.library, {
     board.accelerometer.setRange(r);
   },
 
+  mp_js_hal_compass_get_x: function () {
+    return board.compass.state.compassX.value;
+  },
+
+  mp_js_hal_compass_get_y: function () {
+    return board.compass.state.compassY.value;
+  },
+
+  mp_js_hal_compass_get_z: function () {
+    return board.compass.state.compassZ.value;
+  },
+
+  mp_js_hal_compass_get_field_strength: function () {
+    return board.compass.getFieldStrength();
+  },
+
+  mp_js_hal_compass_get_heading: function () {
+    return board.compass.state.compassHeading.value;
+  },
+
   mp_js_hal_audio_set_volume: function (value) {
     board.audio.setVolume(value);
   },

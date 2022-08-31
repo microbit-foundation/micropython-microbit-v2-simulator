@@ -389,9 +389,9 @@ export class Board {
       sad,
       ...Array.from(digits).map((d) => digitFont[parseInt(d, 10)]),
     ];
-    let i = 0;
+    let nextFrameIndex = 0;
     const showNextFrame = () => {
-      this.display.show(frames[i++ % frames.length]);
+      this.display.show(frames[nextFrameIndex++ % frames.length]);
       this.panicTimeout = setTimeout(() => {
         this.display.clear();
         this.panicTimeout = setTimeout(showNextFrame, 60);

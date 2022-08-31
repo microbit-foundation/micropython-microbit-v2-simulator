@@ -285,6 +285,7 @@ export class Board {
       const idx = this.fs.create(name);
       this.fs.write(idx, value);
     });
+    this.dataLogging.delete();
     return this.start();
   }
 

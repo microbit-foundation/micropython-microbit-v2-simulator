@@ -383,7 +383,7 @@ export class Board {
     // For larger values we just display the last three digits.
     let digits = code.toString();
     digits = digits.slice(-3);
-    let prefix = "0".repeat(3 - digits.length);
+    const prefix = "0".repeat(3 - digits.length);
     digits = prefix + digits;
     const frames = [
       sad,

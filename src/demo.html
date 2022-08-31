@@ -85,6 +85,7 @@
               <option value="background">Background music and display</option>
               <option value="buttons">Buttons</option>
               <option value="compass">Compass</option>
+              <option value="data_logging">Data logging</option>
               <option value="display">Display</option>
               <option value="microphone">Microphone</option>
               <option value="music">Music</option>
@@ -145,6 +146,26 @@
           switch (data.kind) {
             case "serial_output": {
               term.write(e.data.data);
+              break;
+            }
+            case "radio_output": {
+              const text = new TextDecoder()
+                .decode(e.data.data)
+                .replace(/^\x01\x01\x00/, "");
+              console.log(text);
+              break;
+            }
+            case "log_output": {
+              if (e.data.headings) {
+                console.log(e.data.headings);
+              }
+              if (e.data.data) {
+                console.log(e.data.data);
+              }
+              break;
+            }
+            case "log_delete": {
+              console.log("[log_delete]");
               break;
             }
             case "ready": {

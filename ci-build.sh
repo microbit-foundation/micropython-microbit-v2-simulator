@@ -12,4 +12,4 @@ git clone https://github.com/emscripten-core/emsdk.git ~/.emsdk
 ~/.emsdk/emsdk activate latest
 source ~/.emsdk/emsdk_env.sh
 
-npm run build
+npm run test && npm run build

@@ -1,5 +1,10 @@
 // Matches microbithal.h
 
+// General error codes, only define the ones needed by this HAL.
+export const MICROBIT_HAL_DEVICE_OK = 0;
+export const MICROBIT_HAL_DEVICE_NO_RESOURCES = -1;
+export const MICROBIT_HAL_DEVICE_ERROR = -2;
+
 // These numbers refer to indices in the (private) pin_obj table.
 export const MICROBIT_HAL_PIN_P0 = 0;
 export const MICROBIT_HAL_PIN_P1 = 1;

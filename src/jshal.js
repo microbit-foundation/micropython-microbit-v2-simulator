@@ -85,6 +85,10 @@ mergeInto(LibraryManager.library, {
     return board.reset();
   },
 
+  mp_js_hal_panic: function (code) {
+    return board.panic(code);
+  },
+
   mp_js_hal_temperature: function () {
     return board.temperature.value;
   },

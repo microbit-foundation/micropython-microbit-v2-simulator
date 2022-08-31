@@ -30,6 +30,18 @@ export class Display {
     ];
   }
 
+  /**
+   * This is only used for panic. HAL interactions are via setPixel.
+   */
+  show(image: Array<Array<number>>) {
+    for (let y = 0; y < 5; ++y) {
+      for (let x = 0; x < 5; ++x) {
+        this.state[x][y] = clamp(image[y][x], 0, 9);
+      }
+    }
+    this.render();
+  }
+
   clear() {
     this.state = this.initialState();
     this.render();

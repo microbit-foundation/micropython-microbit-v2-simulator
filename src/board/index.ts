@@ -49,6 +49,8 @@ export class Board {
   radio: Radio;
   dataLogging: DataLogging;
 
+  private panicTimeout: any;
+
   public serialInputBuffer: number[] = [];
 
   private stoppedOverlay: HTMLDivElement;
@@ -268,6 +270,11 @@ export class Board {
   }
 
   async stop(): Promise<void> {
+    if (this.panicTimeout) {
+      clearTimeout(this.panicTimeout);
+      this.panicTimeout = null;
+      this.display.clear();
+    }
     const interrupt = () => this.serialInputBuffer.push(3, 4); // Ctrl-C, Ctrl-D.
     await this.operations.stop(interrupt);
     this.displayStoppedState();
@@ -287,6 +294,110 @@ export class Board {
     });
     this.dataLogging.delete();
     return this.start();
+  }
+
+  panic(code: number): void {
+    // We should hang MicroPython here. I think ideally we'd stop it entirely so we do this without any WASM.
+    // For now we just do the display animation.
+    const sad = [
+      [9, 9, 0, 9, 9],
+      [9, 9, 0, 9, 9],
+      [0, 0, 0, 0, 0],
+      [0, 9, 9, 9, 0],
+      [9, 0, 0, 0, 9],
+    ];
+    // Extracted via display.get_pixel.
+    const digitFont = [
+      [
+        [0, 9, 9, 0, 0],
+        [9, 0, 0, 9, 0],
+        [9, 0, 0, 9, 0],
+        [9, 0, 0, 9, 0],
+        [0, 9, 9, 0, 0],
+      ],
+      [
+        [0, 0, 9, 0, 0],
+        [0, 9, 9, 0, 0],
+        [0, 0, 9, 0, 0],
+        [0, 0, 9, 0, 0],
+        [0, 9, 9, 9, 0],
+      ],
+      [
+        [9, 9, 9, 0, 0],
+        [0, 0, 0, 9, 0],
+        [0, 9, 9, 0, 0],
+        [9, 0, 0, 0, 0],
+        [9, 9, 9, 9, 0],
+      ],
+      [
+        [9, 9, 9, 9, 0],
+        [0, 0, 0, 9, 0],
+        [0, 0, 9, 0, 0],
+        [9, 0, 0, 9, 0],
+        [0, 9, 9, 0, 0],
+      ],
+      [
+        [0, 0, 9, 9, 0],
+        [0, 9, 0, 9, 0],
+        [9, 0, 0, 9, 0],
+        [9, 9, 9, 9, 9],
+        [0, 0, 0, 9, 0],
+      ],
+      [
+        [9, 9, 9, 9, 9],
+        [9, 0, 0, 0, 0],
+        [9, 9, 9, 9, 0],
+        [0, 0, 0, 0, 9],
+        [9, 9, 9, 9, 0],
+      ],
+      [
+        [0, 0, 0, 9, 0],
+        [0, 0, 9, 0, 0],
+        [0, 9, 9, 9, 0],
+        [9, 0, 0, 0, 9],
+        [0, 9, 9, 9, 0],
+      ],
+      [
+        [9, 9, 9, 9, 9],
+        [0, 0, 0, 9, 0],
+        [0, 0, 9, 0, 0],
+        [0, 9, 0, 0, 0],
+        [9, 0, 0, 0, 0],
+      ],
+      [
+        [0, 9, 9, 9, 0],
+        [9, 0, 0, 0, 9],
+        [0, 9, 9, 9, 0],
+        [9, 0, 0, 0, 9],
+        [0, 9, 9, 9, 0],
+      ],
+      [
+        [0, 9, 9, 9, 0],
+        [9, 0, 0, 0, 9],
+        [0, 9, 9, 9, 0],
+        [0, 0, 9, 0, 0],
+        [0, 9, 0, 0, 0],
+      ],
+    ];
+    // Three digit code with leading zero if required.
+    // For larger values we just display the last three digits.
+    let digits = code.toString();
+    digits = digits.slice(-3);
+    let prefix = "0".repeat(3 - digits.length);
+    digits = prefix + digits;
+    const frames = [
+      sad,
+      ...Array.from(digits).map((d) => digitFont[parseInt(d, 10)]),
+    ];
+    let i = 0;
+    const showNextFrame = () => {
+      this.display.show(frames[i++ % frames.length]);
+      this.panicTimeout = setTimeout(() => {
+        this.display.clear();
+        this.panicTimeout = setTimeout(showNextFrame, 60);
+      }, 600);
+    };
+    showNextFrame();
   }
 
   mute() {

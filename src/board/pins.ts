@@ -12,7 +12,7 @@ export class Pin {
 
   constructor(
     private id: "pin0" | "pin1" | "pin2" | "pinLogo",
-    private ui: { element: SVGElement; label: string },
+    private ui: { element: SVGElement; label: () => string } | null,
     private onChange: (changes: Partial<State>) => void
   ) {
     this.state = new RangeSensor(id, 0, 1, 0, undefined);
@@ -21,7 +21,6 @@ export class Pin {
       const { element, label } = this.ui;
       element.setAttribute("role", "button");
       element.setAttribute("tabindex", "0");
-      element.ariaLabel = label;
       element.style.cursor = "pointer";
     }
 
@@ -97,6 +96,12 @@ export class Pin {
 
   isTouched() {
     return !!this.state.value;
+  }
+
+  updateTranslations() {
+    if (this.ui) {
+      this.ui.element.ariaLabel = this.ui.label();
+    }
   }
 
   render() {

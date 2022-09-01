@@ -12,7 +12,6 @@ import {
 import { DataLogging } from "./data-logging";
 import { Display } from "./display";
 import { FileSystem } from "./fs";
-import { formattedMessage } from "./i18n";
 import { Microphone } from "./microphone";
 import { Pin } from "./pins";
 import { Radio } from "./radio";
@@ -57,6 +56,22 @@ export class Board {
 
   private epoch: number | undefined;
 
+  // The language and translations can be changed via the "config" message.
+  private language: string = "en";
+  private translations: Record<string, string> = {
+    "button-a": "Button A",
+    "button-b": "Button B",
+    "touch-logo": "Touch logo",
+    "start-simulator": "Start simulator",
+  };
+  formattedMessage = ({ id }: { id: string }): string => {
+    const result = this.translations[id];
+    if (!result) {
+      console.trace(`No string for code ${id}`);
+    }
+    return result ?? id;
+  };
+
   constructor(
     public operations: WebAssemblyOperations,
     private notifications: Notifications,
@@ -71,13 +86,13 @@ export class Board {
       new Button(
         "buttonA",
         this.svg.querySelector("#ButtonA")!,
-        formattedMessage({ id: "button-a" }),
+        () => this.formattedMessage({ id: "button-a" }),
         onChange
       ),
       new Button(
         "buttonB",
         this.svg.querySelector("#ButtonB")!,
-        formattedMessage({ id: "button-b" }),
+        () => this.formattedMessage({ id: "button-b" }),
         onChange
       ),
     ];
@@ -86,7 +101,7 @@ export class Board {
       "pinLogo",
       {
         element: this.svg.querySelector("#Logo")!,
-        label: formattedMessage({ id: "touch-logo" }),
+        label: () => this.formattedMessage({ id: "touch-logo" }),
       },
       onChange
     );
@@ -118,13 +133,29 @@ export class Board {
 
     this.stoppedOverlay = document.querySelector(".play-button-container")!;
     this.playButton = document.querySelector(".play-button")!;
-    this.playButton.ariaLabel = formattedMessage({ id: "start-simulator" });
     this.initializePlayButton();
     // We start stopped.
     this.displayStoppedState();
     this.playButton.addEventListener("click", () =>
       this.notifications.onRequestFlash()
     );
+
+    this.updateTranslationsInternal();
+  }
+
+  updateTranslations(language: string, translations: Record<string, string>) {
+    this.language = language;
+    this.translations = translations;
+    this.updateTranslationsInternal();
+  }
+
+  private updateTranslationsInternal() {
+    document.documentElement.lang = this.language;
+    this.playButton.ariaLabel = this.formattedMessage({
+      id: "start-simulator",
+    });
+    this.buttons.forEach((b) => b.updateTranslations());
+    this.pins.forEach((b) => b.updateTranslations());
   }
 
   getState(): State {
@@ -392,6 +423,11 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
   if (e.source === window.parent) {
     const { data } = e;
     switch (data.kind) {
+      case "config": {
+        const { language, translations } = data;
+        board.updateTranslations(language, translations);
+        break;
+      }
       case "flash": {
         const { filesystem } = data;
         if (!isFileSystem(filesystem)) {

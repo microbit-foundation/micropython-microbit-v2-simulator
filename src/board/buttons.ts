@@ -14,7 +14,7 @@ export class Button {
   constructor(
     private id: "buttonA" | "buttonB",
     private element: SVGElement,
-    label: string,
+    private label: () => string,
     private onChange: (change: Partial<State>) => void
   ) {
     this._presses = 0;
@@ -22,7 +22,6 @@ export class Button {
 
     this.element.setAttribute("role", "button");
     this.element.setAttribute("tabindex", "0");
-    this.element.ariaLabel = label;
     this.element.style.cursor = "pointer";
 
     this.keyListener = (e) => {
@@ -62,6 +61,10 @@ export class Button {
     this.element.addEventListener("keydown", this.keyListener);
     this.element.addEventListener("keyup", this.keyListener);
     this.element.addEventListener("mouseleave", this.mouseLeaveListener);
+  }
+
+  updateTranslations() {
+    this.element.ariaLabel = this.label();
   }
 
   setValue(value: any) {

@@ -58,6 +58,22 @@ export class Board {
 
   private epoch: number | undefined;
 
+  // The language and translations can be changed via the "config" message.
+  private language: string = "en";
+  private translations: Record<string, string> = {
+    "button-a": "Button A",
+    "button-b": "Button B",
+    "touch-logo": "Touch logo",
+    "start-simulator": "Start simulator",
+  };
+  formattedMessage = ({ id }: { id: string }): string => {
+    const result = this.translations[id];
+    if (!result) {
+      console.trace(`No string for code ${id}`);
+    }
+    return result ?? id;
+  };
+
   constructor(
     public operations: WebAssemblyOperations,
     private notifications: Notifications,
@@ -72,26 +88,28 @@ export class Board {
       new Button(
         "buttonA",
         this.svg.querySelector("#ButtonA")!,
-        "button A",
+        () => this.formattedMessage({ id: "button-a" }),
         onChange
       ),
       new Button(
         "buttonB",
         this.svg.querySelector("#ButtonB")!,
-        "button B",
+        () => this.formattedMessage({ id: "button-b" }),
         onChange
       ),
     ];
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new Pin(
       "pinLogo",
-      this.svg.querySelector("#Logo")!,
-      "logo",
+      {
+        element: this.svg.querySelector("#Logo")!,
+        label: () => this.formattedMessage({ id: "touch-logo" }),
+      },
       onChange
     );
-    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, "pin 0", onChange);
-    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, "pin 1", onChange);
-    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, "pin 2", onChange);
+    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, onChange);
     this.audio = new Audio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
@@ -123,6 +141,23 @@ export class Board {
     this.playButton.addEventListener("click", () =>
       this.notifications.onRequestFlash()
     );
+
+    this.updateTranslationsInternal();
+  }
+
+  updateTranslations(language: string, translations: Record<string, string>) {
+    this.language = language;
+    this.translations = translations;
+    this.updateTranslationsInternal();
+  }
+
+  private updateTranslationsInternal() {
+    document.documentElement.lang = this.language;
+    this.playButton.ariaLabel = this.formattedMessage({
+      id: "start-simulator",
+    });
+    this.buttons.forEach((b) => b.updateTranslations());
+    this.pins.forEach((b) => b.updateTranslations());
   }
 
   getState(): State {
@@ -499,6 +534,11 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
   if (e.source === window.parent) {
     const { data } = e;
     switch (data.kind) {
+      case "config": {
+        const { language, translations } = data;
+        board.updateTranslations(language, translations);
+        break;
+      }
       case "flash": {
         const { filesystem } = data;
         if (!isFileSystem(filesystem)) {

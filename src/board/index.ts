@@ -12,6 +12,7 @@ import {
 import { DataLogging } from "./data-logging";
 import { Display } from "./display";
 import { FileSystem } from "./fs";
+import { formattedMessage } from "./i18n";
 import { Microphone } from "./microphone";
 import { Pin } from "./pins";
 import { Radio } from "./radio";
@@ -70,13 +71,13 @@ export class Board {
       new Button(
         "buttonA",
         this.svg.querySelector("#ButtonA")!,
-        "button A",
+        formattedMessage({ id: "button-a" }),
         onChange
       ),
       new Button(
         "buttonB",
         this.svg.querySelector("#ButtonB")!,
-        "button B",
+        formattedMessage({ id: "button-b" }),
         onChange
       ),
     ];
@@ -84,12 +85,12 @@ export class Board {
     this.pins[MICROBIT_HAL_PIN_FACE] = new Pin(
       "pinLogo",
       this.svg.querySelector("#Logo")!,
-      "logo",
+      formattedMessage({ id: "touch-logo" }),
       onChange
     );
-    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, "pin 0", onChange);
-    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, "pin 1", onChange);
-    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, "pin 2", onChange);
+    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, null, onChange);
     this.audio = new Audio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
@@ -115,6 +116,7 @@ export class Board {
 
     this.stoppedOverlay = document.querySelector(".play-button-container")!;
     this.playButton = document.querySelector(".play-button")!;
+    this.playButton.ariaLabel = formattedMessage({ id: "start-simulator" });
     this.initializePlayButton();
     // We start stopped.
     this.displayStoppedState();

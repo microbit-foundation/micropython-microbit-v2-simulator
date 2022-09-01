@@ -13,9 +13,12 @@ export class Pin {
   constructor(
     private id: "pin0" | "pin1" | "pin2" | "pinLogo",
     private element: SVGElement | null,
-    label: string,
+    label: string | null,
     private onChange: (changes: Partial<State>) => void
   ) {
+    if ((element ? 0 : 1) + (label ? 0 : 1) === 1) {
+      throw new Error("Must provide element and label or neither");
+    }
     this.state = new RangeSensor(id, 0, 1, 0, undefined);
 
     if (this.element) {

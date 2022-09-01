@@ -84,13 +84,15 @@ export class Board {
     this.pins = Array(33);
     this.pins[MICROBIT_HAL_PIN_FACE] = new Pin(
       "pinLogo",
-      this.svg.querySelector("#Logo")!,
-      formattedMessage({ id: "touch-logo" }),
+      {
+        element: this.svg.querySelector("#Logo")!,
+        label: formattedMessage({ id: "touch-logo" }),
+      },
       onChange
     );
-    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, null, onChange);
-    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, null, onChange);
-    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, onChange);
     this.audio = new Audio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);

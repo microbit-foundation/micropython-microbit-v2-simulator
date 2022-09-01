@@ -12,20 +12,17 @@ export class Pin {
 
   constructor(
     private id: "pin0" | "pin1" | "pin2" | "pinLogo",
-    private element: SVGElement | null,
-    label: string | null,
+    private ui: { element: SVGElement; label: string },
     private onChange: (changes: Partial<State>) => void
   ) {
-    if ((element ? 0 : 1) + (label ? 0 : 1) === 1) {
-      throw new Error("Must provide element and label or neither");
-    }
     this.state = new RangeSensor(id, 0, 1, 0, undefined);
 
-    if (this.element) {
-      this.element.setAttribute("role", "button");
-      this.element.setAttribute("tabindex", "0");
-      this.element.ariaLabel = label;
-      this.element.style.cursor = "pointer";
+    if (this.ui) {
+      const { element, label } = this.ui;
+      element.setAttribute("role", "button");
+      element.setAttribute("tabindex", "0");
+      element.ariaLabel = label;
+      element.style.cursor = "pointer";
     }
 
     this.keyListener = (e) => {
@@ -60,12 +57,13 @@ export class Pin {
       }
     };
 
-    if (this.element) {
-      this.element.addEventListener("mousedown", this.mouseDownListener);
-      this.element.addEventListener("mouseup", this.mouseUpListener);
-      this.element.addEventListener("keydown", this.keyListener);
-      this.element.addEventListener("keyup", this.keyListener);
-      this.element.addEventListener("mouseleave", this.mouseLeaveListener);
+    if (this.ui) {
+      const { element } = this.ui;
+      element.addEventListener("mousedown", this.mouseDownListener);
+      element.addEventListener("mouseup", this.mouseUpListener);
+      element.addEventListener("keydown", this.keyListener);
+      element.addEventListener("keyup", this.keyListener);
+      element.addEventListener("mouseleave", this.mouseLeaveListener);
     }
   }
 
@@ -102,9 +100,9 @@ export class Pin {
   }
 
   render() {
-    if (this.element) {
+    if (this.ui) {
       const fill = !!this.state.value ? "red" : "url(#an)";
-      this.element.querySelectorAll("path").forEach((p) => {
+      this.ui.element.querySelectorAll("path").forEach((p) => {
         p.style.fill = fill;
       });
     }

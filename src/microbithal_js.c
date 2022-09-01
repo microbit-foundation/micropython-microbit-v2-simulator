@@ -69,7 +69,7 @@ void microbit_hal_reset(void) {
 }
 
 void microbit_hal_panic(int code) {
-    //microbit_panic(code);
+    mp_js_hal_panic(code);
 }
 
 int microbit_hal_temperature(void) {

@@ -85,7 +85,11 @@ export class Radio {
     this.config = config;
     this.rxQueue = [];
     if (!this.state.enabled) {
-      this.state.enabled = true;
+      this.state = {
+        ...this.state,
+        enabled: true,
+        group: config.group,
+      };
       this.onChange({
         radio: this.state,
       });

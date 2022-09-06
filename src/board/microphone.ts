@@ -1,4 +1,7 @@
-import { convertSoundEventStringToNumber } from "./conversions";
+import {
+  MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_HIGH,
+  MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_LOW,
+} from "./constants";
 import { RangeSensor, State } from "./state";
 
 type SoundLevelCallback = (v: number) => void;
@@ -48,9 +51,9 @@ export class Microphone {
     const low = this.soundLevel.lowThreshold!;
     const high = this.soundLevel.highThreshold!;
     if (prev > low && curr <= low) {
-      this.soundLevelCallback!(convertSoundEventStringToNumber("low"));
+      this.soundLevelCallback!(MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_LOW);
     } else if (prev < high && curr >= high!) {
-      this.soundLevelCallback!(convertSoundEventStringToNumber("high"));
+      this.soundLevelCallback!(MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_HIGH);
     }
   }
 

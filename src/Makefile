@@ -78,6 +78,7 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	microbit_pinaudio.c \
 	microbit_pinmode.c \
 	microbit_sound.c \
+	microbit_soundeffect.c \
 	microbit_soundevent.c \
 	microbit_speaker.c \
 	microbit_spi.c \
@@ -91,6 +92,7 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	modmusic.c \
 	modmusictunes.c \
 	modos.c \
+	modpower.c \
 	modradio.c \
 	modspeech.c \
 	modthis.c \

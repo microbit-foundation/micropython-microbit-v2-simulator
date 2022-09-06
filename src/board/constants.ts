@@ -53,8 +53,13 @@ export const MICROBIT_HAL_ACCELEROMETER_EVT_8G = 10;
 export const MICROBIT_HAL_ACCELEROMETER_EVT_SHAKE = 11;
 export const MICROBIT_HAL_ACCELEROMETER_EVT_2G = 12;
 
-export const MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_LOW = 1;
-export const MICROBIT_HAL_MICROPHONE_LEVEL_THRESHOLD_HIGH = 2;
+// Microphone events, passed to microbit_hal_level_detector_callback().
+export const MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_LOW = 1;
+export const MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_HIGH = 2;
+
+// Threshold kind, passed to microbit_hal_microphone_set_threshold().
+export const MICROBIT_HAL_MICROPHONE_SET_THRESHOLD_LOW = 0;
+export const MICROBIT_HAL_MICROPHONE_SET_THRESHOLD_HIGH = 1;
 
 export const MICROBIT_HAL_LOG_TIMESTAMP_NONE = 0;
 export const MICROBIT_HAL_LOG_TIMESTAMP_MILLISECONDS = 1;

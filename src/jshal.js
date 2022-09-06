@@ -207,8 +207,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_microphone_set_threshold: function (kind, value) {
     board.microphone.setThreshold(
-      // `+ 1` is temporary, see https://github.com/microbit-foundation/micropython-microbit-v2/pull/109
-      conversions.convertSoundEventNumberToString(kind + 1),
+      conversions.convertSoundThresholdNumberToString(kind),
       value
     );
   },
@@ -217,8 +216,8 @@ mergeInto(LibraryManager.library, {
     return board.microphone.soundLevel.value;
   },
 
-  mp_js_hal_audio_play_expression_by_name: function (name) {
-    return board.audio.playSoundExpression(UTF8ToString(name));
+  mp_js_hal_audio_play_expression: function (data) {
+    return board.audio.playSoundExpression(UTF8ToString(data));
   },
 
   mp_js_hal_audio_stop_expression: function () {

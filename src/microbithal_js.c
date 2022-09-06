@@ -451,8 +451,8 @@ bool microbit_hal_audio_is_expression_active(void) {
     return mp_js_hal_audio_is_expression_active();
 }
 
-void microbit_hal_audio_play_expression(const char *name) {
-    mp_js_hal_audio_play_expression(name);
+void microbit_hal_audio_play_expression(const char *expr) {
+    mp_js_hal_audio_play_expression(expr);
 }
 
 void microbit_hal_audio_stop_expression(void) {

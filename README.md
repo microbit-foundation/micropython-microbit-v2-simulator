@@ -76,7 +76,7 @@ The following sections documents the messages supported via postMessage.
       "type": "range",
       "min": 0,
       "max": 255
-      // Microphone sensor has low (quiet) and high (loud) thresholds:
+      // Microphone sensor only:
       "lowThreshold": 50,
       "highThreshold": 150
     }
@@ -100,11 +100,11 @@ The following sections documents the messages supported via postMessage.
         "type": "range",
         "min": 0,
         "max": 255
-        // Microphone sensor has low (quiet) and high (loud) thresholds:
+        // Microphone sensor only:
         "lowThreshold": 50,
         "highThreshold": 150
       }
-      // Optionally, further top-level keys here.
+      // Optionally, further keys here.
   }
   ]
 }

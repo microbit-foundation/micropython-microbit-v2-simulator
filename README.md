@@ -170,7 +170,9 @@ If you send string data from the program then it will be prepended with the thre
 {
   "kind": "flash",
   "filesystem": {
-    "main.py": new TextEncoder().encode("# your program here")
+    "main.py":
+      new TextEncoder()
+        .encode("# your program here")
   }
 }
 ```

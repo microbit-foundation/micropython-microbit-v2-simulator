@@ -59,8 +59,8 @@ export class Audio {
     );
   }
 
-  playSoundExpression(expression: string) {
-    const soundEffects = parseSoundEffects(replaceBuiltinSound(expression));
+  playSoundExpression(expr: string) {
+    const soundEffects = parseSoundEffects(replaceBuiltinSound(expr));
     const onDone = () => {
       this.stopSoundExpression();
     };

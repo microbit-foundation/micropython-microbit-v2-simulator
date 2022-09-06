@@ -76,6 +76,26 @@ int microbit_hal_temperature(void) {
     return mp_js_hal_temperature();
 }
 
+void microbit_hal_power_clear_wake_sources(void) {
+    // Stub, unsupported.
+}
+
+void microbit_hal_power_wake_on_button(int button, bool wake_on_active) {
+    // Stub, unsupported.
+}
+
+void microbit_hal_power_wake_on_pin(int pin, bool wake_on_active) {
+    // Stub, unsupported.
+}
+
+void microbit_hal_power_off(void) {
+    // Stub, unsupported.
+}
+
+void microbit_hal_power_deep_sleep(bool wake_on_ms, uint32_t ms) {
+    // Stub, unsupported.
+}
+
 void microbit_hal_pin_set_pull(int pin, int pull) {
     //pin_obj[pin]->setPull(pin_pull_mode_mapping[pull]);
     //pin_pull_state[pin] = pull;
@@ -431,8 +451,8 @@ bool microbit_hal_audio_is_expression_active(void) {
     return mp_js_hal_audio_is_expression_active();
 }
 
-void microbit_hal_audio_play_expression_by_name(const char *name) {
-    mp_js_hal_audio_play_expression_by_name(name);
+void microbit_hal_audio_play_expression(const char *expr) {
+    mp_js_hal_audio_play_expression(expr);
 }
 
 void microbit_hal_audio_stop_expression(void) {

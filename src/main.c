@@ -102,6 +102,7 @@ void mp_js_main(int heap_size) {
         microbit_hal_deinit();
         gc_sweep_all();
         mp_deinit();
+        free(heap);
     }
 }
 

@@ -107,8 +107,6 @@ export class Radio {
     }
   }
 
-  initialize() {}
-
   dispose() {
     this.rxQueue = undefined;
     this.config = undefined;

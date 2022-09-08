@@ -151,6 +151,19 @@ The following sections documents the messages supported via postMessage.
 <td>Radio output (sent from the user's program) as bytes.
 If you send string data from the program then it will be prepended with the three bytes 0x01, 0x00, 0x01.
 
+<tr>
+<td>internal_error
+<td>
+
+```javascript
+{
+  "kind": "internal_error",
+  "error": new Error()
+}
+```
+
+<td>A debug message sent for internal (unexpected) errors thrown by the simulator. Suitable for application-level logging. Please raise issues in this project as these indicate a bug in the simulator.
+
 </table>
 
 ## Messages supported by the iframe

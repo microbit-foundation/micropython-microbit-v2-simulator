@@ -113,7 +113,5 @@ export class Pin {
     }
   }
 
-  initialize() {}
-
   dispose() {}
 }

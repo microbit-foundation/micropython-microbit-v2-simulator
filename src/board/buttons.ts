@@ -115,8 +115,6 @@ export class Button {
     return result;
   }
 
-  initialize() {}
-
   dispose() {
     this._presses = 0;
   }

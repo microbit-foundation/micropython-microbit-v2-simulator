@@ -24,34 +24,35 @@
  * THE SOFTWARE.
  */
 
+
 mergeInto(LibraryManager.library, {
   mp_js_hal_init: async function () {
-    board.initialize();
+    Module.board.initialize();
   },
 
   mp_js_hal_deinit: function () {
-    board.dispose();
+    Module.board.dispose();
   },
 
   mp_js_hal_ticks_ms: function () {
-    return board.ticksMilliseconds();
+    return Module.board.ticksMilliseconds();
   },
 
   mp_js_hal_stdin_pop_char: function () {
-    return board.readSerialInput();
+    return Module.board.readSerialInput();
   },
 
   mp_js_hal_stdout_tx_strn: function (ptr, len) {
-    board.writeSerialOutput(UTF8ToString(ptr, len));
+    Module.board.writeSerialOutput(UTF8ToString(ptr, len));
   },
 
   mp_js_hal_filesystem_find: function (name, len) {
-    return fs.find(UTF8ToString(name, len));
+    return Module.fs.find(UTF8ToString(name, len));
   },
 
   mp_js_hal_filesystem_create: function (name, len) {
     const filename = UTF8ToString(name, len);
-    return fs.create(filename);
+    return Module.fs.create(filename);
   },
 
   mp_js_hal_filesystem_name: function (idx, buf) {
@@ -65,222 +66,224 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_filesystem_size: function (idx) {
-    return fs.size(idx);
+    return Module.fs.size(idx);
   },
 
   mp_js_hal_filesystem_remove: function (idx) {
-    return fs.remove(idx);
+    return Module.fs.remove(idx);
   },
 
   mp_js_hal_filesystem_readbyte: function (idx, offset) {
-    return fs.readbyte(idx, offset);
+    return Module.fs.readbyte(idx, offset);
   },
 
   mp_js_hal_filesystem_write: function (idx, buf, len) {
     const data = new Uint8Array(HEAP8.buffer, buf, len);
-    return fs.write(idx, data);
+    return Module.fs.write(idx, data);
   },
 
   mp_js_hal_reset: function () {
-    return board.reset();
+    return Module.board.reset();
   },
 
   mp_js_hal_panic: function (code) {
-    return board.panic(code);
+    Module.board.throwPanic(code);
   },
 
   mp_js_hal_temperature: function () {
-    return board.temperature.value;
+    return Module.board.temperature.value;
   },
 
   mp_js_hal_button_get_presses: function (button) {
-    return board.buttons[button].getAndClearPresses();
+    return Module.board.buttons[button].getAndClearPresses();
   },
 
   mp_js_hal_button_is_pressed: function (button) {
-    return board.buttons[button].isPressed();
+    return Module.board.buttons[button].isPressed();
   },
 
   mp_js_hal_pin_is_touched: function (pin) {
-    return board.pins[pin].isTouched();
+    return Module.board.pins[pin].isTouched();
   },
 
   mp_js_hal_display_get_pixel: function (x, y) {
-    return board.display.getPixel(x, y);
+    return Module.board.display.getPixel(x, y);
   },
 
   mp_js_hal_display_set_pixel: function (x, y, value) {
-    board.display.setPixel(x, y, value);
+    Module.board.display.setPixel(x, y, value);
   },
 
   mp_js_hal_display_clear: function () {
-    board.display.clear();
+    Module.board.display.clear();
   },
 
   mp_js_hal_display_read_light_level: function () {
-    return board.display.lightLevel.value;
+    return Module.board.display.lightLevel.value;
   },
 
   mp_js_hal_accelerometer_get_x: function () {
-    return board.accelerometer.state.accelerometerX.value;
+    return Module.board.accelerometer.state.accelerometerX.value;
   },
 
   mp_js_hal_accelerometer_get_y: function () {
-    return board.accelerometer.state.accelerometerY.value;
+    return Module.board.accelerometer.state.accelerometerY.value;
   },
 
   mp_js_hal_accelerometer_get_z: function () {
-    return board.accelerometer.state.accelerometerZ.value;
+    return Module.board.accelerometer.state.accelerometerZ.value;
   },
 
   mp_js_hal_accelerometer_get_gesture: function () {
-    return conversions.convertAccelerometerStringToNumber(
-      board.accelerometer.state.gesture.value
+    return Module.conversions.convertAccelerometerStringToNumber(
+      Module.board.accelerometer.state.gesture.value
     );
   },
 
   mp_js_hal_accelerometer_set_range: function (r) {
-    board.accelerometer.setRange(r);
+    Module.board.accelerometer.setRange(r);
   },
 
   mp_js_hal_compass_get_x: function () {
-    return board.compass.state.compassX.value;
+    return Module.board.compass.state.compassX.value;
   },
 
   mp_js_hal_compass_get_y: function () {
-    return board.compass.state.compassY.value;
+    return Module.board.compass.state.compassY.value;
   },
 
   mp_js_hal_compass_get_z: function () {
-    return board.compass.state.compassZ.value;
+    return Module.board.compass.state.compassZ.value;
   },
 
   mp_js_hal_compass_get_field_strength: function () {
-    return board.compass.getFieldStrength();
+    return Module.board.compass.getFieldStrength();
   },
 
   mp_js_hal_compass_get_heading: function () {
-    return board.compass.state.compassHeading.value;
+    return Module.board.compass.state.compassHeading.value;
   },
 
   mp_js_hal_audio_set_volume: function (value) {
-    board.audio.setVolume(value);
+    Module.board.audio.setVolume(value);
   },
 
   mp_js_hal_audio_init: function (sample_rate) {
-    board.audio.default.init(sample_rate);
+    Module.board.audio.default.init(sample_rate);
   },
 
   mp_js_hal_audio_write_data: function (buf, num_samples) {
-    board.audio.default.writeData(
-      conversions.convertAudioBuffer(
+    Module.board.audio.default.writeData(
+      Module.conversions.convertAudioBuffer(
+        Module.HEAPU8,
         buf,
-        board.audio.default.createBuffer(num_samples)
+        Module.board.audio.default.createBuffer(num_samples)
       )
     );
   },
 
   mp_js_hal_audio_speech_init: function (sample_rate) {
-    board.audio.speech.init(sample_rate);
+    Module.board.audio.speech.init(sample_rate);
   },
 
   mp_js_hal_audio_speech_write_data: function (buf, num_samples) {
-    board.audio.speech.writeData(
-      conversions.convertAudioBuffer(
+    Module.board.audio.speech.writeData(
+      Module.conversions.convertAudioBuffer(
+        Module.HEAPU8,
         buf,
-        board.audio.speech.createBuffer(num_samples)
+        Module.board.audio.speech.createBuffer(num_samples)
       )
     );
   },
 
   mp_js_hal_audio_period_us: function (period_us) {
-    board.audio.setPeriodUs(period_us);
+    Module.board.audio.setPeriodUs(period_us);
   },
 
   mp_js_hal_audio_amplitude_u10: function (amplitude_u10) {
-    board.audio.setAmplitudeU10(amplitude_u10);
+    Module.board.audio.setAmplitudeU10(amplitude_u10);
   },
 
   mp_js_hal_microphone_init: function () {
-    board.microphone.microphoneOn();
+    Module.board.microphone.microphoneOn();
   },
 
   mp_js_hal_microphone_set_threshold: function (kind, value) {
-    board.microphone.setThreshold(
-      conversions.convertSoundThresholdNumberToString(kind),
+    Module.board.microphone.setThreshold(
+      Module.conversions.convertSoundThresholdNumberToString(kind),
       value
     );
   },
 
   mp_js_hal_microphone_get_level: function () {
-    return board.microphone.soundLevel.value;
+    return Module.board.microphone.soundLevel.value;
   },
 
   mp_js_hal_audio_play_expression: function (expr) {
-    return board.audio.playSoundExpression(UTF8ToString(expr));
+    return Module.board.audio.playSoundExpression(UTF8ToString(expr));
   },
 
   mp_js_hal_audio_stop_expression: function () {
-    return board.audio.stopSoundExpression();
+    return Module.board.audio.stopSoundExpression();
   },
 
   mp_js_hal_audio_is_expression_active: function () {
-    return board.audio.isSoundExpressionActive();
+    return Module.board.audio.isSoundExpressionActive();
   },
 
   mp_js_radio_enable: function (group, max_payload, queue) {
-    board.radio.enable({ group, maxPayload: max_payload, queue });
+    Module.board.radio.enable({ group, maxPayload: max_payload, queue });
   },
 
   mp_js_radio_disable: function () {
-    board.radio.disable();
+    Module.board.radio.disable();
   },
 
   mp_js_radio_update_config: function (group, max_payload, queue) {
-    board.radio.updateConfig({ group, maxPayload: max_payload, queue });
+    Module.board.radio.updateConfig({ group, maxPayload: max_payload, queue });
   },
 
   mp_js_radio_send: function (buf, len, buf2, len2) {
     const data = new Uint8Array(len + len2);
     data.set(HEAPU8.slice(buf, buf + len));
     data.set(HEAPU8.slice(buf2, buf2 + len2), len);
-    board.radio.send(data);
+    Module.board.radio.send(data);
   },
 
   mp_js_radio_peek: function () {
-    const packet = board.radio.peek();
+    const packet = Module.board.radio.peek();
     if (packet) {
-      return board.operations.writeRadioRxBuffer(packet);
+      return Module.board.module.writeRadioRxBuffer(packet);
     }
     return null;
   },
 
   mp_js_radio_pop: function () {
-    board.radio.pop();
+    Module.board.radio.pop();
   },
 
   mp_js_hal_log_delete: function (full_erase) {
     // We don't have a notion of non-full erase.
-    board.dataLogging.delete();
+    Module.board.dataLogging.delete();
   },
 
   mp_js_hal_log_set_mirroring: function (serial) {
-    board.dataLogging.setMirroring(serial);
+    Module.board.dataLogging.setMirroring(serial);
   },
 
   mp_js_hal_log_set_timestamp: function (period) {
-    board.dataLogging.setTimestamp(period);
+    Module.board.dataLogging.setTimestamp(period);
   },
 
   mp_js_hal_log_begin_row: function () {
-    return board.dataLogging.beginRow();
+    return Module.board.dataLogging.beginRow();
   },
 
   mp_js_hal_log_end_row: function () {
-    return board.dataLogging.endRow();
+    return Module.board.dataLogging.endRow();
   },
 
   mp_js_hal_log_data: function (key, value) {
-    return board.dataLogging.logData(UTF8ToString(key), UTF8ToString(value));
+    return Module.board.dataLogging.logData(UTF8ToString(key), UTF8ToString(value));
   },
 });

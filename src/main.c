@@ -52,11 +52,14 @@ void mp_js_request_stop(void) {
     stop_requested = 1;
 }
 
+void mp_js_force_stop(void) {
+    emscripten_force_exit(0);
+}
+
 // Main entrypoint called from JavaScript.
 // Calling mp_js_request_stop allows Ctrl-D to exit, otherwise Ctrl-D does a soft reset.
 // As we use asyncify you can await this call.
 void mp_js_main(int heap_size) {
-    stop_requested = 0;
     while (!stop_requested) {
         microbit_hal_init();
         microbit_system_init();

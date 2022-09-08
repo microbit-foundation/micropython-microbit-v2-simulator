@@ -73,8 +73,6 @@ export class Display {
     }
   }
 
-  initialize() {}
-
   dispose() {
     this.clear();
   }

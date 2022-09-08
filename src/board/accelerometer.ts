@@ -48,8 +48,8 @@ export class Accelerometer {
 
   setValue(id: StateKeys, value: any) {
     this.state[id].setValue(value);
-    if (id === "gesture") {
-      this.gestureCallback!(
+    if (id === "gesture" && this.gestureCallback) {
+      this.gestureCallback(
         convertAccelerometerStringToNumber(this.state.gesture.value)
       );
     }
@@ -71,11 +71,9 @@ export class Accelerometer {
     });
   }
 
-  initialize(gestureCallback: GestureCallback) {
+  initializeCallbacks(gestureCallback: GestureCallback) {
     this.gestureCallback = gestureCallback;
   }
 
-  dispose() {
-    this.gestureCallback = undefined;
-  }
+  dispose() {}
 }

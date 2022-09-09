@@ -50,7 +50,7 @@ export class ModuleWrapper {
 
   writeRadioRxBuffer(packet: Uint8Array) {
     const buf = this.module._microbit_radio_rx_buffer!();
-    this.module!.HEAPU8.set(packet, buf);
+    this.module.HEAPU8.set(packet, buf);
     return buf;
   }
 }

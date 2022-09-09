@@ -23,7 +23,10 @@ export class Audio {
 
   constructor() {}
 
-  initialize({ defaultAudioCallback, speechAudioCallback }: AudioOptions) {
+  initializeCallbacks({
+    defaultAudioCallback,
+    speechAudioCallback,
+  }: AudioOptions) {
     this.context = new AudioContext({
       // The highest rate is the sound expression synth.
       sampleRate: 44100,

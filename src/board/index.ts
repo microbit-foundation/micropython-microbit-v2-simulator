@@ -9,6 +9,7 @@ import {
   MICROBIT_HAL_PIN_P1,
   MICROBIT_HAL_PIN_P2,
 } from "./constants";
+import * as conversions from "./conversions";
 import { DataLogging } from "./data-logging";
 import { Display } from "./display";
 import { FileSystem } from "./fs";
@@ -16,21 +17,23 @@ import { Microphone } from "./microphone";
 import { Pin } from "./pins";
 import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
-import { WebAssemblyOperations } from "./wasm";
+import { ModuleWrapper } from "./wasm";
+
+export class PanicError extends Error {
+  constructor(public code: number) {
+    super("panic");
+  }
+}
 
 const stoppedOpactity = "0.5";
 
-export function createBoard(
-  operations: WebAssemblyOperations,
-  notifications: Notifications,
-  fs: FileSystem
-) {
+export function createBoard(notifications: Notifications, fs: FileSystem) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
   const svg = document.querySelector("svg");
   if (!svg) {
     throw new Error("No SVG");
   }
-  return new Board(operations, notifications, fs, svg);
+  return new Board(notifications, fs, svg);
 }
 
 export class Board {
@@ -74,8 +77,16 @@ export class Board {
     return result ?? id;
   };
 
+  /**
+   * Defined during start().
+   */
+  private modulePromise: Promise<ModuleWrapper> | undefined;
+  /**
+   * Flag to trigger a reset after start finishes.
+   */
+  private resetWhenDone: boolean = false;
+
   constructor(
-    public operations: WebAssemblyOperations,
     private notifications: Notifications,
     private fs: FileSystem,
     private svg: SVGElement
@@ -143,6 +154,29 @@ export class Board {
     );
 
     this.updateTranslationsInternal();
+    this.notifications.onReady(this.getState());
+  }
+
+  private async createModule(): Promise<ModuleWrapper> {
+    const wrapped = await window.createModule({
+      board: this,
+      fs: this.fs,
+      conversions,
+      noInitialRun: true,
+      instantiateWasm,
+    });
+    const module = new ModuleWrapper(wrapped);
+    this.audio.initializeCallbacks({
+      defaultAudioCallback: wrapped._microbit_hal_audio_ready_callback,
+      speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
+    });
+    this.accelerometer.initializeCallbacks(
+      wrapped._microbit_hal_gesture_callback
+    );
+    this.microphone.initializeCallbacks(
+      wrapped._microbit_hal_level_detector_callback
+    );
+    return module;
   }
 
   updateTranslations(language: string, translations: Record<string, string>) {
@@ -246,27 +280,6 @@ export class Board {
     }
   }
 
-  initializedWebAssembly() {
-    this.operations.initialize();
-    this.notifications.onReady(this.getState());
-  }
-
-  initialize() {
-    this.epoch = new Date().getTime();
-    this.audio.initialize({
-      defaultAudioCallback: this.operations.defaultAudioCallback!,
-      speechAudioCallback: this.operations.speechAudioCallback!,
-    });
-    this.buttons.forEach((b) => b.initialize());
-    this.pins.forEach((p) => p.initialize());
-    this.display.initialize();
-    this.accelerometer.initialize(this.operations.gestureCallback!);
-    this.compass.initialize();
-    this.microphone.initialize(this.operations.soundLevelCallback!);
-    this.radio.initialize();
-    this.serialInputBuffer.length = 0;
-  }
-
   ticksMilliseconds() {
     return new Date().getTime() - this.epoch!;
   }
@@ -299,25 +312,65 @@ export class Board {
     this.stoppedOverlay.style.display = "flex";
   }
 
-  private start() {
-    this.operations.start();
-    this.displayRunningState();
+  private async start() {
+    if (this.modulePromise) {
+      throw new Error("Module already exists!");
+    }
+
+    this.modulePromise = this.createModule();
+    const module = await this.modulePromise;
+    let panicCode: number | undefined;
+    try {
+      this.displayRunningState();
+      await module.start();
+    } catch (e: any) {
+      if (e instanceof PanicError) {
+        panicCode = e.code;
+      } else {
+        this.notifications.onInternalError(e);
+      }
+    }
+    try {
+      module.forceStop();
+    } catch (e: any) {
+      if (e.name !== "ExitStatus") {
+        console.error(e);
+        throw new Error("Expected status message");
+      }
+    }
+    this.modulePromise = undefined;
+
+    if (panicCode !== undefined) {
+      this.displayPanic(panicCode);
+    } else {
+      if (this.resetWhenDone) {
+        this.resetWhenDone = false;
+        setTimeout(() => this.start(), 0);
+      } else {
+        this.displayStoppedState();
+      }
+    }
   }
 
-  async stop(): Promise<void> {
+  async stop(reset: boolean = false): Promise<void> {
+    this.resetWhenDone = reset;
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
       this.display.clear();
+      this.displayStoppedState();
     }
-    const interrupt = () => this.serialInputBuffer.push(3, 4); // Ctrl-C, Ctrl-D.
-    await this.operations.stop(interrupt);
-    this.displayStoppedState();
+    if (this.modulePromise) {
+      const module = await this.modulePromise;
+      module.requestStop();
+      this.modulePromise = undefined;
+      // Ctrl-C, Ctrl-D to interrupt the main loop.
+      this.writeSerialInput("\x03\x04");
+    }
   }
 
   async reset(): Promise<void> {
-    await this.stop();
-    this.start();
+    this.stop(true);
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
@@ -331,9 +384,11 @@ export class Board {
     return this.start();
   }
 
-  panic(code: number): void {
-    // We should hang MicroPython here. I think ideally we'd stop it entirely so we do this without any WASM.
-    // For now we just do the display animation.
+  throwPanic(code: number): void {
+    throw new PanicError(code);
+  }
+
+  displayPanic(code: number): void {
     const sad = [
       [9, 9, 0, 9, 9],
       [9, 9, 0, 9, 9],
@@ -457,7 +512,15 @@ export class Board {
   }
 
   writeSerialOutput(text: string): void {
-    this.notifications.onSerialOutput(text);
+    // Avoid the Ctrl-C, Ctrl-D output when we request a stop.
+    if (this.modulePromise) {
+      this.notifications.onSerialOutput(text);
+    }
+  }
+
+  initialize() {
+    this.epoch = new Date().getTime();
+    this.serialInputBuffer.length = 0;
   }
 
   dispose() {
@@ -517,6 +580,10 @@ export class Notifications {
 
   onLogDelete = () => {
     this.postMessage("log_delete", {});
+  };
+
+  onInternalError = (error: any) => {
+    this.postMessage("internal_error", { error });
   };
 
   private postMessage(kind: string, data: any) {
@@ -599,3 +666,33 @@ function isFileSystem(
     ([k, v]) => typeof k === "string" && v instanceof Uint8Array
   );
 }
+
+const fetchWasm = async () => {
+  const response = await fetch("./build/firmware.wasm");
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  return response.arrayBuffer();
+};
+
+const compileWasm = async () => {
+  // Can't use streaming in Safari 14 but would be nice to feature detect.
+  return WebAssembly.compile(new Uint8Array(await fetchWasm()));
+};
+
+let compiledWasmPromise: Promise<WebAssembly.Module> = compileWasm();
+
+const instantiateWasm = function (imports: any, successCallback: any) {
+  // No easy way to communicate failure here so hard to add retries.
+  compiledWasmPromise
+    .then(async (wasmModule) => {
+      const instance = await WebAssembly.instantiate(wasmModule, imports);
+      successCallback(instance);
+    })
+    .catch((e) => {
+      console.error("Failed to instantiate WASM");
+      console.error(e);
+    });
+  // Result via callback.
+  return {};
+};

@@ -1,4 +1,4 @@
-# Makefile to build micropython.js
+# Makefile to build WASM and simulator JS.
 
 # Build upon the codal_port code.
 CODAL_PORT = $(abspath ../lib/micropython-microbit-v2/src/codal_port)
@@ -44,9 +44,11 @@ COPT += -O3 -DNDEBUG
 endif
 
 JSFLAGS += -s ASYNCIFY
-JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_mp_js_request_stop','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer']"
+JSFLAGS += -s EXIT_RUNTIME
+JSFLAGS += -s MODULARIZE=1
+JSFLAGS += -s EXPORT_NAME=createModule
+JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer','_mp_js_force_stop','_mp_js_request_stop']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
-JSFLAGS += --pre-js $(BUILD)/pre.js
 
 ifdef DEBUG
 JSFLAGS += -g
@@ -136,14 +138,13 @@ $(MBIT_VER_FILE): FORCE
 	$(PYTHON) $(TOP)/py/makeversionhdr.py $(MBIT_VER_FILE).pre
 	$(CAT) $(MBIT_VER_FILE).pre | $(SED) s/MICROPY_/MICROBIT_/ > $(MBIT_VER_FILE)
 
-$(BUILD)/micropython.js: $(OBJ) jshal.js main.js pre-js
+$(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 	$(ECHO) "LINK $(BUILD)/firmware.js"
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
-	cat main.js $(BUILD)/firmware.js > $@
 
-pre-js:
-	npx esbuild ./pre.ts --bundle --outfile=$(BUILD)/pre.js --loader:.svg=text
+simulator-js:
+	npx esbuild ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
 
 include $(TOP)/py/mkrules.mk
 
-.PHONY: pre-js
+.PHONY: simulator-js

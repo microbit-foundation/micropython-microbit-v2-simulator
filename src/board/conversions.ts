@@ -12,21 +12,9 @@ import {
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_LEFT,
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_RIGHT,
   MICROBIT_HAL_ACCELEROMETER_EVT_TILT_UP,
-  MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_HIGH,
-  MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_LOW,
   MICROBIT_HAL_MICROPHONE_SET_THRESHOLD_HIGH,
   MICROBIT_HAL_MICROPHONE_SET_THRESHOLD_LOW,
 } from "./constants";
-
-export function convertAudioBuffer(source: number, target: AudioBuffer) {
-  const channel = target.getChannelData(0);
-  const heap = window.HEAPU8;
-  for (let i = 0; i < channel.length; ++i) {
-    // Convert from uint8 to -1..+1 float.
-    channel[i] = (heap[source + i] / 255) * 2 - 1;
-  }
-  return target;
-}
 
 export function convertSoundThresholdNumberToString(
   value: number
@@ -106,3 +94,16 @@ export function convertAccelerometerNumberToString(value: number): string {
       throw new Error(`Invalid value ${value}`);
   }
 }
+
+export const convertAudioBuffer = (
+  heap: Uint8Array,
+  source: number,
+  target: AudioBuffer
+) => {
+  const channel = target.getChannelData(0);
+  for (let i = 0; i < channel.length; ++i) {
+    // Convert from uint8 to -1..+1 float.
+    channel[i] = (heap[source + i] / 255) * 2 - 1;
+  }
+  return target;
+};

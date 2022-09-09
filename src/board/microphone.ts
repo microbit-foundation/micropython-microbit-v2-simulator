@@ -50,19 +50,20 @@ export class Microphone {
 
     const low = this.soundLevel.lowThreshold!;
     const high = this.soundLevel.highThreshold!;
-    if (prev > low && curr <= low) {
-      this.soundLevelCallback!(MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_LOW);
-    } else if (prev < high && curr >= high!) {
-      this.soundLevelCallback!(MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_HIGH);
+    if (this.soundLevelCallback) {
+      if (prev > low && curr <= low) {
+        this.soundLevelCallback(MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_LOW);
+      } else if (prev < high && curr >= high!) {
+        this.soundLevelCallback(MICROBIT_HAL_MICROPHONE_EVT_THRESHOLD_HIGH);
+      }
     }
   }
 
-  initialize(soundLevelCallback: (v: number) => void) {
+  initializeCallbacks(soundLevelCallback: (v: number) => void) {
     this.soundLevelCallback = soundLevelCallback;
   }
 
   dispose() {
     this.microphoneOff();
-    this.soundLevelCallback = undefined;
   }
 }

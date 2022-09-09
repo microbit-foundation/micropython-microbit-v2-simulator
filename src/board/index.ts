@@ -178,7 +178,7 @@ export class Board {
       wrapped._microbit_hal_gesture_callback
     );
     this.microphone.initializeCallbacks(
-      wrapped._microbit_hal_audio_speech_ready_callback
+      wrapped._microbit_hal_level_detector_callback
     );
     return module;
   }

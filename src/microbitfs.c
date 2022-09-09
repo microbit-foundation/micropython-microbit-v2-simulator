@@ -209,7 +209,12 @@ STATIC mp_uint_t microbit_file_write(mp_obj_t self_in, const void *buf, mp_uint_
         *errcode = MP_EBADF;
         return MP_STREAM_ERROR;
     }
-    return mp_js_hal_filesystem_write(self->idx, buf, size);
+    bool success = mp_js_hal_filesystem_write(self->idx, buf, size);
+    if (!success) {
+        *errcode = MP_ENOSPC;
+        return MP_STREAM_ERROR;
+    }
+    return size;
 }
 
 STATIC mp_uint_t microbit_file_ioctl(mp_obj_t self_in, mp_uint_t request, uintptr_t arg, int *errcode) {

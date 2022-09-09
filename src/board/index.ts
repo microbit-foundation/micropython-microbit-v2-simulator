@@ -82,9 +82,10 @@ export class Board {
    */
   private modulePromise: Promise<ModuleWrapper> | undefined;
   /**
-   * Flag to trigger a reset after start finishes.
+   * If undefined, then when main finishes we stay stopped.
+   * Otherwise we perform the action then clear this field.
    */
-  private resetWhenDone: boolean = false;
+  private afterStopped: (() => void) | undefined;
 
   constructor(
     private notifications: Notifications,
@@ -339,8 +340,9 @@ export class Board {
     if (panicCode !== undefined) {
       this.displayPanic(panicCode);
     } else {
-      if (this.resetWhenDone) {
-        this.resetWhenDone = false;
+      if (this.afterStopped) {
+        this.afterStopped();
+        this.afterStopped = undefined;
         setTimeout(() => this.start(), 0);
       } else {
         this.displayStoppedState();
@@ -348,8 +350,10 @@ export class Board {
     }
   }
 
-  async stop(reset: boolean = false): Promise<void> {
-    this.resetWhenDone = reset;
+  async stop(
+    afterStopped: (() => void) | undefined = undefined
+  ): Promise<void> {
+    this.afterStopped = afterStopped;
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
@@ -366,17 +370,24 @@ export class Board {
   }
 
   async reset(): Promise<void> {
-    this.stop(true);
+    const noChangeRestart = () => {};
+    this.stop(noChangeRestart);
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
-    await this.stop();
-    this.fs.clear();
-    Object.entries(filesystem).forEach(([name, value]) => {
-      const idx = this.fs.create(name);
-      this.fs.write(idx, value);
-    });
-    this.dataLogging.delete();
+    const flashFileSystem = () => {
+      this.fs.clear();
+      Object.entries(filesystem).forEach(([name, value]) => {
+        const idx = this.fs.create(name);
+        this.fs.write(idx, value, true);
+      });
+      this.dataLogging.delete();
+    };
+    if (this.modulePromise) {
+      // If it's running then we need to stop before flash.
+      return this.stop(flashFileSystem);
+    }
+    flashFileSystem();
     return this.start();
   }
 

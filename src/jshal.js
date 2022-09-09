@@ -56,7 +56,7 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_filesystem_name: function (idx, buf) {
-    const name = fs.name(idx);
+    const name = Module.fs.name(idx);
     if (name === undefined) {
       return -1;
     }

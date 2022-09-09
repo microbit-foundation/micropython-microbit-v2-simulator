@@ -77,7 +77,6 @@ export class Board {
     return result ?? id;
   };
 
-  private initialModulePromise: Promise<ModuleWrapper> | undefined;
   /**
    * Defined during start().
    */
@@ -92,9 +91,6 @@ export class Board {
     private fs: FileSystem,
     private svg: SVGElement
   ) {
-    // We start this loading here so as not to delay loading WASM until start().
-    this.initialModulePromise = this.createModule();
-
     this.display = new Display(
       Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
     );
@@ -320,14 +316,8 @@ export class Board {
     if (this.modulePromise) {
       throw new Error("Module already exists!");
     }
-    // Use the pre-loaded one the first time through.
-    if (this.initialModulePromise) {
-      this.modulePromise = this.initialModulePromise;
-      this.initialModulePromise = undefined;
-    } else {
-      this.modulePromise = this.createModule();
-    }
 
+    this.modulePromise = this.createModule();
     const module = await this.modulePromise;
     let panicCode: number | undefined;
     try {

@@ -9,7 +9,7 @@ import {
   MICROBIT_HAL_LOG_TIMESTAMP_NONE,
   MICROBIT_HAL_LOG_TIMESTAMP_SECONDS,
 } from "./constants";
-import { State } from "./state";
+import { DataLoggingState, State } from "./state";
 
 // Determined via a CODAL program dumping logEnd - dataStart in MicroBitLog.cpp.
 // This is only approximate as we don't serialize our state in the same way but
@@ -24,7 +24,7 @@ export class DataLogging {
   private headingsChanged: boolean = false;
   private headings: string[] = [];
   private row: string[] | undefined;
-  private logFull: boolean = false;
+  state: DataLoggingState = { type: "dataLogging", logFull: false };
 
   constructor(
     private currentTimeMillis: () => number,
@@ -84,13 +84,13 @@ export class DataLogging {
     if (entry.data || entry.headings) {
       const entrySize = calculateEntrySize(entry);
       if (this.size + entrySize > maxSizeBytes) {
-        if (!this.logFull) {
-          this.logFull = true;
+        if (!this.state.logFull) {
+          this.state = {
+            ...this.state,
+            logFull: true,
+          };
           this.onChange({
-            dataLogging: {
-              type: "dataLogging",
-              logFull: true,
-            },
+            dataLogging: this.state,
           });
         }
         return MICROBIT_HAL_DEVICE_NO_RESOURCES;
@@ -148,13 +148,13 @@ export class DataLogging {
     this.timestampOnLastEndRow = undefined;
 
     this.size = 0;
-    if (this.logFull) {
-      this.logFull = false;
+    if (this.state.logFull) {
+      this.state = {
+        ...this.state,
+        logFull: false,
+      };
       this.onChange({
-        dataLogging: {
-          type: "dataLogging",
-          logFull: false,
-        },
+        dataLogging: this.state,
       });
     }
 

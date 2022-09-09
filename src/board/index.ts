@@ -181,11 +181,7 @@ export class Board {
       compassHeading: this.compass.state.compassHeading,
 
       lightLevel: this.display.lightLevel,
-      dataLogging: {
-        // Placeholder.
-        type: "dataLogging",
-        logFull: false,
-      },
+      dataLogging: this.dataLogging.state,
       soundLevel: this.microphone.soundLevel,
       temperature: this.temperature,
     };

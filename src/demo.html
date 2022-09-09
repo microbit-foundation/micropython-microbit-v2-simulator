@@ -197,6 +197,14 @@
               );
               break;
             }
+            case "internal_error": {
+              console.error("Simulator internal error:");
+              console.error(e.data.error);
+              break;
+            }
+            default: {
+              // Ignore unknown message
+            }
           }
         }
       });

@@ -1,7 +1,11 @@
+// Size as per C implementation.
+const maxSize = 31.5 * 1024;
+
 export class FileSystem {
   // Each entry is an FsFile object. The indexes are used as identifiers.
   // When a file is deleted the entry becomes ['', null] and can be reused.
   private _content: Array<FsFile | null> = [];
+  private _size = 0;
 
   create(name: string) {
     let free_idx = -1;
@@ -49,7 +53,11 @@ export class FileSystem {
   }
 
   remove(idx: number) {
-    this._content[idx] = null;
+    const file = this._content[idx];
+    if (file) {
+      this._size -= file.size();
+      this._content[idx] = null;
+    }
   }
 
   readbyte(idx: number, offset: number) {
@@ -57,13 +65,17 @@ export class FileSystem {
     return file ? file.readbyte(offset) : -1;
   }
 
-  write(idx: number, data: Uint8Array) {
+  write(idx: number, data: Uint8Array, force: boolean = false): boolean {
     const file = this._content[idx];
     if (!file) {
       throw new Error("File must exist");
     }
+    if (!force && this._size + data.length > maxSize) {
+      return false;
+    }
+    this._size += data.length;
     file.append(data);
-    return data.length;
+    return true;
   }
 
   clear() {

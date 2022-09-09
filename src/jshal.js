@@ -24,7 +24,6 @@
  * THE SOFTWARE.
  */
 
-
 mergeInto(LibraryManager.library, {
   mp_js_hal_init: async function () {
     Module.board.initialize();
@@ -83,7 +82,7 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_reset: function () {
-    return Module.board.reset();
+    Module.board.throwReset();
   },
 
   mp_js_hal_panic: function (code) {
@@ -284,6 +283,9 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_log_data: function (key, value) {
-    return Module.board.dataLogging.logData(UTF8ToString(key), UTF8ToString(value));
+    return Module.board.dataLogging.logData(
+      UTF8ToString(key),
+      UTF8ToString(value)
+    );
   },
 });

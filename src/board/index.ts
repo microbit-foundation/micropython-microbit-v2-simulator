@@ -25,6 +25,12 @@ export class PanicError extends Error {
   }
 }
 
+export class ResetError extends Error {
+  constructor() {
+    super("reset");
+  }
+}
+
 const stoppedOpactity = "0.5";
 
 export function createBoard(notifications: Notifications, fs: FileSystem) {
@@ -323,6 +329,8 @@ export class Board {
     } catch (e: any) {
       if (e instanceof PanicError) {
         panicCode = e.code;
+      } else if (e instanceof ResetError) {
+        this.resetWhenDone = true;
       } else {
         this.notifications.onInternalError(e);
       }
@@ -370,6 +378,10 @@ export class Board {
     }
   }
 
+  /**
+   * An external reset.
+   * reset() in MicroPython code throws ResetError.
+   */
   async reset(): Promise<void> {
     const noChangeRestart = () => {};
     this.stop(noChangeRestart);
@@ -394,6 +406,10 @@ export class Board {
 
   throwPanic(code: number): void {
     throw new PanicError(code);
+  }
+
+  throwReset(): void {
+    throw new ResetError();
   }
 
   displayPanic(code: number): void {

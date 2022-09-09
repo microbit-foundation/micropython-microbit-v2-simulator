@@ -1,4 +1,4 @@
-import { Board, PanicError } from ".";
+import { Board } from ".";
 import * as conversions from "./conversions";
 import { FileSystem } from "./fs";
 

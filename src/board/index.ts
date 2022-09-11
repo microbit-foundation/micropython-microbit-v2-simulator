@@ -331,10 +331,11 @@ export class Board {
       module.forceStop();
     } catch (e: any) {
       if (e.name !== "ExitStatus") {
-        console.error(e);
-        throw new Error("Expected status message");
+        this.notifications.onInternalError(e);
       }
     }
+    // Called by the HAL for normal shutdown but not in error scenarios.
+    this.stopComponents();
     this.modulePromise = undefined;
 
     if (panicCode !== undefined) {
@@ -530,15 +531,16 @@ export class Board {
     this.serialInputBuffer.length = 0;
   }
 
-  dispose() {
-    this.audio.dispose();
-    this.buttons.forEach((b) => b.dispose());
-    this.pins.forEach((p) => p.dispose());
-    this.display.dispose();
-    this.accelerometer.dispose();
-    this.compass.dispose();
-    this.microphone.dispose();
-    this.radio.dispose();
+  stopComponents() {
+    this.audio.boardStopped();
+    this.buttons.forEach((b) => b.boardStopped());
+    this.pins.forEach((p) => p.boardStopped());
+    this.display.boardStopped();
+    this.accelerometer.boardStopped();
+    this.compass.boardStopped();
+    this.microphone.boardStopped();
+    this.radio.boardStopped();
+    this.dataLogging.boardStopped();
     this.serialInputBuffer.length = 0;
 
     // Nofify of the state resets.

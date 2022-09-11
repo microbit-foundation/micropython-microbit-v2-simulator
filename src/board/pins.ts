@@ -113,5 +113,5 @@ export class Pin {
     }
   }
 
-  dispose() {}
+  boardStopped() {}
 }

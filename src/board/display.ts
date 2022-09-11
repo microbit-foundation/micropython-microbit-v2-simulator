@@ -73,7 +73,7 @@ export class Display {
     }
   }
 
-  dispose() {
+  boardStopped() {
     this.clear();
   }
 }

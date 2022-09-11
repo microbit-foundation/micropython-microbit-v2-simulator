@@ -31,7 +31,7 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_deinit: function () {
-    Module.board.dispose();
+    Module.board.stopComponents();
   },
 
   mp_js_hal_ticks_ms: function () {

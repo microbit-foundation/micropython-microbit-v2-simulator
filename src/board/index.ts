@@ -330,7 +330,8 @@ export class Board {
       if (e instanceof PanicError) {
         panicCode = e.code;
       } else if (e instanceof ResetError) {
-        this.resetWhenDone = true;
+        const noChangeRestart = () => {};
+        this.afterStopped = noChangeRestart;
       } else {
         this.notifications.onInternalError(e);
       }

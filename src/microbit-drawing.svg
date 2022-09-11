@@ -355,7 +355,7 @@
   <circle cx="96.849" cy="220.4" r="5.7384" fill="none" filter="url(#aE)" stroke="url(#aD)" stroke-width=".2" style="stroke:url(#aD)"/>
  </g>
  <g id="LEDTemplate" transform="translate(-7.641 -1.4302)" display="none">
-  <g id="ac" transform="matrix(0 .14526 -.14526 0 154.68 1.8239)" display="inline" stroke-width="2.4286">
+  <g id="ac" transform="matrix(0 .14526 -.14526 0 154.68 1.8239)" display="inline" stroke-width="2.4286" style="opacity: 0.2">
    <rect transform="rotate(-90)" x="-702.9" y="215.41" width="95.593" height="94.587" ry="3.68" fill="none"/>
    <rect x="236.87" y="646.27" width="50.853" height="17.811" rx="0" ry="0" fill="url(#aF)" stroke-width="5.4645" style="fill:url(#aF)"/>
    <rect x="246.83" y="644.93" width="30.673" height="20.485" rx="0" ry="0" fill="#e6e6e6" opacity=".5" stroke="url(#aG)" stroke-width=".91074" style="stroke:url(#aG)"/>

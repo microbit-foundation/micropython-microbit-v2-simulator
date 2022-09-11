@@ -133,7 +133,7 @@ export class DataLogging {
 
   initialize() {}
 
-  dispose() {
+  boardStopped() {
     // We don't delete the log here as it's on flash, but we do reset in-memory state.
     this.resetNonFlashStateExceptTimestamp();
     // Keep the timestamp if we could restore it from a persisted log.

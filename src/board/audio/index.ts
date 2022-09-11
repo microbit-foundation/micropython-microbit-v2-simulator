@@ -138,7 +138,7 @@ export class Audio {
     }
   }
 
-  dispose() {
+  boardStopped() {
     if (this.context) {
       this.context.close();
       this.context = undefined;

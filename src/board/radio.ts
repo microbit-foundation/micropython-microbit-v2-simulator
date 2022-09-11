@@ -107,7 +107,7 @@ export class Radio {
     }
   }
 
-  dispose() {
+  boardStopped() {
     this.rxQueue = undefined;
     this.config = undefined;
     this.state = {

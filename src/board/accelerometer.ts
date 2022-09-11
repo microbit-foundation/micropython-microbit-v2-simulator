@@ -75,5 +75,5 @@ export class Accelerometer {
     this.gestureCallback = gestureCallback;
   }
 
-  dispose() {}
+  boardStopped() {}
 }

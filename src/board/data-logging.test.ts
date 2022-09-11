@@ -233,7 +233,7 @@ describe("DataLogging", () => {
 
   it("dispose resets timestamp if nothing written", () => {
     logging.setTimestamp(MICROBIT_HAL_LOG_TIMESTAMP_SECONDS);
-    logging.dispose();
+    logging.boardStopped();
     logging.initialize();
 
     logging.beginRow();
@@ -253,7 +253,7 @@ describe("DataLogging", () => {
     logging.logData("b", "");
     logging.endRow();
 
-    logging.dispose();
+    logging.boardStopped();
     logging.initialize();
 
     logging.beginRow();

@@ -115,7 +115,7 @@ export class Button {
     return result;
   }
 
-  dispose() {
+  boardStopped() {
     this._presses = 0;
   }
 }

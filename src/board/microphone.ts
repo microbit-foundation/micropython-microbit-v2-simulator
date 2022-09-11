@@ -63,7 +63,7 @@ export class Microphone {
     this.soundLevelCallback = soundLevelCallback;
   }
 
-  dispose() {
+  boardStopped() {
     this.microphoneOff();
   }
 }

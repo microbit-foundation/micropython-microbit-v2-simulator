@@ -55,7 +55,7 @@ describe("Radio", () => {
   });
 
   it("disables the radio", () => {
-    radio.dispose();
+    radio.boardStopped();
     expect(radio.state).toEqual({
       type: "radio",
       enabled: false,

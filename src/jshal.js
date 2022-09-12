@@ -24,6 +24,9 @@
  * THE SOFTWARE.
  */
 
+// @ts-check
+/// <reference path="./jshal.d.ts" />
+
 mergeInto(LibraryManager.library, {
   mp_js_hal_init: async function () {
     Module.board.initialize();
@@ -41,20 +44,32 @@ mergeInto(LibraryManager.library, {
     return Module.board.readSerialInput();
   },
 
-  mp_js_hal_stdout_tx_strn: function (ptr, len) {
+  mp_js_hal_stdout_tx_strn: function (
+    /** @type {number} */ ptr,
+    /** @type {number} */ len
+  ) {
     Module.board.writeSerialOutput(UTF8ToString(ptr, len));
   },
 
-  mp_js_hal_filesystem_find: function (name, len) {
+  mp_js_hal_filesystem_find: function (
+    /** @type {number} */ name,
+    /** @type {number} */ len
+  ) {
     return Module.fs.find(UTF8ToString(name, len));
   },
 
-  mp_js_hal_filesystem_create: function (name, len) {
+  mp_js_hal_filesystem_create: function (
+    /** @type {number} */ name,
+    /** @type {number} */ len
+  ) {
     const filename = UTF8ToString(name, len);
     return Module.fs.create(filename);
   },
 
-  mp_js_hal_filesystem_name: function (idx, buf) {
+  mp_js_hal_filesystem_name: function (
+    /** @type {number} */ idx,
+    /** @type {number} */ buf
+  ) {
     const name = Module.fs.name(idx);
     if (name === undefined) {
       return -1;
@@ -64,20 +79,27 @@ mergeInto(LibraryManager.library, {
     return len;
   },
 
-  mp_js_hal_filesystem_size: function (idx) {
+  mp_js_hal_filesystem_size: function (/** @type {number} */ idx) {
     return Module.fs.size(idx);
   },
 
-  mp_js_hal_filesystem_remove: function (idx) {
+  mp_js_hal_filesystem_remove: function (/** @type {number} */ idx) {
     return Module.fs.remove(idx);
   },
 
-  mp_js_hal_filesystem_readbyte: function (idx, offset) {
+  mp_js_hal_filesystem_readbyte: function (
+    /** @type {number} */ idx,
+    /** @type {number} */ offset
+  ) {
     return Module.fs.readbyte(idx, offset);
   },
 
-  mp_js_hal_filesystem_write: function (idx, buf, len) {
-    const data = new Uint8Array(HEAP8.buffer, buf, len);
+  mp_js_hal_filesystem_write: function (
+    /** @type {number} */ idx,
+    /** @type {number} */ buf,
+    /** @type {number} */ len
+  ) {
+    const data = new Uint8Array(Module.HEAPU8.buffer, buf, len);
     return Module.fs.write(idx, data);
   },
 
@@ -85,7 +107,7 @@ mergeInto(LibraryManager.library, {
     Module.board.throwReset();
   },
 
-  mp_js_hal_panic: function (code) {
+  mp_js_hal_panic: function (/** @type {number} */ code) {
     Module.board.throwPanic(code);
   },
 
@@ -93,23 +115,30 @@ mergeInto(LibraryManager.library, {
     return Module.board.temperature.value;
   },
 
-  mp_js_hal_button_get_presses: function (button) {
+  mp_js_hal_button_get_presses: function (/** @type {number} */ button) {
     return Module.board.buttons[button].getAndClearPresses();
   },
 
-  mp_js_hal_button_is_pressed: function (button) {
+  mp_js_hal_button_is_pressed: function (/** @type {number} */ button) {
     return Module.board.buttons[button].isPressed();
   },
 
-  mp_js_hal_pin_is_touched: function (pin) {
+  mp_js_hal_pin_is_touched: function (/** @type {number} */ pin) {
     return Module.board.pins[pin].isTouched();
   },
 
-  mp_js_hal_display_get_pixel: function (x, y) {
+  mp_js_hal_display_get_pixel: function (
+    /** @type {number} */ x,
+    /** @type {number} */ y
+  ) {
     return Module.board.display.getPixel(x, y);
   },
 
-  mp_js_hal_display_set_pixel: function (x, y, value) {
+  mp_js_hal_display_set_pixel: function (
+    /** @type {number} */ x,
+    /** @type {number} */ y,
+    /** @type {number} */ value
+  ) {
     Module.board.display.setPixel(x, y, value);
   },
 
@@ -139,7 +168,7 @@ mergeInto(LibraryManager.library, {
     );
   },
 
-  mp_js_hal_accelerometer_set_range: function (r) {
+  mp_js_hal_accelerometer_set_range: function (/** @type {number} */ r) {
     Module.board.accelerometer.setRange(r);
   },
 
@@ -163,43 +192,57 @@ mergeInto(LibraryManager.library, {
     return Module.board.compass.state.compassHeading.value;
   },
 
-  mp_js_hal_audio_set_volume: function (value) {
+  mp_js_hal_audio_set_volume: function (/** @type {number} */ value) {
     Module.board.audio.setVolume(value);
   },
 
-  mp_js_hal_audio_init: function (sample_rate) {
+  mp_js_hal_audio_init: function (/** @type {number} */ sample_rate) {
+    // @ts-expect-error
     Module.board.audio.default.init(sample_rate);
   },
 
-  mp_js_hal_audio_write_data: function (buf, num_samples) {
+  mp_js_hal_audio_write_data: function (
+    /** @type {number} */ buf,
+    /** @type {number} */ num_samples
+  ) {
+    // @ts-expect-error
     Module.board.audio.default.writeData(
       Module.conversions.convertAudioBuffer(
         Module.HEAPU8,
         buf,
+        // @ts-expect-error
         Module.board.audio.default.createBuffer(num_samples)
       )
     );
   },
 
-  mp_js_hal_audio_speech_init: function (sample_rate) {
+  mp_js_hal_audio_speech_init: function (/** @type {number} */ sample_rate) {
+    // @ts-expect-error
     Module.board.audio.speech.init(sample_rate);
   },
 
-  mp_js_hal_audio_speech_write_data: function (buf, num_samples) {
+  mp_js_hal_audio_speech_write_data: function (
+    /** @type {number} */ buf,
+    /** @type {number} */ num_samples
+  ) {
+    // @ts-expect-error
     Module.board.audio.speech.writeData(
       Module.conversions.convertAudioBuffer(
         Module.HEAPU8,
         buf,
+        // @ts-expect-error
         Module.board.audio.speech.createBuffer(num_samples)
       )
     );
   },
 
-  mp_js_hal_audio_period_us: function (period_us) {
+  mp_js_hal_audio_period_us: function (/** @type {number} */ period_us) {
     Module.board.audio.setPeriodUs(period_us);
   },
 
-  mp_js_hal_audio_amplitude_u10: function (amplitude_u10) {
+  mp_js_hal_audio_amplitude_u10: function (
+    /** @type {number} */ amplitude_u10
+  ) {
     Module.board.audio.setAmplitudeU10(amplitude_u10);
   },
 
@@ -207,7 +250,10 @@ mergeInto(LibraryManager.library, {
     Module.board.microphone.microphoneOn();
   },
 
-  mp_js_hal_microphone_set_threshold: function (kind, value) {
+  mp_js_hal_microphone_set_threshold: function (
+    /** @type {number} */ kind,
+    /** @type {number} */ value
+  ) {
     Module.board.microphone.setThreshold(
       Module.conversions.convertSoundThresholdNumberToString(kind),
       value
@@ -218,7 +264,7 @@ mergeInto(LibraryManager.library, {
     return Module.board.microphone.soundLevel.value;
   },
 
-  mp_js_hal_audio_play_expression: function (expr) {
+  mp_js_hal_audio_play_expression: function (/** @type {any} */ expr) {
     return Module.board.audio.playSoundExpression(UTF8ToString(expr));
   },
 
@@ -230,7 +276,11 @@ mergeInto(LibraryManager.library, {
     return Module.board.audio.isSoundExpressionActive();
   },
 
-  mp_js_radio_enable: function (group, max_payload, queue) {
+  mp_js_radio_enable: function (
+    /** @type {number} */ group,
+    /** @type {number} */ max_payload,
+    /** @type {number} */ queue
+  ) {
     Module.board.radio.enable({ group, maxPayload: max_payload, queue });
   },
 
@@ -238,21 +288,30 @@ mergeInto(LibraryManager.library, {
     Module.board.radio.disable();
   },
 
-  mp_js_radio_update_config: function (group, max_payload, queue) {
+  mp_js_radio_update_config: function (
+    /** @type {number} */ group,
+    /** @type {number} */ max_payload,
+    /** @type {number} */ queue
+  ) {
     Module.board.radio.updateConfig({ group, maxPayload: max_payload, queue });
   },
 
-  mp_js_radio_send: function (buf, len, buf2, len2) {
+  mp_js_radio_send: function (
+    /** @type {number} */ buf,
+    /** @type {number} */ len,
+    /** @type {number} */ buf2,
+    /** @type {number} */ len2
+  ) {
     const data = new Uint8Array(len + len2);
-    data.set(HEAPU8.slice(buf, buf + len));
-    data.set(HEAPU8.slice(buf2, buf2 + len2), len);
+    data.set(Module.HEAPU8.slice(buf, buf + len));
+    data.set(Module.HEAPU8.slice(buf2, buf2 + len2), len);
     Module.board.radio.send(data);
   },
 
   mp_js_radio_peek: function () {
     const packet = Module.board.radio.peek();
     if (packet) {
-      return Module.board.module.writeRadioRxBuffer(packet);
+      return Module.board.writeRadioRxBuffer(packet);
     }
     return null;
   },
@@ -261,16 +320,16 @@ mergeInto(LibraryManager.library, {
     Module.board.radio.pop();
   },
 
-  mp_js_hal_log_delete: function (full_erase) {
+  mp_js_hal_log_delete: function (/** @type {boolean} */ full_erase) {
     // We don't have a notion of non-full erase.
     Module.board.dataLogging.delete();
   },
 
-  mp_js_hal_log_set_mirroring: function (serial) {
+  mp_js_hal_log_set_mirroring: function (/** @type {boolean} */ serial) {
     Module.board.dataLogging.setMirroring(serial);
   },
 
-  mp_js_hal_log_set_timestamp: function (period) {
+  mp_js_hal_log_set_timestamp: function (/** @type {number} */ period) {
     Module.board.dataLogging.setTimestamp(period);
   },
 
@@ -282,7 +341,10 @@ mergeInto(LibraryManager.library, {
     return Module.board.dataLogging.endRow();
   },
 
-  mp_js_hal_log_data: function (key, value) {
+  mp_js_hal_log_data: function (
+    /** @type {number} */ key,
+    /** @type {number} */ value
+  ) {
     return Module.board.dataLogging.logData(
       UTF8ToString(key),
       UTF8ToString(value)

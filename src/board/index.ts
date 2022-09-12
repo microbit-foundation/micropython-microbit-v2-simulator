@@ -88,6 +88,10 @@ export class Board {
    */
   private modulePromise: Promise<ModuleWrapper> | undefined;
   /**
+   * Defined by start but async.
+   */
+  private module: ModuleWrapper | undefined;
+  /**
    * If undefined, then when main finishes we stay stopped.
    * Otherwise we perform the action then clear this field.
    */
@@ -316,12 +320,13 @@ export class Board {
   }
 
   private async start() {
-    if (this.modulePromise) {
+    if (this.modulePromise || this.module) {
       throw new Error("Module already exists!");
     }
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
+    this.module = module;
     let panicCode: number | undefined;
     try {
       this.displayRunningState();
@@ -346,6 +351,7 @@ export class Board {
     // Called by the HAL for normal shutdown but not in error scenarios.
     this.stopComponents();
     this.modulePromise = undefined;
+    this.module = undefined;
 
     if (panicCode !== undefined) {
       this.displayPanic(panicCode);
@@ -371,9 +377,11 @@ export class Board {
       this.displayStoppedState();
     }
     if (this.modulePromise) {
+      // Avoid this.module as we might still be creating it (async).
       const module = await this.modulePromise;
       module.requestStop();
       this.modulePromise = undefined;
+      this.module = undefined;
       // Ctrl-C, Ctrl-D to interrupt the main loop.
       this.writeSerialInput("\x03\x04");
     }
@@ -541,6 +549,13 @@ export class Board {
     if (this.modulePromise) {
       this.notifications.onSerialOutput(text);
     }
+  }
+
+  writeRadioRxBuffer(packet: Uint8Array): void {
+    if (!this.module) {
+      throw new Error("Must be running");
+    }
+    this.module.writeRadioRxBuffer(packet);
   }
 
   initialize() {

@@ -551,11 +551,11 @@ export class Board {
     }
   }
 
-  writeRadioRxBuffer(packet: Uint8Array): void {
+  writeRadioRxBuffer(packet: Uint8Array): number {
     if (!this.module) {
       throw new Error("Must be running");
     }
-    this.module.writeRadioRxBuffer(packet);
+    return this.module.writeRadioRxBuffer(packet);
   }
 
   initialize() {

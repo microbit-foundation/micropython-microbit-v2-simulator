@@ -307,6 +307,7 @@
  </g>
  <g id="Logo" transform="matrix(.7019 0 0 .7019 80.008 22.174)" stroke="#ffffff" stroke-width=".23508" style="fill:url(#aj)">
   <rect class="outline" width="46" height="31" rx="0" ry="0" fill="none" stroke-width="0"/>
+  <path class="no-edit" d="m32.8,28.4 H 13.3 c -7.2,0 -13,-5.8 -13,-13 0,-7.2 5.8,-13 13,-13 h 19.5 c 7.2,0 13,5.8 13,13 0,7.2 -5.9,13 -13,13" fill="#1a1a1a" stroke-width="0" />
   <path class="st10" d="m32.5 18c1.5 0 2.6-1.2 2.6-2.6s-1.2-2.6-2.6-2.6c-1.5 0-2.6 1.2-2.6 2.6s1.2 2.6 2.6 2.6" fill="url(#aj)" stroke="url(#ak)" style="fill:url(#aj);stroke:url(#ak)"/>
   <path class="st11" d="m13.3 12.8c-1.5 0-2.6 1.2-2.6 2.6s1.2 2.6 2.6 2.6 2.6-1.2 2.6-2.6-1.2-2.6-2.6-2.6" fill="url(#aj)" stroke="url(#am)" style="fill:url(#aj);stroke:url(#am)"/>
   <path class="st12" d="m13.3 7.6c-4.3 0-7.8 3.5-7.8 7.8s3.5 7.8 7.8 7.8h19.5c4.3 0 7.8-3.5 7.8-7.8s-3.5-7.8-7.8-7.8h-19.5m19.5 20.8h-19.5c-7.2 0-13-5.8-13-13s5.8-13 13-13h19.5c7.2 0 13 5.8 13 13s-5.9 13-13 13" fill="url(#an)" stroke="url(#ao)" style="fill:url(#an);stroke:url(#ao)"/>
@@ -328,10 +329,7 @@
   <rect transform="scale(1,-1)" x="86.343" y="-231.69" width="21.013" height=".77824" rx="0" ry="0" fill="url(#aw)" style="fill:url(#aw)"/>
   <rect x="86.343" y="209.89" width="21.013" height="21.013" rx="0" ry="0" fill="url(#ax)" style="fill:url(#ax)"/>
   <rect x="86.343" y="209.89" width="21.013" height="21.013" rx="0" ry="0" fill="url(#ax)" opacity=".5" stroke="url(#az)" stroke-width=".13229" style="fill:url(#ax);stroke:url(#az)"/>
-  <circle transform="matrix(.35278 0 0 .35278 -4.0314 40.362)" cx="286.43" cy="510.03" r="16.266" fill="#333333" filter="url(#aA)" stroke="#1a1a1a" stroke-width=".375"/>
-  <circle cx="96.849" cy="220.4" r="5.7384" stroke="#000000" stroke-width=".13229"/>
-  <path transform="matrix(.35278 0 0 .35278 -4.0314 40.362)" d="m282.93 526.04c7.881 1.6854 16.406-3.563 18.414-11.375 2.4082-7.8709-2.4045-17.012-10.275-19.443-7.7626-2.849-17.159 1.5556-19.988 9.3162-3.1575 7.5834 0.70491 17.138 8.2792 20.344 1.1344 0.53464 2.3432 0.90453 3.5699 1.1582z" filter="url(#aC)" stroke="url(#aB)" stroke-width=".15" style="stroke:url(#aB)"/>
-  <circle cx="96.849" cy="220.4" r="5.7384" fill="none" filter="url(#aE)" stroke="url(#aD)" stroke-width=".2" style="stroke:url(#aD)"/>
+  <circle cx="96.849" cy="220.4" r="5.7384" fill="#000000"/>
  </g>
  <g id="ButtonB" transform="rotate(90 204.38 188.22)">
   <rect class="outline" x="86.343" y="209.89" width="21.013" height="21.013" rx="0" ry="0"/>
@@ -349,10 +347,7 @@
   <rect transform="scale(1,-1)" x="86.343" y="-231.69" width="21.013" height=".77824" rx="0" ry="0" fill="url(#aw)" style="fill:url(#aw)"/>
   <rect x="86.343" y="209.89" width="21.013" height="21.013" rx="0" ry="0" fill="url(#ax)" style="fill:url(#ax)"/>
   <rect x="86.343" y="209.89" width="21.013" height="21.013" rx="0" ry="0" fill="url(#ax)" opacity=".5" stroke="url(#az)" stroke-width=".13229" style="fill:url(#ax);stroke:url(#az)"/>
-  <circle transform="matrix(.35278 0 0 .35278 -4.0314 40.362)" cx="286.43" cy="510.03" r="16.266" fill="#333333" filter="url(#aA)" stroke="#1a1a1a" stroke-width=".375"/>
-  <circle cx="96.849" cy="220.4" r="5.7384" stroke="#000000" stroke-width=".13229"/>
-  <path transform="matrix(.35278 0 0 .35278 -4.0314 40.362)" d="m282.93 526.04c7.881 1.6854 16.406-3.563 18.414-11.375 2.4082-7.8709-2.4045-17.012-10.275-19.443-7.7626-2.849-17.159 1.5556-19.988 9.3162-3.1575 7.5834 0.70491 17.138 8.2792 20.344 1.1344 0.53464 2.3432 0.90453 3.5699 1.1582z" filter="url(#aC)" stroke="url(#aB)" stroke-width=".15" style="stroke:url(#aB)"/>
-  <circle cx="96.849" cy="220.4" r="5.7384" fill="none" filter="url(#aE)" stroke="url(#aD)" stroke-width=".2" style="stroke:url(#aD)"/>
+  <circle cx="96.849" cy="220.4" r="5.7384" fill="#000000"/>
  </g>
  <g id="LEDTemplate" transform="translate(-7.641 -1.4302)" display="none">
   <g id="ac" transform="matrix(0 .14526 -.14526 0 154.68 1.8239)" display="inline" stroke-width="2.4286" style="opacity: 0.2">

@@ -106,9 +106,11 @@ export class Pin {
 
   render() {
     if (this.ui) {
-      const fill = !!this.state.value ? "red" : "url(#an)";
+      const fill = !!this.state.value ? "#fba424" : "#1a1a1a";
       this.ui.element.querySelectorAll("path").forEach((p) => {
-        p.style.fill = fill;
+        if (!p.classList.contains("no-edit")) {
+          p.style.fill = fill;
+        }
       });
     }
   }

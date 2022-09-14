@@ -307,9 +307,10 @@
  </g>
  <g id="Logo" transform="matrix(.7019 0 0 .7019 80.008 22.174)" stroke="#ffffff" stroke-width=".23508" style="fill:url(#aj)">
   <rect class="outline" width="46" height="31" rx="0" ry="0" fill="none" stroke-width="0"/>
-  <path class="st10" d="m32.5 18c1.5 0 2.6-1.2 2.6-2.6s-1.2-2.6-2.6-2.6c-1.5 0-2.6 1.2-2.6 2.6s1.2 2.6 2.6 2.6" fill="url(#aj)" stroke="url(#ak)" style="fill:url(#aj);stroke:url(#ak)"/>
-  <path class="st11" d="m13.3 12.8c-1.5 0-2.6 1.2-2.6 2.6s1.2 2.6 2.6 2.6 2.6-1.2 2.6-2.6-1.2-2.6-2.6-2.6" fill="url(#aj)" stroke="url(#am)" style="fill:url(#aj);stroke:url(#am)"/>
-  <path class="st12" d="m13.3 7.6c-4.3 0-7.8 3.5-7.8 7.8s3.5 7.8 7.8 7.8h19.5c4.3 0 7.8-3.5 7.8-7.8s-3.5-7.8-7.8-7.8h-19.5m19.5 20.8h-19.5c-7.2 0-13-5.8-13-13s5.8-13 13-13h19.5c7.2 0 13 5.8 13 13s-5.9 13-13 13" fill="url(#an)" stroke="url(#ao)" style="fill:url(#an);stroke:url(#ao)"/>
+  <path d="m32.8,28.4 H 13.3 c -7.2,0 -13,-5.8 -13,-13 0,-7.2 5.8,-13 13,-13 h 19.5 c 7.2,0 13,5.8 13,13 0,7.2 -5.9,13 -13,13" fill="#1a1a1a" stroke-width="0" />
+  <path class="st10 no-edit" d="m32.5 18c1.5 0 2.6-1.2 2.6-2.6s-1.2-2.6-2.6-2.6c-1.5 0-2.6 1.2-2.6 2.6s1.2 2.6 2.6 2.6" fill="url(#aj)" stroke="url(#ak)" style="fill:url(#aj);stroke:url(#ak)"/>
+  <path class="st11 no-edit" d="m13.3 12.8c-1.5 0-2.6 1.2-2.6 2.6s1.2 2.6 2.6 2.6 2.6-1.2 2.6-2.6-1.2-2.6-2.6-2.6" fill="url(#aj)" stroke="url(#am)" style="fill:url(#aj);stroke:url(#am)"/>
+  <path class="st12 no-edit" d="m13.3 7.6c-4.3 0-7.8 3.5-7.8 7.8s3.5 7.8 7.8 7.8h19.5c4.3 0 7.8-3.5 7.8-7.8s-3.5-7.8-7.8-7.8h-19.5m19.5 20.8h-19.5c-7.2 0-13-5.8-13-13s5.8-13 13-13h19.5c7.2 0 13 5.8 13 13s-5.9 13-13 13" fill="url(#an)" stroke="url(#ao)" style="fill:url(#an);stroke:url(#ao)"/>
  </g>
  <path id="MicrophoneHole" d="m124.3 39.211c-0.867 0-1.5028 0.69355-1.5028 1.5028 0 0.8092 0.69355 1.5027 1.5028 1.5027 0.867 0 1.5028-0.69355 1.5028-1.5027 0-0.8092-0.69355-1.5028-1.5028-1.5028zm0 0.17415a1.3287 1.3287 0 0 1 1.3286 1.3286 1.3287 1.3287 0 0 1-1.3286 1.3286 1.3287 1.3287 0 0 1-1.3286-1.3286 1.3287 1.3287 0 0 1 1.3286-1.3286z" fill="url(#ap)" stroke="url(#aq)" stroke-width=".13588" style="fill:url(#ap);stroke:url(#aq)"/>
  <g id="ButtonA" transform="rotate(90 128.8 112.64)">

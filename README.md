@@ -1,54 +1,38 @@
 # MicroPython-micro:bit simulator
 
-This is a variant of codal_port which is compiled with Emscripten. It
-provides a simulated micro:bit REPL in the browser.
+## Try it out
 
-To build, first fetch the submodules (don't use recursive fetch):
+To try the simulator use the [micro:bit Python Editor beta](https://python.microbit.org/v/beta).
 
-    $ git submodule update --init lib/micropython-microbit-v2
-    $ git -C lib/micropython-microbit-v2 submodule update --init lib/micropython
-
-Then run (from this top-level directory):
-
-    $ make
-
-Once it is build the webpage in src/ needs to be served, eg via:
-
-    $ (cd build && python -m http.server)
-
-Then browse to http://localhost:8000/demo.html
-
-## Deployments
-
-The main branch is deployed to https://stage-python-simulator.microbit.org/ by CircleCI.
-
-Other branches are deployed to https://review-python-simulator.microbit.org/{branchName} by CircleCI.
-
-There is currently no stable deployment. The URLs above are under active development
-and are subject to change.
-
-There is also a Netlify based build for development purposes only.
-Netlify's GitHub integration will comment on PRs with deployment details.
+The rest of this page explains how to embed the simulator in an application
+and develop the simulator software.
 
 ## Embedding
 
 The simulator is designed to be embedded into other web applications
-via an iframe.
+as an iframe. The embedding API and URLs are not yet stable and are
+subject to change. If you are interested in embedding the simulator
+in your application please [get in touch](mailto:support@microbit.org).
 
-The page to embed is http://localhost:8000/simulator.html
+The URL to embed is https://stage-python-simulator.microbit.org/simulator.html (subject to change, still under development).
 
 The iframe provides the micro:bit board user interface and some limited
-interactions. It does not provide a terminal for serial output or the
-REPL or any UI for the sensors. A value for color can be passed to the simulator
-via a query string and is used to style the play button. E.g., http://localhost:8000/simulator.html?color=blue
+interactions. It does not provide a terminal for serial/the REPL or any UI to change the board sensor state.
+
+A value for a brand color can be passed to the simulator via a query
+string and is used to style the play button. E.g., https://stage-python-simulator.microbit.org/simulator.html?color=blue
 
 [demo.html](./src/demo.html) is an example of embedding the simulator.
 It connects the iframe to a terminal and provides a simple interface for
 sensors.
 
-The following sections documents the messages supported via postMessage.
+The following sections document the messages supported by the iframe embed
+via postMessage.
 
-## Messages sent to parent window from iframe
+### Messages sent to parent window from iframe
+
+These messages are sent as the result of user interactions or actions taken
+by the running program. The simulator starts stopped with no program flashed.
 
 <table>
 <thead>
@@ -166,7 +150,7 @@ If you send string data from the program then it will be prepended with the thre
 
 </table>
 
-## Messages supported by the iframe
+### Messages you can send to the iframe from the embedding app
 
 <table>
 <thead>
@@ -190,7 +174,7 @@ If you send string data from the program then it will be prepended with the thre
 }
 ```
 
-<td>Update the micro:bit filesystem and restart the program.
+<td>Update the micro:bit filesystem and restart the program. You must send this in response to the request_flash message.
 
 <tr>
 <td>stop
@@ -283,7 +267,42 @@ Otherwise, the user will need to use <code>radio.receive_bytes</code> or <code>r
 
 </table>
 
-## Upgrading micropython-microbit-v2
+## Developing the simulator
+
+### Build steps
+
+The simulator is a variant of the MicroPython codal_port which is compiled with
+Emscripten. It provides a simulated micro:bit (including REPL) in the browser.
+
+To build, first fetch the submodules (don't use recursive fetch):
+
+    $ git submodule update --init lib/micropython-microbit-v2
+    $ git -C lib/micropython-microbit-v2 submodule update --init lib/micropython
+
+Then run (from this top-level directory):
+
+    $ make
+
+Once it is built the pages in build/ need to be served, e.g. via:
+
+    $ npx serve build
+
+View at http://localhost:3000/demo.html
+
+    $ (cd build && python -m http.server)
+
+View at http://localhost:8000/demo.html
+
+### Branch deployments
+
+There is a Netlify based build for development purposes. Do not embed
+the simulator via this URL. Netlify's GitHub integration will comment
+on PRs with deployment details.
+
+Branches in this repository are also deployed via CircleCI to https://review-python-simulator.microbit.org/{branchName}/. This requires the user pushing code to have
+permissions for the relevant Micro:bit Educational Foundation infrastructure.
+
+### Upgrading micropython-microbit-v2
 
 1. Update the lib/micropython-microbit-v2 to the relevant hash. Make sure that its lib/micropython submodule is updated (see checkout instructions above).
 2. Review the full diff for micropython-microbit-v2. In particular, note changes to:
@@ -291,11 +310,24 @@ Otherwise, the user will need to use <code>radio.receive_bytes</code> or <code>r
    2. the HAL, which may require implementing in the simulator
    3. the filesystem, which has a JavaScript implementation.
 
-## Web Assembly debugging
+### Web Assembly debugging
 
 Steps for WASM debugging in Chrome:
 
-- Add the source folder
+- Add the source folder in dev tools
 - Install the C/C++ debug extension: https://helpgoo.gle/wasm-debugging-extension
-- Enable "WebAssembly Debugging: Enable DWARF support" in DevTools Experiments.
+- Enable "WebAssembly Debugging: Enable DWARF support" in DevTools Experiments
 - DEBUG=1 make
+
+## Code of Conduct
+
+Trust, partnership, simplicity and passion are our core values we live and
+breathe in our daily work life and within our projects. Our open-source
+projects are no exception. We have an active community which spans the globe
+and we welcome and encourage participation and contributions to our projects
+by everyone. We work to foster a positive, open, inclusive and supportive
+environment and trust that our community respects the micro:bit code of
+conduct. Please see our [code of conduct](https://microbit.org/safeguarding/)
+which outlines our expectations for all those that participate in our
+community and details on how to report any concerns and what would happen
+should breaches occur.

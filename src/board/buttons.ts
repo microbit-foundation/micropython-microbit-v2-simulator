@@ -103,7 +103,7 @@ export class Button {
   }
 
   render() {
-    const fill = !!this.state.value ? "#fba424" : "none";
+    const fill = !!this.state.value ? "#f7febfdd" : "none";
     this.element.querySelectorAll("circle").forEach((c) => {
       c.style.fill = fill;
     });

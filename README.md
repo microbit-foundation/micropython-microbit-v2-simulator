@@ -12,7 +12,7 @@ and develop the simulator software.
 The simulator is designed to be embedded into other web applications
 as an iframe. The embedding API and URLs are not yet stable and are
 subject to change. If you are interested in embedding the simulator
-in your appplication please [get in touch](mailto:support@microbit.org).
+in your application please [get in touch](mailto:support@microbit.org).
 
 The URL to embed is https://stage-python-simulator.microbit.org/simulator.html (subject to change, still under development).
 
@@ -26,7 +26,7 @@ string and is used to style the play button. E.g., https://stage-python-simulato
 It connects the iframe to a terminal and provides a simple interface for
 sensors.
 
-The following sections documents the messages supported by the iframe embed
+The following sections document the messages supported by the iframe embed
 via postMessage.
 
 ### Messages sent to parent window from iframe
@@ -283,7 +283,7 @@ Then run (from this top-level directory):
 
     $ make
 
-Once it is built the pages in build/ needs to be served, e.g. via:
+Once it is built the pages in build/ need to be served, e.g. via:
 
     $ npx serve build
 

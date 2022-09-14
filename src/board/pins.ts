@@ -106,7 +106,7 @@ export class Pin {
 
   render() {
     if (this.ui) {
-      const fill = !!this.state.value ? "#f7febfdd" : "url(#an)";
+      const fill = !!this.state.value ? "#00c800" : "url(#an)";
       this.ui.element.querySelectorAll("path").forEach((p) => {
         if (!p.classList.contains("no-edit")) {
           p.style.fill = fill;

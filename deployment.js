@@ -4,10 +4,23 @@
  * SPDX-License-Identifier: MIT
  */
 const {
-  createDeploymentDetailsWithReviewPrefixes,
+  createDeploymentDetailsFromOptions,
 } = require("@microbit-foundation/website-deploy-aws-config");
 
-const { s3Config } = createDeploymentDetailsWithReviewPrefixes();
+const { s3Config } = createDeploymentDetailsFromOptions({
+  production: {
+    bucket: "python-simulator.usermbit.org",
+    mode: "tag",
+  },
+  staging: {
+    bucket: "python-simulator.usermbit.org",
+    prefix: "staging",
+  },
+  review: {
+    bucket: "review-python-simulator.usermbit.org",
+    mode: "branch-prefix",
+  },
+});
 module.exports = {
   ...s3Config,
   region: "eu-west-1",

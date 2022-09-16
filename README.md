@@ -14,13 +14,13 @@ as an iframe. The embedding API and URLs are not yet stable and are
 subject to change. If you are interested in embedding the simulator
 in your application please [get in touch](mailto:support@microbit.org).
 
-The URL to embed is https://stage-python-simulator.microbit.org/simulator.html (subject to change, still under development).
+The URL to embed is https://python-simulator.usermbit.org/staging/simulator.html (subject to change, still under development).
 
 The iframe provides the micro:bit board user interface and some limited
 interactions. It does not provide a terminal for serial/the REPL or any UI to change the board sensor state.
 
 A value for a brand color can be passed to the simulator via a query
-string and is used to style the play button. E.g., https://stage-python-simulator.microbit.org/simulator.html?color=blue
+string and is used to style the play button. E.g., https://python-simulator.usermbit.org/staging/simulator.html?color=blue
 
 [demo.html](./src/demo.html) is an example of embedding the simulator.
 It connects the iframe to a terminal and provides a simple interface for
@@ -299,7 +299,7 @@ There is a Netlify based build for development purposes. Do not embed
 the simulator via this URL. Netlify's GitHub integration will comment
 on PRs with deployment details.
 
-Branches in this repository are also deployed via CircleCI to https://review-python-simulator.microbit.org/{branchName}/. This requires the user pushing code to have
+Branches in this repository are also deployed via CircleCI to https://review-python-simulator.usermbit.org/{branchName}/. This requires the user pushing code to have
 permissions for the relevant Micro:bit Educational Foundation infrastructure.
 
 ### Upgrading micropython-microbit-v2

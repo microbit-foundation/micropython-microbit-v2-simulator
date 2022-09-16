@@ -302,6 +302,10 @@ on PRs with deployment details.
 Branches in this repository are also deployed via CircleCI to https://review-python-simulator.usermbit.org/{branchName}/. This requires the user pushing code to have
 permissions for the relevant Micro:bit Educational Foundation infrastructure.
 
+Similarly, the main branch is deployed to https://python-simulator.usermbit.org/staging/.
+
+Tagged releases with a `v` prefix are deployed to https://python-simulator.usermbit.org/v/{number}/
+
 ### Upgrading micropython-microbit-v2
 
 1. Update the lib/micropython-microbit-v2 to the relevant hash. Make sure that its lib/micropython submodule is updated (see checkout instructions above).

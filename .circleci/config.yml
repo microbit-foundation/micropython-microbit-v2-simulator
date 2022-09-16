@@ -31,7 +31,7 @@ _steps:
   install_aws_cli: &install_aws_cli
     run: sudo apt-get update && sudo apt-get install awscli
   install_dependencies: &install_dependencies
-    run: npm ci --cache .npm-cache && sudo npm config set @microbit-foundation:registry https://npm.pkg.github.com/microbit-foundation && sudo npm i -g @microbit-foundation/website-deploy-aws@0.3.0 @microbit-foundation/website-deploy-aws-config@0.4.2 @microbit-foundation/circleci-npm-package-versioner@1
+    run: npm ci --cache .npm-cache && sudo npm config set @microbit-foundation:registry https://npm.pkg.github.com/microbit-foundation && sudo npm i -g @microbit-foundation/website-deploy-aws@0.3.0 @microbit-foundation/website-deploy-aws-config@0.5.0-dev.84 @microbit-foundation/circleci-npm-package-versioner@1
   update_version: &update_version
     run: npm run ci:update-version
   build: &build
@@ -61,7 +61,6 @@ jobs:
       - <<: *docker_defaults
         environment:
           STAGE: REVIEW
-          REVIEW_DOMAIN: "review-python-simulator.microbit.org"
           REVIEW_CLOUDFRONT_DISTRIBUTION_ID: "E2DW5F7PA9W7JD"
     steps:
       - checkout
@@ -82,8 +81,7 @@ jobs:
       - <<: *docker_defaults
         environment:
           STAGE: STAGING
-          STAGING_DOMAIN: "stage-python-simulator.microbit.org"
-          STAGING_CLOUDFRONT_DISTRIBUTION_ID: "E10B3FPUWOJLVL"
+          STAGING_CLOUDFRONT_DISTRIBUTION_ID: "E15FPP46STH15O"
     steps:
       - checkout
       - *restore_npm_cache
@@ -103,8 +101,7 @@ jobs:
       - <<: *docker_defaults
         environment:
           STAGE: PRODUCTION
-          PRODUCTION_DOMAIN: "python-simulator.microbit.org"
-          PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID: "NOT_YET_CREATED"
+          PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID: "E15FPP46STH15O"
     steps:
       - checkout
       - *restore_npm_cache

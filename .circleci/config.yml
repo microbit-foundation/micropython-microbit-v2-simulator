@@ -31,7 +31,7 @@ _steps:
   install_aws_cli: &install_aws_cli
     run: sudo apt-get update && sudo apt-get install awscli
   install_dependencies: &install_dependencies
-    run: npm ci --cache .npm-cache && sudo npm config set @microbit-foundation:registry https://npm.pkg.github.com/microbit-foundation && sudo npm i -g @microbit-foundation/website-deploy-aws@0.3.0 @microbit-foundation/website-deploy-aws-config@0.5.0-dev.84 @microbit-foundation/circleci-npm-package-versioner@1
+    run: npm ci --cache .npm-cache && sudo npm config set @microbit-foundation:registry https://npm.pkg.github.com/microbit-foundation && sudo npm i -g @microbit-foundation/website-deploy-aws@0.3.0 @microbit-foundation/website-deploy-aws-config@0.5.0-dev.90 @microbit-foundation/circleci-npm-package-versioner@1
   update_version: &update_version
     run: npm run ci:update-version
   build: &build

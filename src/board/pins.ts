@@ -7,7 +7,8 @@ export class Pin {
 
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
-  private mouseUpListener: (e: MouseEvent) => void;
+  private touchStartListener: (e: TouchEvent) => void;
+  private mouseUpTouchEndListener: (e: MouseEvent | TouchEvent) => void;
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(
@@ -39,10 +40,12 @@ export class Pin {
 
     this.mouseDownListener = (e) => {
       e.preventDefault();
-      this._mouseDown = true;
-      this.press();
+      this.mouseDownTouchStartAction();
     };
-    this.mouseUpListener = (e) => {
+    this.touchStartListener = (e) => {
+      this.mouseDownTouchStartAction();
+    };
+    this.mouseUpTouchEndListener = (e) => {
       e.preventDefault();
       if (this._mouseDown) {
         this._mouseDown = false;
@@ -59,7 +62,9 @@ export class Pin {
     if (this.ui) {
       const { element } = this.ui;
       element.addEventListener("mousedown", this.mouseDownListener);
-      element.addEventListener("mouseup", this.mouseUpListener);
+      element.addEventListener("touchstart", this.touchStartListener);
+      element.addEventListener("mouseup", this.mouseUpTouchEndListener);
+      element.addEventListener("touchend", this.mouseUpTouchEndListener);
       element.addEventListener("keydown", this.keyListener);
       element.addEventListener("keyup", this.keyListener);
       element.addEventListener("mouseleave", this.mouseLeaveListener);
@@ -78,6 +83,11 @@ export class Pin {
       });
     }
     this.render();
+  }
+
+  private mouseDownTouchStartAction() {
+    this._mouseDown = true;
+    this.press();
   }
 
   press() {

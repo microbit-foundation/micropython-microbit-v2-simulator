@@ -11,8 +11,7 @@
     "test": "vitest",
     "ci:update-version": "update-ci-version",
     "deploy": "website-deploy-aws",
-    "invalidate": "aws cloudfront create-invalidation --distribution-id $(printenv ${STAGE}_CLOUDFRONT_DISTRIBUTION_ID) --paths \"/*\"",
-    "public-url": "node bin/public-url.js"
+    "invalidate": "aws cloudfront create-invalidation --distribution-id $(printenv ${STAGE}_CLOUDFRONT_DISTRIBUTION_ID) --paths \"/*\""
   },
   "repository": {
     "type": "git",

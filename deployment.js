@@ -10,7 +10,7 @@ const {
 const { s3Config } = createDeploymentDetailsFromOptions({
   production: {
     bucket: "python-simulator.usermbit.org",
-    mode: "tag",
+    mode: "patch",
   },
   staging: {
     bucket: "python-simulator.usermbit.org",

@@ -8,7 +8,8 @@ export class Button {
 
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
-  private mouseUpListener: (e: MouseEvent) => void;
+  private touchStartListener: (e: TouchEvent) => void;
+  private mouseUpTouchEndListener: (e: MouseEvent | TouchEvent) => void;
   private mouseLeaveListener: (e: MouseEvent) => void;
 
   constructor(
@@ -39,10 +40,12 @@ export class Button {
 
     this.mouseDownListener = (e) => {
       e.preventDefault();
-      this._mouseDown = true;
-      this.press();
+      this.mouseDownTouchStartAction();
     };
-    this.mouseUpListener = (e) => {
+    this.touchStartListener = (e) => {
+      this.mouseDownTouchStartAction();
+    };
+    this.mouseUpTouchEndListener = (e) => {
       e.preventDefault();
       if (this._mouseDown) {
         this._mouseDown = false;
@@ -57,7 +60,9 @@ export class Button {
     };
 
     this.element.addEventListener("mousedown", this.mouseDownListener);
-    this.element.addEventListener("mouseup", this.mouseUpListener);
+    this.element.addEventListener("touchstart", this.touchStartListener);
+    this.element.addEventListener("mouseup", this.mouseUpTouchEndListener);
+    this.element.addEventListener("touchend", this.mouseUpTouchEndListener);
     this.element.addEventListener("keydown", this.keyListener);
     this.element.addEventListener("keyup", this.keyListener);
     this.element.addEventListener("mouseleave", this.mouseLeaveListener);
@@ -82,6 +87,11 @@ export class Button {
       });
     }
     this.render();
+  }
+
+  private mouseDownTouchStartAction() {
+    this._mouseDown = true;
+    this.press();
   }
 
   press() {

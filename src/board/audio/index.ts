@@ -138,13 +138,7 @@ export class Audio {
     }
   }
 
-  boardStopped() {
-    if (this.context) {
-      this.context.close();
-      this.context = undefined;
-      this.oscillator = undefined;
-    }
-  }
+  boardStopped() {}
 }
 
 class BufferedAudio {

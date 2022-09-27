@@ -92,8 +92,9 @@ void microbit_hal_power_off(void) {
     // Stub, unsupported.
 }
 
-void microbit_hal_power_deep_sleep(bool wake_on_ms, uint32_t ms) {
-    // Stub, unsupported.
+bool microbit_hal_power_deep_sleep(bool wake_on_ms, uint32_t ms) {
+    // Stub, unsupported, always claim we were interrupted.
+    return true;
 }
 
 void microbit_hal_pin_set_pull(int pin, int pull) {

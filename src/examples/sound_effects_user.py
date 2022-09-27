@@ -8,7 +8,7 @@ audio.play(
         duration=500,
         vol_start=100,
         vol_end=255,
-        wave=audio.SoundEffect.WAVE_TRIANGLE,
+        wave=audio.SoundEffect.WAVEFORM_TRIANGLE,
         fx=audio.SoundEffect.FX_VIBRATO,
         shape=audio.SoundEffect.SHAPE_LOG,
     )

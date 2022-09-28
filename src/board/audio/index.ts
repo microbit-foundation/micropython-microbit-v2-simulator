@@ -125,10 +125,7 @@ export class Audio {
   }
 
   setAmplitudeU10(amplitudeU10: number) {
-    if (this.oscillator) {
-      this.oscillator.stop();
-      this.oscillator = undefined;
-    }
+    this.stopOscillator();
     if (amplitudeU10) {
       this.oscillator = this.context!.createOscillator();
       this.oscillator.type = "sine";
@@ -139,7 +136,14 @@ export class Audio {
   }
 
   boardStopped() {
-    this.oscillator?.stop();
+    this.stopOscillator();
+  }
+
+  private stopOscillator() {
+    if (this.oscillator) {
+      this.oscillator.stop();
+      this.oscillator = undefined;
+    }
   }
 }
 

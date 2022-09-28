@@ -118,7 +118,8 @@ export class Audio {
   }
 
   setPeriodUs(periodUs: number) {
-    this.frequency = 1000000 / periodUs;
+    // CODAL defaults in this way:
+    this.frequency = periodUs === 0 ? 6068 : 1000000 / periodUs;
     if (this.oscillator) {
       this.oscillator.frequency.value = this.frequency;
     }

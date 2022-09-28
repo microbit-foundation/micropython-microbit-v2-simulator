@@ -118,17 +118,15 @@ export class Audio {
   }
 
   setPeriodUs(periodUs: number) {
-    this.frequency = 1000000 / periodUs;
+    // CODAL defaults in this way:
+    this.frequency = periodUs === 0 ? 6068 : 1000000 / periodUs;
     if (this.oscillator) {
       this.oscillator.frequency.value = this.frequency;
     }
   }
 
   setAmplitudeU10(amplitudeU10: number) {
-    if (this.oscillator) {
-      this.oscillator.stop();
-      this.oscillator = undefined;
-    }
+    this.stopOscillator();
     if (amplitudeU10) {
       this.oscillator = this.context!.createOscillator();
       this.oscillator.type = "sine";
@@ -138,7 +136,16 @@ export class Audio {
     }
   }
 
-  boardStopped() {}
+  boardStopped() {
+    this.stopOscillator();
+  }
+
+  private stopOscillator() {
+    if (this.oscillator) {
+      this.oscillator.stop();
+      this.oscillator = undefined;
+    }
+  }
 }
 
 class BufferedAudio {

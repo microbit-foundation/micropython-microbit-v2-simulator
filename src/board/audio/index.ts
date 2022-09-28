@@ -138,7 +138,9 @@ export class Audio {
     }
   }
 
-  boardStopped() {}
+  boardStopped() {
+    this.oscillator?.stop();
+  }
 }
 
 class BufferedAudio {

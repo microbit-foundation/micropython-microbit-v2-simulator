@@ -113,37 +113,11 @@ int microbit_hal_pin_set_analog_period_us(int pin, int period) {
         mp_js_hal_audio_period_us(period);
         return 0;
     }
-
-    /*
-    // Calling setAnalogPeriodUs requires the pin to be in analog-out mode.  So
-    // test for this mode by first calling getAnalogPeriodUs, and if it fails then
-    // attempt to configure the pin in analog-out mode by calling setAnalogValue.
-    if ((ErrorCode)pin_obj[pin]->getAnalogPeriodUs() == DEVICE_NOT_SUPPORTED) {
-        if (pin_obj[pin]->setAnalogValue(0) != DEVICE_OK) {
-            return -1;
-        }
-    }
-
-    // Set the analog period.
-    if (pin_obj[pin]->setAnalogPeriodUs(period) == DEVICE_OK) {
-        return 0;
-    } else {
-        return -1;
-    }
-    */
-    return -1;
+    return mp_js_hal_pin_set_analog_period_us(pin, period);
 }
 
 int microbit_hal_pin_get_analog_period_us(int pin) {
-    /*
-    int period = pin_obj[pin]->getAnalogPeriodUs();
-    if (period != DEVICE_NOT_SUPPORTED) {
-        return period;
-    } else {
-        return -1;
-    }
-    */
-    return -1;
+    return mp_js_hal_pin_get_analog_period_us(pin);
 }
 
 void microbit_hal_pin_set_touch_mode(int pin, int mode) {

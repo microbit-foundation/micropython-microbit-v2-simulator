@@ -127,6 +127,14 @@ mergeInto(LibraryManager.library, {
     return Module.board.pins[pin].isTouched();
   },
 
+  mp_js_hal_pin_get_analog_period_us: function (/** @type {number} */ pin) {
+    return Module.board.pins[pin].getAnalogPeriodUs();
+  },
+
+  mp_js_hal_pin_set_analog_period_us: function (/** @type {number} */ pin, /** @type {number} */ period) {
+    return Module.board.pins[pin].setAnalogPeriodUs(period);
+  },
+
   mp_js_hal_display_get_pixel: function (
     /** @type {number} */ x,
     /** @type {number} */ y

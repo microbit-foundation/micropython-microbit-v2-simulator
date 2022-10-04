@@ -8,13 +8,29 @@ import {
   MICROBIT_HAL_PIN_P0,
   MICROBIT_HAL_PIN_P1,
   MICROBIT_HAL_PIN_P2,
+  MICROBIT_HAL_PIN_P3,
+  MICROBIT_HAL_PIN_P4,
+  MICROBIT_HAL_PIN_P5,
+  MICROBIT_HAL_PIN_P6,
+  MICROBIT_HAL_PIN_P7,
+  MICROBIT_HAL_PIN_P8,
+  MICROBIT_HAL_PIN_P9,
+  MICROBIT_HAL_PIN_P10,
+  MICROBIT_HAL_PIN_P11,
+  MICROBIT_HAL_PIN_P12,
+  MICROBIT_HAL_PIN_P13,
+  MICROBIT_HAL_PIN_P14,
+  MICROBIT_HAL_PIN_P15,
+  MICROBIT_HAL_PIN_P16,
+  MICROBIT_HAL_PIN_P19,
+  MICROBIT_HAL_PIN_P20,
 } from "./constants";
 import * as conversions from "./conversions";
 import { DataLogging } from "./data-logging";
 import { Display } from "./display";
 import { FileSystem } from "./fs";
 import { Microphone } from "./microphone";
-import { Pin } from "./pins";
+import { Pin, StubPin, TouchPin } from "./pins";
 import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
 import { ModuleWrapper } from "./wasm";
@@ -121,7 +137,7 @@ export class Board {
       ),
     ];
     this.pins = Array(33);
-    this.pins[MICROBIT_HAL_PIN_FACE] = new Pin(
+    this.pins[MICROBIT_HAL_PIN_FACE] = new TouchPin(
       "pinLogo",
       {
         element: this.svg.querySelector("#Logo")!,
@@ -129,9 +145,26 @@ export class Board {
       },
       onChange
     );
-    this.pins[MICROBIT_HAL_PIN_P0] = new Pin("pin0", null, onChange);
-    this.pins[MICROBIT_HAL_PIN_P1] = new Pin("pin1", null, onChange);
-    this.pins[MICROBIT_HAL_PIN_P2] = new Pin("pin2", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P0] = new TouchPin("pin0", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P1] = new TouchPin("pin1", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P2] = new TouchPin("pin2", null, onChange);
+    this.pins[MICROBIT_HAL_PIN_P3] = new StubPin("pin3");
+    this.pins[MICROBIT_HAL_PIN_P4] = new StubPin("pin4");
+    this.pins[MICROBIT_HAL_PIN_P5] = new StubPin("pin5");
+    this.pins[MICROBIT_HAL_PIN_P6] = new StubPin("pin6");
+    this.pins[MICROBIT_HAL_PIN_P7] = new StubPin("pin7");
+    this.pins[MICROBIT_HAL_PIN_P8] = new StubPin("pin8");
+    this.pins[MICROBIT_HAL_PIN_P9] = new StubPin("pin9");
+    this.pins[MICROBIT_HAL_PIN_P10] = new StubPin("pin10");
+    this.pins[MICROBIT_HAL_PIN_P11] = new StubPin("pin11");
+    this.pins[MICROBIT_HAL_PIN_P12] = new StubPin("pin12");
+    this.pins[MICROBIT_HAL_PIN_P13] = new StubPin("pin13");
+    this.pins[MICROBIT_HAL_PIN_P14] = new StubPin("pin14");
+    this.pins[MICROBIT_HAL_PIN_P15] = new StubPin("pin15");
+    this.pins[MICROBIT_HAL_PIN_P16] = new StubPin("pin16");
+    this.pins[MICROBIT_HAL_PIN_P19] = new StubPin("pin19");
+    this.pins[MICROBIT_HAL_PIN_P20] = new StubPin("pin20");
+
     this.audio = new Audio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);

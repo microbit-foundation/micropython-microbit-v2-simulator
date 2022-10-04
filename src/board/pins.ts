@@ -32,7 +32,7 @@ abstract class BasePin implements Pin {
   updateTranslations() {}
 
   setValue(value: any): void {
-    this.state.value = value;
+    this.state.setValue(value);
   }
 
   setAnalogPeriodUs(period: number) {

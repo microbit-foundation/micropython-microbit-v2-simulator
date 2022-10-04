@@ -2,7 +2,7 @@
 
 ## Try it out
 
-To try the simulator use the [micro:bit Python Editor beta](https://python.microbit.org/v/beta).
+To try the simulator use the [micro:bit Python Editor](https://python.microbit.org).
 
 The rest of this page explains how to embed the simulator in an application
 and develop the simulator software.

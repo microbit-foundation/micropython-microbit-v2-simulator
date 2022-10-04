@@ -60,6 +60,7 @@ SRC_C += \
 	microbithal_js.c \
 	main.c \
 	mphalport.c \
+	modmachine.c \
 
 SRC_C += $(addprefix $(CODAL_PORT)/, \
 	drv_display.c \

@@ -158,4 +158,8 @@ typedef long mp_off_t;
 // Needed for MICROPY_PY_URANDOM_SEED_INIT_FUNC.
 extern uint32_t rng_generate_random_word(void);
 
+// Intercept modmachine memory access.
+#define MICROPY_MACHINE_MEM_GET_READ_ADDR machine_mem_get_read_addr
+#define MICROPY_MACHINE_MEM_GET_WRITE_ADDR machine_mem_get_write_addr
+
 #endif

@@ -48,6 +48,8 @@ int mp_js_hal_button_get_presses(int button);
 bool mp_js_hal_button_is_pressed(int button);
 
 bool mp_js_hal_pin_is_touched(int pin);
+int mp_js_hal_pin_get_analog_period_us(int pin);
+int mp_js_hal_pin_set_analog_period_us(int pin, int period);
 
 int mp_js_hal_display_get_pixel(int x, int y);
 void mp_js_hal_display_set_pixel(int x, int y, int value);

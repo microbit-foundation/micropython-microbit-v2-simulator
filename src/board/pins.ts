@@ -1,8 +1,61 @@
 import { RangeSensor, State } from "./state";
 
-export class Pin {
+export interface Pin {
   state: RangeSensor;
 
+  updateTranslations(): void;
+
+  setValue(value: any): void;
+
+  isTouched(): boolean;
+
+  boardStopped(): void;
+
+  setAnalogPeriodUs(period: number): number;
+
+  getAnalogPeriodUs(): number;
+}
+
+const initialAnalogPeriodUs = -1;
+
+abstract class BasePin implements Pin {
+  state: RangeSensor;
+
+  // For now we just allow get/set of this value
+  // but don't do anything with it.
+  private analogPeriodUs: number = initialAnalogPeriodUs;
+
+  constructor(id: string) {
+    this.state = new RangeSensor(id, 0, 1, 0, undefined);
+  }
+
+  updateTranslations() {}
+
+  setValue(value: any): void {
+    this.state.setValue(value);
+  }
+
+  setAnalogPeriodUs(period: number) {
+    this.analogPeriodUs = period;
+    return 0;
+  }
+
+  getAnalogPeriodUs() {
+    return this.analogPeriodUs;
+  }
+
+  isTouched(): boolean {
+    return false;
+  }
+
+  boardStopped() {
+    this.analogPeriodUs = initialAnalogPeriodUs;
+  }
+}
+
+export class StubPin extends BasePin {}
+
+export class TouchPin extends BasePin {
   private _mouseDown: boolean = false;
 
   private keyListener: (e: KeyboardEvent) => void;
@@ -16,7 +69,7 @@ export class Pin {
     private ui: { element: SVGElement; label: () => string } | null,
     private onChange: (changes: Partial<State>) => void
   ) {
-    this.state = new RangeSensor(id, 0, 1, 0, undefined);
+    super(id);
 
     if (this.ui) {
       const { element, label } = this.ui;
@@ -76,7 +129,8 @@ export class Pin {
   }
 
   private setValueInternal(value: any, internalChange: boolean) {
-    this.state.setValue(value);
+    super.setValue(value);
+
     if (internalChange) {
       this.onChange({
         [this.id]: this.state,

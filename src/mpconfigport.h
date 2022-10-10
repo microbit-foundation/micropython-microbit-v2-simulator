@@ -162,4 +162,7 @@ extern uint32_t rng_generate_random_word(void);
 #define MICROPY_MACHINE_MEM_GET_READ_ADDR machine_mem_get_read_addr
 #define MICROPY_MACHINE_MEM_GET_WRITE_ADDR machine_mem_get_write_addr
 
+#define MICROPY_MAKE_POINTER_CALLABLE(p) \
+    ((mp_raise_NotImplementedError(MP_ERROR_TEXT("simulator limitation: asm_thumb code"))), p)
+
 #endif

@@ -7,6 +7,12 @@ To try the simulator use the [micro:bit Python Editor](https://python.microbit.o
 The rest of this page explains how to embed the simulator in an application
 and develop the simulator software.
 
+## License
+
+This software is under the MIT open source license.
+
+[SPDX-License-Identifier: MIT](LICENSE)
+
 ## Embedding
 
 The simulator is designed to be embedded into other web applications

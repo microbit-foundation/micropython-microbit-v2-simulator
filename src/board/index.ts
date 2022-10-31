@@ -436,9 +436,6 @@ export class Board {
         break;
       }
       case StopKind.Reset: {
-        if (this.pendingRestart) {
-          throw new Error("Unexpected state");
-        }
         this.pendingRestart = setTimeout(() => this.start(), 0);
         break;
       }

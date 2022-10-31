@@ -138,7 +138,7 @@ export class Board {
    */
   private stopKind: StopKind = StopKind.Default;
   /**
-   * Timeout for a pending start call due to StopKind.Restart.
+   * Timeout for a pending start call due to StopKind.Reset.
    */
   private pendingRestart: any;
   /**

@@ -35,11 +35,6 @@ import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
 import { ModuleWrapper } from "./wasm";
 
-/**
- * Controls the behaviour after the program has come to a stop.
- *
- * We use this to communicate between the start
- */
 enum StopKind {
   /**
    * The main Wasm function returned control to us in a normal way.
@@ -105,8 +100,6 @@ export class Board {
   radio: Radio;
   dataLogging: DataLogging;
 
-  private panicTimeout: any;
-
   public serialInputBuffer: number[] = [];
 
   private stoppedOverlay: HTMLDivElement;
@@ -140,12 +133,18 @@ export class Board {
   private module: ModuleWrapper | undefined;
   /**
    * Controls the action after the user program completes.
+   *
+   * Determined by a combination of user actions (stop, reset etc) and program actions.
    */
   private stopKind: StopKind = StopKind.Default;
   /**
    * Timeout for a pending start call due to StopKind.Restart.
    */
   private pendingRestart: any;
+  /**
+   * Timeout for the next frame of the panic animation.
+   */
+  private panicTimeout: any;
 
   constructor(
     private notifications: Notifications,
@@ -391,7 +390,7 @@ export class Board {
       throw new Error("Module already exists!");
     }
     clearTimeout(this.pendingRestart);
-    this.pendingRestart = undefined;
+    this.pendingRestart = null;
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -468,7 +467,7 @@ export class Board {
     }
     if (this.pendingRestart) {
       clearTimeout(this.pendingRestart);
-      this.pendingRestart = undefined;
+      this.pendingRestart = null;
       this.displayStoppedState();
     }
     if (this.modulePromise) {

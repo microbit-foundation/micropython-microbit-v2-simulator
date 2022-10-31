@@ -426,7 +426,7 @@ export class Board {
         if (panicCode === undefined) {
           throw new Error("Must be set");
         }
-        this.displayPanic(panicCode!);
+        this.displayPanic(panicCode);
         break;
       }
       case StopKind.Reset: {
@@ -443,7 +443,7 @@ export class Board {
         break;
       }
       default: {
-        throw new Error("Unknown stop action: " + this.stopKind);
+        throw new Error("Unknown stop kind: " + this.stopKind);
       }
     }
     this.stopKind = StopKind.Default;

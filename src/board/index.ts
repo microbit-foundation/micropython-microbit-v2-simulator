@@ -35,6 +35,36 @@ import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
 import { ModuleWrapper } from "./wasm";
 
+/**
+ * Controls the behaviour after the program has come to a stop.
+ *
+ * We use this to communicate between the start
+ */
+enum StopKind {
+  /**
+   * The main Wasm function returned control to us in a normal way.
+   */
+  Default = "default",
+  /**
+   * The program called panic.
+   */
+  Panic = "panic",
+  /**
+   * The user or the program requested a reset.
+   */
+  Reset = "reset",
+  /**
+   * An internal mode where we do not display the stop state UI as we plan to immediately restart.
+   */
+  BriefStop = "brief",
+  /**
+   * The user requested the program be interrupted.
+   *
+   * Note the program could finish for other reasons, but should always count as a user stop.
+   */
+  UserStop = "user",
+}
+
 export class PanicError extends Error {
   constructor(public code: number) {
     super("panic");
@@ -108,10 +138,9 @@ export class Board {
    */
   private module: ModuleWrapper | undefined;
   /**
-   * If undefined, then when main finishes we stay stopped.
-   * Otherwise we perform the action then clear this field.
+   * Controls the action after the user program completes.
    */
-  private afterStopped: (() => void) | undefined;
+  private stopKind: StopKind = StopKind.Default;
 
   constructor(
     private notifications: Notifications,
@@ -365,11 +394,17 @@ export class Board {
       this.displayRunningState();
       await module.start();
     } catch (e: any) {
+      // Take care not to overwrite another kind of stop just because the program
+      // called restart or panic.
       if (e instanceof PanicError) {
-        panicCode = e.code;
+        if (this.stopKind === StopKind.Default) {
+          this.stopKind = StopKind.Panic;
+          panicCode = e.code;
+        }
       } else if (e instanceof ResetError) {
-        const noChangeRestart = () => {};
-        this.afterStopped = noChangeRestart;
+        if (this.stopKind === StopKind.Default) {
+          this.stopKind = StopKind.Reset;
+        }
       } else {
         this.notifications.onInternalError(e);
       }
@@ -386,23 +421,36 @@ export class Board {
     this.modulePromise = undefined;
     this.module = undefined;
 
-    if (panicCode !== undefined) {
-      this.displayPanic(panicCode);
-    } else {
-      if (this.afterStopped) {
-        this.afterStopped();
-        this.afterStopped = undefined;
+    switch (this.stopKind) {
+      case StopKind.Panic: {
+        if (panicCode === undefined) {
+          throw new Error("Must be set");
+        }
+        this.displayPanic(panicCode!);
+        break;
+      }
+      case StopKind.Reset: {
         setTimeout(() => this.start(), 0);
-      } else {
+        break;
+      }
+      case StopKind.BriefStop: {
+        // Skip the stopped state.
+        break;
+      }
+      case StopKind.UserStop: /* Fall through */
+      case StopKind.Default: {
         this.displayStoppedState();
+        break;
+      }
+      default: {
+        throw new Error("Unknown stop action: " + this.stopKind);
       }
     }
+    this.stopKind = StopKind.Default;
   }
 
-  async stop(
-    afterStopped: (() => void) | undefined = undefined
-  ): Promise<void> {
-    this.afterStopped = afterStopped;
+  async stop(kind: StopKind = StopKind.UserStop): Promise<void> {
+    this.stopKind = kind;
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
@@ -425,8 +473,7 @@ export class Board {
    * reset() in MicroPython code throws ResetError.
    */
   async reset(): Promise<void> {
-    const noChangeRestart = () => {};
-    this.stop(noChangeRestart);
+    this.stop(StopKind.Reset);
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
@@ -440,7 +487,7 @@ export class Board {
     };
     if (this.modulePromise) {
       // If it's running then we need to stop before flash.
-      return this.stop(flashFileSystem);
+      await this.stop(StopKind.BriefStop);
     }
     flashFileSystem();
     return this.start();

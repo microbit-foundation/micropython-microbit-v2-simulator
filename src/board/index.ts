@@ -50,11 +50,12 @@ enum StopKind {
    */
   Panic = "panic",
   /**
-   * The user or the program requested a reset.
+   * The program requested a reset.
    */
   Reset = "reset",
   /**
-   * An internal mode where we do not display the stop state UI as we plan to immediately restart.
+   * An internal mode where we do not display the stop state UI as we plan to immediately reset.
+   * Used for user-requested flash or reset.
    */
   BriefStop = "brief",
   /**
@@ -471,10 +472,10 @@ export class Board {
 
   /**
    * An external reset.
-   * reset() in MicroPython code throws ResetError.
    */
   async reset(): Promise<void> {
-    return this.stop(StopKind.Reset);
+    await this.stop(StopKind.BriefStop);
+    return this.start();
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {

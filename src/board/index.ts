@@ -140,7 +140,7 @@ export class Board {
   /**
    * Timeout for a pending start call due to StopKind.Reset.
    */
-  private pendingRestart: any;
+  private pendingRestartTimeout: any;
   /**
    * Timeout for the next frame of the panic animation.
    */
@@ -389,8 +389,8 @@ export class Board {
     if (this.modulePromise || this.module) {
       throw new Error("Module already exists!");
     }
-    clearTimeout(this.pendingRestart);
-    this.pendingRestart = null;
+    clearTimeout(this.pendingRestartTimeout);
+    this.pendingRestartTimeout = null;
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -436,7 +436,7 @@ export class Board {
         break;
       }
       case StopKind.Reset: {
-        this.pendingRestart = setTimeout(() => this.start(), 0);
+        this.pendingRestartTimeout = setTimeout(() => this.start(), 0);
         break;
       }
       case StopKind.BriefStop: {
@@ -464,9 +464,9 @@ export class Board {
         this.displayStoppedState();
       }
     }
-    if (this.pendingRestart) {
-      clearTimeout(this.pendingRestart);
-      this.pendingRestart = null;
+    if (this.pendingRestartTimeout) {
+      clearTimeout(this.pendingRestartTimeout);
+      this.pendingRestartTimeout = null;
       if (!brief) {
         this.displayStoppedState();
       }

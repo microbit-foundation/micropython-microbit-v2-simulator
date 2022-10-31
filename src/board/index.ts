@@ -450,7 +450,6 @@ export class Board {
   }
 
   async stop(kind: StopKind = StopKind.UserStop): Promise<void> {
-    this.stopKind = kind;
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
@@ -458,6 +457,8 @@ export class Board {
       this.displayStoppedState();
     }
     if (this.modulePromise) {
+      this.stopKind = kind;
+
       // Avoid this.module as we might still be creating it (async).
       const module = await this.modulePromise;
       module.requestStop();

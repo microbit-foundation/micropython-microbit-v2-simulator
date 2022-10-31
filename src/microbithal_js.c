@@ -389,10 +389,9 @@ int microbit_hal_log_data(const char *key, const char *value) {
     return mp_js_hal_log_data(key, value);
 }
 
-// This is needed by the microbitfs implementation.
+// This is used to seed the random number generator.
 uint32_t rng_generate_random_word(void) {
-    //return uBit.random(65536) << 16 | uBit.random(65536);
-    return 0;
+    return mp_js_rng_generate_random_word();
 }
 
 void microbit_hal_audio_select_pin(int pin) {

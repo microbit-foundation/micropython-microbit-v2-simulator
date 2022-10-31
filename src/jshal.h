@@ -27,6 +27,8 @@
 void mp_js_hal_init(void);
 void mp_js_hal_deinit(void);
 
+uint32_t mp_js_rng_generate_random_word();
+
 uint32_t mp_js_hal_ticks_ms(void);
 void mp_js_hal_stdout_tx_strn(const char *ptr, size_t len);
 int mp_js_hal_stdin_pop_char(void);

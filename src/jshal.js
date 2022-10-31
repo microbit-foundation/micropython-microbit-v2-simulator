@@ -36,6 +36,10 @@ mergeInto(LibraryManager.library, {
     Module.board.stopComponents();
   },
 
+  mp_js_rng_generate_random_word: function () {
+    return (Math.random() * 0x100000000) >>> 0;
+  },
+
   mp_js_hal_ticks_ms: function () {
     return Module.board.ticksMilliseconds();
   },
@@ -131,7 +135,10 @@ mergeInto(LibraryManager.library, {
     return Module.board.pins[pin].getAnalogPeriodUs();
   },
 
-  mp_js_hal_pin_set_analog_period_us: function (/** @type {number} */ pin, /** @type {number} */ period) {
+  mp_js_hal_pin_set_analog_period_us: function (
+    /** @type {number} */ pin,
+    /** @type {number} */ period
+  ) {
     return Module.board.pins[pin].setAnalogPeriodUs(period);
   },
 

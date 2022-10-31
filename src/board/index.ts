@@ -459,7 +459,7 @@ export class Board {
     this.stopKind = StopKind.Default;
   }
 
-  async stop(kind: StopKind = StopKind.UserStop): Promise<void> {
+  async stop(brief: boolean = false): Promise<void> {
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
@@ -472,7 +472,7 @@ export class Board {
       this.displayStoppedState();
     }
     if (this.modulePromise) {
-      this.stopKind = kind;
+      this.stopKind = brief ? StopKind.BriefStop : StopKind.UserStop;
       // Avoid this.module as we might still be creating it (async).
       const module = await this.modulePromise;
       module.requestStop();
@@ -487,7 +487,7 @@ export class Board {
    * An external reset.
    */
   async reset(): Promise<void> {
-    await this.stop(StopKind.BriefStop);
+    await this.stop(true);
     return this.start();
   }
 
@@ -502,7 +502,7 @@ export class Board {
     };
     if (this.modulePromise) {
       // If it's running then we need to stop before flash.
-      await this.stop(StopKind.BriefStop);
+      await this.stop(true);
     }
     flashFileSystem();
     return this.start();

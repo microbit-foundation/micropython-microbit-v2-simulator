@@ -473,7 +473,7 @@ export class Board {
    * reset() in MicroPython code throws ResetError.
    */
   async reset(): Promise<void> {
-    this.stop(StopKind.Reset);
+    return this.stop(StopKind.Reset);
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {

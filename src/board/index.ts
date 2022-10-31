@@ -460,12 +460,16 @@ export class Board {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
       this.display.clear();
-      this.displayStoppedState();
+      if (!brief) {
+        this.displayStoppedState();
+      }
     }
     if (this.pendingRestart) {
       clearTimeout(this.pendingRestart);
       this.pendingRestart = null;
-      this.displayStoppedState();
+      if (!brief) {
+        this.displayStoppedState();
+      }
     }
     if (this.modulePromise) {
       this.stopKind = brief ? StopKind.BriefStop : StopKind.UserStop;

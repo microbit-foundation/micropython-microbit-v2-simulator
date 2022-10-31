@@ -142,6 +142,10 @@ export class Board {
    * Controls the action after the user program completes.
    */
   private stopKind: StopKind = StopKind.Default;
+  /**
+   * Timeout for a pending start call due to StopKind.Restart.
+   */
+  private pendingRestart: any;
 
   constructor(
     private notifications: Notifications,
@@ -386,6 +390,8 @@ export class Board {
     if (this.modulePromise || this.module) {
       throw new Error("Module already exists!");
     }
+    clearTimeout(this.pendingRestart);
+    this.pendingRestart = undefined;
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -431,7 +437,10 @@ export class Board {
         break;
       }
       case StopKind.Reset: {
-        setTimeout(() => this.start(), 0);
+        if (this.pendingRestart) {
+          throw new Error("Unexpected state");
+        }
+        this.pendingRestart = setTimeout(() => this.start(), 0);
         break;
       }
       case StopKind.BriefStop: {
@@ -457,9 +466,13 @@ export class Board {
       this.display.clear();
       this.displayStoppedState();
     }
+    if (this.pendingRestart) {
+      clearTimeout(this.pendingRestart);
+      this.pendingRestart = undefined;
+      this.displayStoppedState();
+    }
     if (this.modulePromise) {
       this.stopKind = kind;
-
       // Avoid this.module as we might still be creating it (async).
       const module = await this.modulePromise;
       module.requestStop();

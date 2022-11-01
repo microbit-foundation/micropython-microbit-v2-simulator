@@ -35,32 +35,6 @@ import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
 import { ModuleWrapper } from "./wasm";
 
-enum StopKind {
-  /**
-   * The main Wasm function returned control to us in a normal way.
-   */
-  Default = "default",
-  /**
-   * The program called panic.
-   */
-  Panic = "panic",
-  /**
-   * The program requested a reset.
-   */
-  Reset = "reset",
-  /**
-   * An internal mode where we do not display the stop state UI as we plan to immediately reset.
-   * Used for user-requested flash or reset.
-   */
-  BriefStop = "brief",
-  /**
-   * The user requested the program be interrupted.
-   *
-   * Note the program could finish for other reasons, but should always count as a user stop.
-   */
-  UserStop = "user",
-}
-
 export class PanicError extends Error {
   constructor(public code: number) {
     super("panic");
@@ -100,6 +74,8 @@ export class Board {
   radio: Radio;
   dataLogging: DataLogging;
 
+  private panicTimeout: any;
+
   public serialInputBuffer: number[] = [];
 
   private stoppedOverlay: HTMLDivElement;
@@ -132,19 +108,10 @@ export class Board {
    */
   private module: ModuleWrapper | undefined;
   /**
-   * Controls the action after the user program completes.
-   *
-   * Determined by a combination of user actions (stop, reset etc) and program actions.
+   * If undefined, then when main finishes we stay stopped.
+   * Otherwise we perform the action then clear this field.
    */
-  private stopKind: StopKind = StopKind.Default;
-  /**
-   * Timeout for a pending start call due to StopKind.Reset.
-   */
-  private pendingRestartTimeout: any;
-  /**
-   * Timeout for the next frame of the panic animation.
-   */
-  private panicTimeout: any;
+  private afterStopped: (() => void) | undefined;
 
   constructor(
     private notifications: Notifications,
@@ -389,8 +356,6 @@ export class Board {
     if (this.modulePromise || this.module) {
       throw new Error("Module already exists!");
     }
-    clearTimeout(this.pendingRestartTimeout);
-    this.pendingRestartTimeout = null;
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -400,17 +365,11 @@ export class Board {
       this.displayRunningState();
       await module.start();
     } catch (e: any) {
-      // Take care not to overwrite another kind of stop just because the program
-      // called restart or panic.
       if (e instanceof PanicError) {
-        if (this.stopKind === StopKind.Default) {
-          this.stopKind = StopKind.Panic;
-          panicCode = e.code;
-        }
+        panicCode = e.code;
       } else if (e instanceof ResetError) {
-        if (this.stopKind === StopKind.Default) {
-          this.stopKind = StopKind.Reset;
-        }
+        const noChangeRestart = () => {};
+        this.afterStopped = noChangeRestart;
       } else {
         this.notifications.onInternalError(e);
       }
@@ -427,52 +386,30 @@ export class Board {
     this.modulePromise = undefined;
     this.module = undefined;
 
-    switch (this.stopKind) {
-      case StopKind.Panic: {
-        if (panicCode === undefined) {
-          throw new Error("Must be set");
-        }
-        this.displayPanic(panicCode);
-        break;
-      }
-      case StopKind.Reset: {
-        this.pendingRestartTimeout = setTimeout(() => this.start(), 0);
-        break;
-      }
-      case StopKind.BriefStop: {
-        // Skip the stopped state.
-        break;
-      }
-      case StopKind.UserStop: /* Fall through */
-      case StopKind.Default: {
+    if (panicCode !== undefined) {
+      this.displayPanic(panicCode);
+    } else {
+      if (this.afterStopped) {
+        this.afterStopped();
+        this.afterStopped = undefined;
+        setTimeout(() => this.start(), 0);
+      } else {
         this.displayStoppedState();
-        break;
-      }
-      default: {
-        throw new Error("Unknown stop kind: " + this.stopKind);
       }
     }
-    this.stopKind = StopKind.Default;
   }
 
-  async stop(brief: boolean = false): Promise<void> {
+  async stop(
+    afterStopped: (() => void) | undefined = undefined
+  ): Promise<void> {
+    this.afterStopped = afterStopped;
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
       this.display.clear();
-      if (!brief) {
-        this.displayStoppedState();
-      }
-    }
-    if (this.pendingRestartTimeout) {
-      clearTimeout(this.pendingRestartTimeout);
-      this.pendingRestartTimeout = null;
-      if (!brief) {
-        this.displayStoppedState();
-      }
+      this.displayStoppedState();
     }
     if (this.modulePromise) {
-      this.stopKind = brief ? StopKind.BriefStop : StopKind.UserStop;
       // Avoid this.module as we might still be creating it (async).
       const module = await this.modulePromise;
       module.requestStop();
@@ -485,10 +422,11 @@ export class Board {
 
   /**
    * An external reset.
+   * reset() in MicroPython code throws ResetError.
    */
   async reset(): Promise<void> {
-    await this.stop(true);
-    return this.start();
+    const noChangeRestart = () => {};
+    this.stop(noChangeRestart);
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
@@ -502,7 +440,7 @@ export class Board {
     };
     if (this.modulePromise) {
       // If it's running then we need to stop before flash.
-      await this.stop(true);
+      return this.stop(flashFileSystem);
     }
     flashFileSystem();
     return this.start();

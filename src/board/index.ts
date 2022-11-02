@@ -35,6 +35,32 @@ import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
 import { ModuleWrapper } from "./wasm";
 
+enum StopKind {
+  /**
+   * The main Wasm function returned control to us in a normal way.
+   */
+  Default = "default",
+  /**
+   * The program called panic.
+   */
+  Panic = "panic",
+  /**
+   * The program requested a reset.
+   */
+  Reset = "reset",
+  /**
+   * An internal mode where we do not display the stop state UI as we plan to immediately reset.
+   * Used for user-requested flash or reset.
+   */
+  BriefStop = "brief",
+  /**
+   * The user requested the program be interrupted.
+   *
+   * Note the program could finish for other reasons, but should always count as a user stop.
+   */
+  UserStop = "user",
+}
+
 export class PanicError extends Error {
   constructor(public code: number) {
     super("panic");
@@ -74,8 +100,6 @@ export class Board {
   radio: Radio;
   dataLogging: DataLogging;
 
-  private panicTimeout: any;
-
   public serialInputBuffer: number[] = [];
 
   private stoppedOverlay: HTMLDivElement;
@@ -100,18 +124,31 @@ export class Board {
   };
 
   /**
+   * Defined for the duration of start().
+   */
+  private runningPromise: Promise<void> | undefined;
+  /**
    * Defined during start().
    */
   private modulePromise: Promise<ModuleWrapper> | undefined;
   /**
-   * Defined by start but async.
+   * Defined during start().
    */
   private module: ModuleWrapper | undefined;
   /**
-   * If undefined, then when main finishes we stay stopped.
-   * Otherwise we perform the action then clear this field.
+   * Controls the action after the user program completes.
+   *
+   * Determined by a combination of user actions (stop, reset etc) and program actions.
    */
-  private afterStopped: (() => void) | undefined;
+  private stopKind: StopKind = StopKind.Default;
+  /**
+   * Timeout for a pending start call due to StopKind.Reset.
+   */
+  private pendingRestartTimeout: any;
+  /**
+   * Timeout for the next frame of the panic animation.
+   */
+  private panicTimeout: any;
 
   constructor(
     private notifications: Notifications,
@@ -352,10 +389,24 @@ export class Board {
     this.stoppedOverlay.style.display = "flex";
   }
 
-  private async start() {
+  /**
+   * Start the simulator.
+   *
+   * @returns a promise that resolves when the simulator has stopped.
+   */
+  private start(): void {
+    if (this.runningPromise) {
+      throw new Error("Already running!");
+    }
+    this.runningPromise = this.createRunningPromise();
+  }
+
+  private async createRunningPromise() {
     if (this.modulePromise || this.module) {
       throw new Error("Module already exists!");
     }
+    clearTimeout(this.pendingRestartTimeout);
+    this.pendingRestartTimeout = null;
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -365,11 +416,17 @@ export class Board {
       this.displayRunningState();
       await module.start();
     } catch (e: any) {
+      // Take care not to overwrite another kind of stop just because the program
+      // called restart or panic.
       if (e instanceof PanicError) {
-        panicCode = e.code;
+        if (this.stopKind === StopKind.Default) {
+          this.stopKind = StopKind.Panic;
+          panicCode = e.code;
+        }
       } else if (e instanceof ResetError) {
-        const noChangeRestart = () => {};
-        this.afterStopped = noChangeRestart;
+        if (this.stopKind === StopKind.Default) {
+          this.stopKind = StopKind.Reset;
+        }
       } else {
         this.notifications.onInternalError(e);
       }
@@ -386,30 +443,61 @@ export class Board {
     this.modulePromise = undefined;
     this.module = undefined;
 
-    if (panicCode !== undefined) {
-      this.displayPanic(panicCode);
-    } else {
-      if (this.afterStopped) {
-        this.afterStopped();
-        this.afterStopped = undefined;
-        setTimeout(() => this.start(), 0);
-      } else {
+    switch (this.stopKind) {
+      case StopKind.Panic: {
+        if (panicCode === undefined) {
+          throw new Error("Must be set");
+        }
+        this.displayPanic(panicCode);
+        break;
+      }
+      case StopKind.Reset: {
+        this.pendingRestartTimeout = setTimeout(() => this.start(), 0);
+        break;
+      }
+      case StopKind.BriefStop: {
+        // Skip the stopped state.
+        break;
+      }
+      case StopKind.UserStop: /* Fall through */
+      case StopKind.Default: {
         this.displayStoppedState();
+        break;
+      }
+      default: {
+        throw new Error("Unknown stop kind: " + this.stopKind);
       }
     }
+    this.stopKind = StopKind.Default;
+    this.runningPromise = undefined;
   }
 
-  async stop(
-    afterStopped: (() => void) | undefined = undefined
-  ): Promise<void> {
-    this.afterStopped = afterStopped;
+  /**
+   * Stop the simulator.
+   *
+   * This cancels any pending restart or panic requested by the program.
+   *
+   * @param brief If true the stopped UI is not shown.
+   * @returns A promise that resolves when the simulator is stopped.
+   */
+  async stop(brief: boolean = false): Promise<void> {
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;
       this.display.clear();
-      this.displayStoppedState();
+      if (!brief) {
+        this.displayStoppedState();
+      }
+    }
+    if (this.pendingRestartTimeout) {
+      clearTimeout(this.pendingRestartTimeout);
+      this.pendingRestartTimeout = null;
+      if (!brief) {
+        this.displayStoppedState();
+      }
     }
     if (this.modulePromise) {
+      this.stopKind = brief ? StopKind.BriefStop : StopKind.UserStop;
       // Avoid this.module as we might still be creating it (async).
       const module = await this.modulePromise;
       module.requestStop();
@@ -418,15 +506,15 @@ export class Board {
       // Ctrl-C, Ctrl-D to interrupt the main loop.
       this.writeSerialInput("\x03\x04");
     }
+    return this.runningPromise;
   }
 
   /**
    * An external reset.
-   * reset() in MicroPython code throws ResetError.
    */
   async reset(): Promise<void> {
-    const noChangeRestart = () => {};
-    this.stop(noChangeRestart);
+    await this.stop(true);
+    this.start();
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
@@ -438,10 +526,8 @@ export class Board {
       });
       this.dataLogging.delete();
     };
-    if (this.modulePromise) {
-      // If it's running then we need to stop before flash.
-      return this.stop(flashFileSystem);
-    }
+    // Ensure it's stopped before flash.
+    await this.stop(true);
     flashFileSystem();
     return this.start();
   }
@@ -586,7 +672,7 @@ export class Board {
 
   writeRadioRxBuffer(packet: Uint8Array): number {
     if (!this.module) {
-      throw new Error("Must be running");
+      throw new Error("Must be running as called via HAL");
     }
     return this.module.writeRadioRxBuffer(packet);
   }

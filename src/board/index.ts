@@ -124,11 +124,15 @@ export class Board {
   };
 
   /**
+   * Defined for the duration of start().
+   */
+  private runningPromise: Promise<void> | undefined;
+  /**
    * Defined during start().
    */
   private modulePromise: Promise<ModuleWrapper> | undefined;
   /**
-   * Defined by start but async.
+   * Defined during start().
    */
   private module: ModuleWrapper | undefined;
   /**
@@ -385,7 +389,19 @@ export class Board {
     this.stoppedOverlay.style.display = "flex";
   }
 
-  private async start() {
+  /**
+   * Start the simulator.
+   *
+   * @returns a promise that resolves when the simulator has stopped.
+   */
+  private start(): void {
+    if (this.runningPromise) {
+      throw new Error("Already running!");
+    }
+    this.runningPromise = this.createRunningPromise();
+  }
+
+  private async createRunningPromise() {
     if (this.modulePromise || this.module) {
       throw new Error("Module already exists!");
     }
@@ -453,8 +469,17 @@ export class Board {
       }
     }
     this.stopKind = StopKind.Default;
+    this.runningPromise = undefined;
   }
 
+  /**
+   * Stop the simulator.
+   *
+   * This cancels any pending restart or panic requested by the program.
+   *
+   * @param brief If true the stopped UI is not shown.
+   * @returns A promise that resolves when the simulator is stopped.
+   */
   async stop(brief: boolean = false): Promise<void> {
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
@@ -481,6 +506,7 @@ export class Board {
       // Ctrl-C, Ctrl-D to interrupt the main loop.
       this.writeSerialInput("\x03\x04");
     }
+    return this.runningPromise;
   }
 
   /**
@@ -488,7 +514,7 @@ export class Board {
    */
   async reset(): Promise<void> {
     await this.stop(true);
-    return this.start();
+    this.start();
   }
 
   async flash(filesystem: Record<string, Uint8Array>): Promise<void> {
@@ -500,10 +526,8 @@ export class Board {
       });
       this.dataLogging.delete();
     };
-    if (this.modulePromise) {
-      // If it's running then we need to stop before flash.
-      await this.stop(true);
-    }
+    // Ensure it's stopped before flash.
+    await this.stop(true);
     flashFileSystem();
     return this.start();
   }
@@ -648,7 +672,7 @@ export class Board {
 
   writeRadioRxBuffer(packet: Uint8Array): number {
     if (!this.module) {
-      throw new Error("Must be running");
+      throw new Error("Must be running as called via HAL");
     }
     return this.module.writeRadioRxBuffer(packet);
   }

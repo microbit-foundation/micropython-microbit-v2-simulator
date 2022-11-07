@@ -41,7 +41,7 @@ COPT += -O3
 CFLAGS += -g
 else
 COPT += -O3 -DNDEBUG
-CFLAGS += -gseparate-dwarf
+CFLAGS += -gsource-map --source-map-base=./
 endif
 
 JSFLAGS += -s ASYNCIFY
@@ -54,7 +54,7 @@ JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.j
 ifdef DEBUG
 JSFLAGS += -g
 else
-JSFLAGS += -gseparate-dwarf
+JSFLAGS += -gsource-map --source-map-base=./
 endif
 
 SRC_C += \

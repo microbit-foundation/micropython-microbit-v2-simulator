@@ -68,7 +68,9 @@
 #define MICROPY_ENABLE_SCHEDULER                (1)
 
 // Fine control over Python builtins, classes, modules, etc
+#define MICROPY_PY_BUILTINS_STR_UNICODE         (1)
 #define MICROPY_PY_BUILTINS_MEMORYVIEW          (1)
+#define MICROPY_PY_BUILTINS_FROZENSET           (1)
 #define MICROPY_PY_BUILTINS_INPUT               (1)
 #define MICROPY_PY_BUILTINS_HELP                (1)
 #define MICROPY_PY_BUILTINS_HELP_TEXT           microbit_help_text
@@ -100,7 +102,7 @@
     { MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&mp_builtin_open_obj) },
 #endif
 
-#define MICROBIT_RELEASE "2.1.0"
+#define MICROBIT_RELEASE "2.1.1"
 #define MICROBIT_BOARD_NAME "micro:bit"
 #define MICROPY_HW_BOARD_NAME MICROBIT_BOARD_NAME " v" MICROBIT_RELEASE
 #define MICROPY_HW_MCU_NAME "nRF52833"

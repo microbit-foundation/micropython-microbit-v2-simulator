@@ -1,0 +1,52 @@
+name: build
+
+on:
+  release:
+    types: [created]
+  push:
+    branches:
+      - "**"
+
+# This is conservative: ideally we'd include branch and stage in this key
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+concurrency: deploy-python-simulator
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      AWS_DEFAULT_REGION: eu-west-1
+      PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID: E15FPP46STH15O
+      STAGING_CLOUDFRONT_DISTRIBUTION_ID: E15FPP46STH15O
+      REVIEW_CLOUDFRONT_DISTRIBUTION_ID: E2DW5F7PA9W7JD
+
+    steps:
+      # Note: This workflow will not run on forks without modification; we're open to making steps
+      #       that rely on our deployment infrastructure conditional. Please open an issue.
+      - uses: actions/checkout@v3
+      - name: Configure node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "npm"
+          registry-url: "https://npm.pkg.github.com"
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm install --no-save @microbit-foundation/website-deploy-aws@0.3.0 @microbit-foundation/website-deploy-aws-config@0.7.1 @microbit-foundation/circleci-npm-package-versioner@1
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: node ./bin/print-ci-env.js >> $GITHUB_ENV
+      - run: npm run ci:update-version
+      - run: ./ci-build.sh
+      - run: npm run deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WEB_DEPLOY_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEB_DEPLOY_AWS_SECRET_ACCESS_KEY }}
+      - run: npm run invalidate
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WEB_DEPLOY_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEB_DEPLOY_AWS_SECRET_ACCESS_KEY }}

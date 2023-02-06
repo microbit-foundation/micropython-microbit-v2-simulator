@@ -230,9 +230,10 @@ export class Board {
     this.initializePlayButton();
     // We start stopped.
     this.displayStoppedState();
-    this.playButton.addEventListener("click", () =>
-      this.notifications.onRequestFlash()
-    );
+    this.playButton.addEventListener("click", async () => {
+      await this.audio.createAudioContextFromUserInteraction();
+      this.notifications.onRequestFlash();
+    });
 
     this.updateTranslationsInternal();
     this.notifications.onReady(this.getState());
@@ -481,6 +482,9 @@ export class Board {
    * @returns A promise that resolves when the simulator is stopped.
    */
   async stop(brief: boolean = false): Promise<void> {
+    // Preemptively stop audio so that we don't call into WASM for more data
+    this.audio.boardStopped();
+
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
       this.panicTimeout = null;

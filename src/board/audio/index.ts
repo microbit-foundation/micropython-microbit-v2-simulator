@@ -27,11 +27,9 @@ export class Audio {
     defaultAudioCallback,
     speechAudioCallback,
   }: AudioOptions) {
-    this.context = new AudioContext({
-      // The highest rate is the sound expression synth.
-      sampleRate: 44100,
-    });
-
+    if (!this.context) {
+      throw new Error("Context must be pre-created from a user event");
+    }
     this.muteNode = this.context.createGain();
     this.muteNode.gain.setValueAtTime(
       this.muted ? 0 : 1,
@@ -60,6 +58,16 @@ export class Audio {
         }
       }
     );
+  }
+
+  async createAudioContextFromUserInteraction(): Promise<void> {
+    this.context = new AudioContext({
+      // The highest rate is the sound expression synth.
+      sampleRate: 44100,
+    });
+    if (this.context.state === "suspended") {
+      return this.context.resume();
+    }
   }
 
   playSoundExpression(expr: string) {
@@ -138,6 +146,9 @@ export class Audio {
 
   boardStopped() {
     this.stopOscillator();
+    this.speech?.dispose();
+    this.soundExpression?.dispose();
+    this.default?.dispose();
   }
 
   private stopOscillator() {
@@ -187,5 +198,10 @@ class BufferedAudio {
       this.callback();
     }
     source.start(startTime);
+  }
+
+  dispose() {
+    // Prevent calls into WASM when the buffer nodes finish.
+    this.callback = () => {};
   }
 }

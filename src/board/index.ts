@@ -81,6 +81,13 @@ export function createBoard(notifications: Notifications, fs: FileSystem) {
   if (!svg) {
     throw new Error("No SVG");
   }
+  // Hack for Oxford student group for a nearly headless sim with a play button.
+  svg.style.display = "none";
+  const playButton = document.querySelector(".play-button") as HTMLElement;
+  playButton.style.width = "100px";
+  playButton.style.height = "100px";
+  playButton.style.margin = "0";
+
   return new Board(notifications, fs, svg);
 }
 
@@ -373,6 +380,9 @@ export class Board {
   }
 
   private displayRunningState() {
+    // Hack for Oxford group.
+    return;
+
     this.svg.style.opacity = "unset";
     const svgButtons = this.svg.querySelectorAll("[role='button']");
     for (const button of svgButtons) {

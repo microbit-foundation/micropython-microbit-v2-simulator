@@ -25,6 +25,7 @@ int mp_hal_stdin_rx_chr(void) {
         if (c != -1) {
             return c;
         }
+        mp_handle_pending(true);
         microbit_hal_idle();
     }
 }

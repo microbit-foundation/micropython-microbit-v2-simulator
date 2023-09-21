@@ -44,6 +44,8 @@ COPT += -O3 -DNDEBUG
 endif
 
 JSFLAGS += -s ASYNCIFY
+# We can hit lower values due to user stack use. See stack_size.py example.
+JSFLAGS += -s ASYNCIFY_STACK_SIZE=262144
 JSFLAGS += -s EXIT_RUNTIME
 JSFLAGS += -s MODULARIZE=1
 JSFLAGS += -s EXPORT_NAME=createModule

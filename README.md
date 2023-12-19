@@ -20,7 +20,9 @@ as an iframe. The embedding API and URLs are not yet stable and are
 subject to change. If you are interested in embedding the simulator
 in your application please [get in touch](mailto:support@microbit.org).
 
-The URL to embed is https://python-simulator.usermbit.org/v/0.1/simulator.html (URL may change in future, for experimentation only).
+The URL to embed is https://python-simulator.usermbit.org/v/0.1/simulator.html.
+You can embed this in your application directly. We would love to hear about
+your use of the simulator so please open an issue to get in touch.
 
 The iframe provides the micro:bit board user interface and some limited
 interactions. It does not provide a terminal for serial/the REPL or any UI to change the board sensor state.

@@ -184,11 +184,8 @@ class BufferedAudio {
   }
 
   createBuffer(length: number) {
-    return new AudioBuffer({
-      sampleRate: this.sampleRate,
-      numberOfChannels: 1,
-      length,
-    });
+    // Use createBuffer instead of new AudioBuffer to support Safari 14.0.
+    return this.context.createBuffer(1, length, this.sampleRate);
   }
 
   writeData(buffer: AudioBuffer) {

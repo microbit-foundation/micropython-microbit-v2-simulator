@@ -67,18 +67,10 @@ export class Audio {
   }
 
   async createAudioContextFromUserInteraction(): Promise<void> {
-    // The highest rate is the sound expression synth.
-    const sampleRate = 44100;
-    if (typeof AudioContext === "undefined") {
-      // Support Safari 13.
-      this.context = new window.webkitAudioContext({
-        sampleRate,
-      });
-    } else {
-      this.context = new AudioContext({
-        sampleRate,
-      });
-    }
+    this.context = new (window.AudioContext || window.webkitAudioContext)({
+      // The highest rate is the sound expression synth.
+      sampleRate: 44100,
+    });
     if (this.context.state === "suspended") {
       return this.context.resume();
     }
@@ -94,17 +86,20 @@ export class Audio {
 
     const callback = () => {
       const source = synth.pull();
-      const target = new AudioBuffer({
-        sampleRate: synth.sampleRate,
-        numberOfChannels: 1,
-        length: source.length,
-      });
-      const channel = target.getChannelData(0);
-      for (let i = 0; i < source.length; i++) {
-        // Buffer is (0, 1023) we need to map it to (-1, 1)
-        channel[i] = (source[i] - 512) / 512;
+      if (this.context) {
+        // Use createBuffer instead of new AudioBuffer to support Safari 14.0.
+        const target = this.context.createBuffer(
+          1,
+          source.length,
+          synth.sampleRate
+        );
+        const channel = target.getChannelData(0);
+        for (let i = 0; i < source.length; i++) {
+          // Buffer is (0, 1023) we need to map it to (-1, 1)
+          channel[i] = (source[i] - 512) / 512;
+        }
+        this.soundExpression!.writeData(target);
       }
-      this.soundExpression!.writeData(target);
     };
     this.currentSoundExpressionCallback = callback;
     callback();

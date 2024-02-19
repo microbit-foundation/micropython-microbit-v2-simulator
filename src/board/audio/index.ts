@@ -2,6 +2,12 @@ import { replaceBuiltinSound } from "./built-in-sounds";
 import { SoundEmojiSynthesizer } from "./sound-emoji-synthesizer";
 import { parseSoundEffects } from "./sound-expressions";
 
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 interface AudioOptions {
   defaultAudioCallback: () => void;
   speechAudioCallback: () => void;
@@ -61,10 +67,18 @@ export class Audio {
   }
 
   async createAudioContextFromUserInteraction(): Promise<void> {
-    this.context = new AudioContext({
-      // The highest rate is the sound expression synth.
-      sampleRate: 44100,
-    });
+    // The highest rate is the sound expression synth.
+    const sampleRate = 44100;
+    if (typeof AudioContext === "undefined") {
+      // Support Safari 13.
+      this.context = new window.webkitAudioContext({
+        sampleRate,
+      });
+    } else {
+      this.context = new AudioContext({
+        sampleRate,
+      });
+    }
     if (this.context.state === "suspended") {
       return this.context.resume();
     }

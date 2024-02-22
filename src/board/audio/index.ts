@@ -2,6 +2,12 @@ import { replaceBuiltinSound } from "./built-in-sounds";
 import { SoundEmojiSynthesizer } from "./sound-emoji-synthesizer";
 import { parseSoundEffects } from "./sound-expressions";
 
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 interface AudioOptions {
   defaultAudioCallback: () => void;
   speechAudioCallback: () => void;
@@ -61,7 +67,7 @@ export class Audio {
   }
 
   async createAudioContextFromUserInteraction(): Promise<void> {
-    this.context = new AudioContext({
+    this.context = new (window.AudioContext || window.webkitAudioContext)({
       // The highest rate is the sound expression synth.
       sampleRate: 44100,
     });
@@ -80,17 +86,20 @@ export class Audio {
 
     const callback = () => {
       const source = synth.pull();
-      const target = new AudioBuffer({
-        sampleRate: synth.sampleRate,
-        numberOfChannels: 1,
-        length: source.length,
-      });
-      const channel = target.getChannelData(0);
-      for (let i = 0; i < source.length; i++) {
-        // Buffer is (0, 1023) we need to map it to (-1, 1)
-        channel[i] = (source[i] - 512) / 512;
+      if (this.context) {
+        // Use createBuffer instead of new AudioBuffer to support Safari 14.0.
+        const target = this.context.createBuffer(
+          1,
+          source.length,
+          synth.sampleRate
+        );
+        const channel = target.getChannelData(0);
+        for (let i = 0; i < source.length; i++) {
+          // Buffer is (0, 1023) we need to map it to (-1, 1)
+          channel[i] = (source[i] - 512) / 512;
+        }
+        this.soundExpression!.writeData(target);
       }
-      this.soundExpression!.writeData(target);
     };
     this.currentSoundExpressionCallback = callback;
     callback();
@@ -175,17 +184,14 @@ class BufferedAudio {
   }
 
   createBuffer(length: number) {
-    return new AudioBuffer({
-      sampleRate: this.sampleRate,
-      numberOfChannels: 1,
-      length,
-    });
+    // Use createBuffer instead of new AudioBuffer to support Safari 14.0.
+    return this.context.createBuffer(1, length, this.sampleRate);
   }
 
   writeData(buffer: AudioBuffer) {
-    const source = new AudioBufferSourceNode(this.context, {
-      buffer,
-    });
+    // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
+    const source = this.context.createBufferSource();
+    source.buffer = buffer;
     source.onended = this.callback;
     source.connect(this.destination);
     const currentTime = this.context.currentTime;

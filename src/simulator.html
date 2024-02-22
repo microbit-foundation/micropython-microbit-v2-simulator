@@ -20,20 +20,23 @@
         display: none;
         align-items: center;
         justify-content: center;
-        width: 25%;
+        /* Avoiding aspect-ratio for older Safari */
+        position: relative;
+        width: 11.5%;
+        padding: 11.5%;
         margin-top: 6%;
         border-radius: 50%;
         background-color: #f5f6f8;
         border: 3px solid;
         cursor: pointer;
-        aspect-ratio: 1/1;
       }
       .play-button:focus {
         box-shadow: 0 0 0 3px #4d90fe;
       }
       .play-button svg {
-        width: 50%;
-        height: 50%;
+        position: absolute;
+        width: 45%;
+        height: 45%;
       }
       .play-button-container {
         position: absolute;

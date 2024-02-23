@@ -67,10 +67,12 @@ export class Audio {
   }
 
   async createAudioContextFromUserInteraction(): Promise<void> {
-    this.context = new (window.AudioContext || window.webkitAudioContext)({
-      // The highest rate is the sound expression synth.
-      sampleRate: 44100,
-    });
+    this.context =
+      this.context ??
+      new (window.AudioContext || window.webkitAudioContext)({
+        // The highest rate is the sound expression synth.
+        sampleRate: 44100,
+      });
     if (this.context.state === "suspended") {
       return this.context.resume();
     }

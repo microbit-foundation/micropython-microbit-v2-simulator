@@ -149,7 +149,7 @@ void microbit_hal_pin_write_analog_u10(int pin, int value) {
 }
 
 int microbit_hal_pin_is_touched(int pin) {
-    if (pin == MICROBIT_HAL_PIN_FACE || pin == MICROBIT_HAL_PIN_P0 || pin == MICROBIT_HAL_PIN_P1 || pin == MICROBIT_HAL_PIN_P2) {
+    if (pin == MICROBIT_HAL_PIN_LOGO || pin == MICROBIT_HAL_PIN_P0 || pin == MICROBIT_HAL_PIN_P1 || pin == MICROBIT_HAL_PIN_P2) {
         return mp_js_hal_pin_is_touched(pin);
     }
     /*

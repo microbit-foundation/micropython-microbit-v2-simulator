@@ -42,7 +42,7 @@ int mp_js_hal_filesystem_readbyte(int idx, size_t offset);
 bool mp_js_hal_filesystem_write(int idx, const char *buf, size_t len);
 
 void mp_js_hal_panic(int code);
-void mp_js_hal_reset(void);
+__attribute__((noreturn)) void mp_js_hal_reset(void);
 
 int mp_js_hal_temperature(void);
 

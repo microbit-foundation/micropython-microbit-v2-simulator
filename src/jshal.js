@@ -131,6 +131,10 @@ mergeInto(LibraryManager.library, {
     return Module.board.pins[pin].isTouched();
   },
 
+  mp_js_hal_pin_get_touches: function (/** @type {number} */ pin) {
+    return Module.board.pins[pin].getAndClearTouches();
+  },
+
   mp_js_hal_pin_get_analog_period_us: function (/** @type {number} */ pin) {
     return Module.board.pins[pin].getAnalogPeriodUs();
   },

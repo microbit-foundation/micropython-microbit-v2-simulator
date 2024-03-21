@@ -58,6 +58,8 @@ export class StubPin extends BasePin {}
 export class TouchPin extends BasePin {
   private _mouseDown: boolean = false;
 
+  private _touches: number = 0;
+
   private keyListener: (e: KeyboardEvent) => void;
   private mouseDownListener: (e: MouseEvent) => void;
   private touchStartListener: (e: TouchEvent) => void;
@@ -128,8 +130,21 @@ export class TouchPin extends BasePin {
     this.setValueInternal(value, false);
   }
 
+  getAndClearTouches() {
+    const touches = this._touches;
+    this._touches = 0;
+    console.log("got touch ", touches);
+    return touches;
+  }
+
   private setValueInternal(value: any, internalChange: boolean) {
+    const previous = this.state.value;
     super.setValue(value);
+    // If this value is transitioning from high to low then count a touch.
+    // Do it after setValue because the input can be converted from a string.
+    if (previous === this.state.max && this.state.value === this.state.min) {
+      this._touches++;
+    }
 
     if (internalChange) {
       this.onChange({
@@ -179,5 +194,7 @@ export class TouchPin extends BasePin {
     }
   }
 
-  boardStopped() {}
+  boardStopped() {
+    this._touches = 0;
+  }
 }

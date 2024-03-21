@@ -56,7 +56,7 @@ JSFLAGS += -s ASYNCIFY_STACK_SIZE=262144
 JSFLAGS += -s EXIT_RUNTIME
 JSFLAGS += -s MODULARIZE=1
 JSFLAGS += -s EXPORT_NAME=createModule
-JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer','_mp_js_force_stop','_mp_js_request_stop']"
+JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_microbit_hal_audio_raw_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer','_mp_js_force_stop','_mp_js_request_stop']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
 
 ifdef DEBUG

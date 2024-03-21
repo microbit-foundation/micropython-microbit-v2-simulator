@@ -9,6 +9,8 @@
 
 extern ringbuf_t stdin_ringbuf;
 
+#define mp_hal_ticks_cpu() (0)
+
 void mp_hal_set_interrupt_char(int c);
 
 static inline uint32_t mp_hal_disable_irq(void) {

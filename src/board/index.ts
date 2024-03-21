@@ -249,7 +249,7 @@ export class Board {
     });
     const module = new ModuleWrapper(wrapped);
     this.audio.initializeCallbacks({
-      defaultAudioCallback: wrapped._microbit_hal_audio_ready_callback,
+      defaultAudioCallback: wrapped._microbit_hal_audio_raw_ready_callback,
       speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
     });
     this.accelerometer.initializeCallbacks(

@@ -9,7 +9,7 @@ export interface EmscriptenModule {
   // See EXPORTED_FUNCTIONS in the Makefile.
   _mp_js_request_stop(): void;
   _mp_js_force_stop(): void;
-  _microbit_hal_audio_ready_callback(): void;
+  _microbit_hal_audio_raw_ready_callback(): void;
   _microbit_hal_audio_speech_ready_callback(): void;
   _microbit_hal_gesture_callback(gesture: number): void;
   _microbit_hal_level_detector_callback(level: number): void;

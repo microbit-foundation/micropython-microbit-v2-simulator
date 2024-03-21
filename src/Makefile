@@ -41,6 +41,7 @@ COPT += -O3
 CFLAGS += -g
 else
 COPT += -O3 -DNDEBUG
+CFLAGS += -gsource-map --source-map-base=./
 endif
 
 JSFLAGS += -s ASYNCIFY
@@ -54,6 +55,8 @@ JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.j
 
 ifdef DEBUG
 JSFLAGS += -g
+else
+JSFLAGS += -gsource-map --source-map-base=./
 endif
 
 SRC_C += \
@@ -146,7 +149,7 @@ $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
 
 simulator-js:
-	npx esbuild ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
+	npx esbuild ./simulator.ts --sourcemap --minify --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text --target=es2020
 
 include $(TOP)/py/mkrules.mk
 

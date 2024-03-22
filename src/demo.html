@@ -115,6 +115,7 @@
             <div class="actions">
               <button id="stop">Stop</button>
               <button id="reset">Reset</button>
+              <button id="record">Record</button>
               <button id="mute">Mute</button>
               <button id="unmute">Unmute</button>
             </div>
@@ -236,6 +237,15 @@
         simulator.postMessage(
           {
             kind: "stop",
+          },
+          "*"
+        );
+      });
+
+      document.querySelector("#record").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "record",
           },
           "*"
         );

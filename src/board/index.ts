@@ -1,6 +1,6 @@
 import svgText from "../microbit-drawing.svg";
 import { Accelerometer } from "./accelerometer";
-import { Audio } from "./audio";
+import { BoardAudio } from "./audio";
 import { Button } from "./buttons";
 import { Compass } from "./compass";
 import {
@@ -92,7 +92,7 @@ export class Board {
   display: Display;
   buttons: Button[];
   pins: Pin[];
-  audio: Audio;
+  audio: BoardAudio;
   temperature: RangeSensor;
   microphone: Microphone;
   accelerometer: Accelerometer;
@@ -202,7 +202,7 @@ export class Board {
     this.pins[MICROBIT_HAL_PIN_P19] = new StubPin("pin19");
     this.pins[MICROBIT_HAL_PIN_P20] = new StubPin("pin20");
 
-    this.audio = new Audio();
+    this.audio = new BoardAudio();
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
     this.compass = new Compass();
@@ -513,6 +513,10 @@ export class Board {
     return this.runningPromise;
   }
 
+  async record(): Promise<void> {
+    await this.audio.record()
+  }
+
   /**
    * An external reset.
    */
@@ -780,6 +784,10 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
       }
       case "stop": {
         board.stop();
+        break;
+      }
+      case "record": {
+        board.record();
         break;
       }
       case "reset": {

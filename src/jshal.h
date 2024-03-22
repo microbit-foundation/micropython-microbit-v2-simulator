@@ -85,6 +85,9 @@ bool mp_js_hal_audio_is_expression_active(void);
 void mp_js_hal_microphone_init(void);
 void mp_js_hal_microphone_set_threshold(int kind, int value);
 int mp_js_hal_microphone_get_level(void);
+void mp_js_hal_microphone_start_recording(uint8_t *buf, size_t max_len, size_t *cur_len, int rate);
+bool mp_js_hal_microphone_is_recording(void);
+void mp_js_hal_microphone_stop_recording(void);
 
 void mp_js_radio_enable(uint8_t group, uint8_t max_payload, uint8_t queue);
 void mp_js_radio_disable(void);

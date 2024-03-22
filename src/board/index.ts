@@ -513,10 +513,6 @@ export class Board {
     return this.runningPromise;
   }
 
-  async record(): Promise<void> {
-    await this.audio.record()
-  }
-
   /**
    * An external reset.
    */
@@ -784,10 +780,6 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
       }
       case "stop": {
         board.stop();
-        break;
-      }
-      case "record": {
-        board.record();
         break;
       }
       case "reset": {

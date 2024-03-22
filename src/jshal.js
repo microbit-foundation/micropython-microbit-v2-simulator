@@ -287,6 +287,25 @@ mergeInto(LibraryManager.library, {
     );
   },
 
+  mp_js_hal_microphone_start_recording: function (
+    /** @type {number} */ buf,
+    /** @type {number} */ max_len,
+    /** @type {number} */ cur_len,
+    /** @type {number} */ rate
+  ) {
+    Module.board.microphone.startRecording(function (
+      chunk
+    ) /** @type {ArrayBuffer} */
+    {
+      console.log("Chunk", chunk);
+    });
+  },
+  mp_js_hal_microphone_is_recording: function () {
+    return Module.board.microphone.isRecording();
+  },
+  mp_js_hal_microphone_stop_recording: function () {
+    Module.board.microphone.stopRecording();
+  },
   mp_js_hal_microphone_get_level: function () {
     return Module.board.microphone.soundLevel.value;
   },

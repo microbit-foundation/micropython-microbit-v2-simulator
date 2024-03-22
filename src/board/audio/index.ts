@@ -66,46 +66,6 @@ export class BoardAudio {
     );
   }
 
-  async record() {
-      let mediaRecorder: MediaRecorder | undefined;
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          mediaRecorder.start();
-
-          setTimeout(() => {
-            if (mediaRecorder) {
-              mediaRecorder.stop();
-            }
-          }, 5000)
-          
-          const chunks:Blob[] = []
-          mediaRecorder.ondataavailable = (e: BlobEvent) => {
-            chunks.push(e.data);
-          }
-
-          mediaRecorder.onstop = async () => {
-            if (chunks.length > 0) {
-                const recordingType = 'audio/wav; codecs=MS_PCM' 
-                const blob = new Blob(chunks, { type: recordingType });
-                const audioURL = window.URL.createObjectURL(blob);
-                const recording = new Audio(audioURL);
-                await recording.play()
-            }
-          }
-
-        } catch (error) {
-            console.log("An error occurred, could not get microphone access");
-            if (mediaRecorder) {
-                mediaRecorder.stop();
-            }
-        }
-    } else {
-        console.log("getUserMedia not supported on your browser!");
-    }
-  }
-
   async createAudioContextFromUserInteraction(): Promise<void> {
     this.context =
       this.context ??

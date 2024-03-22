@@ -514,11 +514,13 @@ int microbit_hal_microphone_get_level(void) {
 }
 
 void microbit_hal_microphone_start_recording(uint8_t *buf, size_t max_len, size_t *cur_len, int rate) {
+    mp_js_hal_microphone_start_recording(buf, max_len, cur_len, rate);
 }
 
 bool microbit_hal_microphone_is_recording(void) {
-    return false;
+    return mp_js_hal_microphone_is_recording();
 }
 
 void microbit_hal_microphone_stop_recording(void) {
+    mp_js_hal_microphone_stop_recording();
 }

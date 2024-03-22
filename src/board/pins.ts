@@ -9,6 +9,8 @@ export interface Pin {
 
   isTouched(): boolean;
 
+  getAndClearTouches(): number;
+
   boardStopped(): void;
 
   setAnalogPeriodUs(period: number): number;
@@ -42,6 +44,10 @@ abstract class BasePin implements Pin {
 
   getAnalogPeriodUs() {
     return this.analogPeriodUs;
+  }
+
+  getAndClearTouches(): number {
+    return 0;
   }
 
   isTouched(): boolean {

@@ -26,6 +26,7 @@ export class BoardAudio {
   speech: BufferedAudio | undefined;
   soundExpression: BufferedAudio | undefined;
   currentSoundExpressionCallback: undefined | (() => void);
+  private stopActiveRecording: (() => void) | undefined;
 
   constructor() {}
 
@@ -155,7 +156,64 @@ export class BoardAudio {
     }
   }
 
+  isRecording(): boolean {
+    return !!this.stopActiveRecording;
+  }
+
+  stopRecording() {
+    if (this.stopActiveRecording) {
+      this.stopActiveRecording();
+    }
+  }
+
+  async startRecording(
+    onChunk: (chunk: Float32Array, sampleRate: number) => void
+  ) {
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      return;
+    }
+    this.stopRecording();
+
+    this.stopActiveRecording = () => {};
+    let micStream: MediaStream | undefined;
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true,
+      });
+    } catch (e) {
+      console.error(e);
+      this.stopRecording();
+      return;
+    }
+
+    const source = this.context!.createMediaStreamSource(micStream);
+    // TODO: wire up microphone sensitivity to this gain node
+    const gain = this.context!.createGain();
+    source.connect(gain);
+    // TODO: consider AudioWorklet - worth it? Browser support?
+    const recorder = this.context!.createScriptProcessor(2048, 1, 1);
+    recorder.onaudioprocess = (e) => {
+      const samples = e.inputBuffer.getChannelData(0);
+      onChunk(samples, this.context!.sampleRate);
+    };
+    gain.connect(recorder);
+    recorder.connect(this.context!.destination);
+
+    this.stopActiveRecording = () => {
+      recorder.disconnect();
+      gain.disconnect();
+      source.disconnect();
+      this.stopActiveRecording = undefined;
+    };
+
+    setTimeout(() => {
+      this.stopRecording();
+    }, 5000);
+  }
+
   boardStopped() {
+    this.stopRecording();
     this.stopOscillator();
     this.speech?.dispose();
     this.soundExpression?.dispose();

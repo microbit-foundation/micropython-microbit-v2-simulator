@@ -17,7 +17,6 @@ export class Microphone {
     150
   );
   private soundLevelCallback: SoundLevelCallback | undefined;
-  private _isRecording: boolean = false;
 
   constructor(
     private element: SVGElement,
@@ -66,55 +65,5 @@ export class Microphone {
 
   boardStopped() {
     this.microphoneOff();
-  }
-
-  isRecording() {
-    return this._isRecording;
-  }
-
-  stopRecording() {
-    // TODO
-  }
-
-  async startRecording(onChunk: (chunk: ArrayBuffer) => void) {
-    if (!navigator?.mediaDevices?.getUserMedia) {
-      return;
-    }
-    if (this.isRecording()) {
-      this.stopRecording();
-      // Wait for it if needed
-    }
-    this._isRecording = true;
-
-    // This might not be the right recording approach as we want 8 bit PCM for AudioFrame
-    // and we're getting a fancy codec.
-    let mediaRecorder: MediaRecorder | undefined;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: false,
-        audio: true,
-      });
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.start();
-
-      setTimeout(() => {
-        if (mediaRecorder) {
-          mediaRecorder.stop();
-        }
-      }, 5000);
-
-      mediaRecorder.ondataavailable = async (e: BlobEvent) => {
-        const buffer = await e.data.arrayBuffer();
-        onChunk(buffer);
-      };
-      mediaRecorder.onstop = async () => {
-        this._isRecording = false;
-      };
-    } catch (error) {
-      if (mediaRecorder) {
-        mediaRecorder.stop();
-      }
-      this._isRecording = false;
-    }
   }
 }

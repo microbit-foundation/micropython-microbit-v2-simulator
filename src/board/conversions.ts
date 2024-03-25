@@ -107,3 +107,14 @@ export const convertAudioBuffer = (
   }
   return target;
 };
+
+export const convertToUnit8Array = (
+  heap: Uint8Array, 
+  buffer: number,
+  channel: Float32Array,
+  ) => {
+  for (let i = 0; i < channel.length; ++i) {
+    heap[buffer + i] = (channel[i] + 1) * 0.5 * 255 
+  }
+  return heap
+}

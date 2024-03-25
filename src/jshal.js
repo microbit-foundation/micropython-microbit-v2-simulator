@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+import { convertToUnit8Array } from "./board/conversions";
+
 // @ts-check
 /// <reference path="./jshal.d.ts" />
 
@@ -297,6 +299,7 @@ mergeInto(LibraryManager.library, {
       /** @type {number} */ actualSampleRate
     ) {
       // TODO: convert from float to int and resample here
+      convertToUnit8Array(Module.HEAPU8, buffer, chunk)
     });
   },
   mp_js_hal_microphone_is_recording: function () {

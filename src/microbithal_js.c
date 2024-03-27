@@ -451,7 +451,7 @@ void microbit_hal_audio_raw_init(uint32_t sample_rate) {
 }
 
 void microbit_hal_audio_raw_set_rate(uint32_t sample_rate) {
-    // TODO
+    mp_js_hal_audio_set_rate(sample_rate);
 }
 
 void microbit_hal_audio_raw_write_data(const uint8_t *buf, size_t num_samples) {

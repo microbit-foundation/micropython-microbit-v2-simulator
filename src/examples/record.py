@@ -1,3 +1,7 @@
-from microbit import microphone
+from microbit import microphone, audio
 
-microphone.record(5000);
+frame = microphone.record(1000)
+print(len(frame))
+for n in range(0, 10):
+  print(frame[n])
+audio.play(frame)

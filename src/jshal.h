@@ -72,6 +72,7 @@ int mp_js_hal_compass_get_heading(void);
 
 void mp_js_hal_audio_set_volume(int value);
 void mp_js_hal_audio_init(uint32_t sample_rate);
+void mp_js_hal_audio_set_rate(const uint32_t sample_rate);
 void mp_js_hal_audio_write_data(const uint8_t *buf, size_t num_samples);
 void mp_js_hal_audio_speech_init(uint32_t sample_rate);
 void mp_js_hal_audio_speech_write_data(const uint8_t *buf, size_t num_samples);

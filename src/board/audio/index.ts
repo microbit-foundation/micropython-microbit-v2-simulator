@@ -167,8 +167,11 @@ export class BoardAudio {
   }
 
   async startRecording(
-    onChunk: (chunk: Float32Array, sampleRate: number) => void
+    sampleRate: number,
+    samplesNeeded: number,
+    onChunk: (chunk: Float32Array) => void
   ) {
+    let samplesSent = 0;
     if (!navigator?.mediaDevices?.getUserMedia) {
       return;
     }
@@ -192,10 +195,27 @@ export class BoardAudio {
     const gain = this.context!.createGain();
     source.connect(gain);
     // TODO: consider AudioWorklet - worth it? Browser support?
+    //       consider alternative resampling approaches
+    //       what sample rates are actually supported this way?
     const recorder = this.context!.createScriptProcessor(2048, 1, 1);
     recorder.onaudioprocess = (e) => {
-      const samples = e.inputBuffer.getChannelData(0);
-      onChunk(samples, this.context!.sampleRate);
+      const offlineContext = new OfflineAudioContext({
+        sampleRate,
+        length: sampleRate * (e.inputBuffer.length / e.inputBuffer.sampleRate),
+        numberOfChannels: 1,
+      });
+      const source = offlineContext.createBufferSource();
+      source.buffer = e.inputBuffer;
+      source.connect(offlineContext.destination);
+      source.start();
+      offlineContext.addEventListener("complete", (e) => {
+        onChunk(e.renderedBuffer.getChannelData(0));
+        samplesSent += e.renderedBuffer.length;
+        if (samplesSent >= samplesNeeded) {
+          this.stopRecording();
+        }
+      });
+      offlineContext.startRendering();
     };
     gain.connect(recorder);
     recorder.connect(this.context!.destination);
@@ -206,10 +226,6 @@ export class BoardAudio {
       source.disconnect();
       this.stopActiveRecording = undefined;
     };
-
-    setTimeout(() => {
-      this.stopRecording();
-    }, 5000);
   }
 
   boardStopped() {
@@ -248,7 +264,14 @@ class BufferedAudio {
     return this.context.createBuffer(1, length, this.sampleRate);
   }
 
+  setSampleRate(sampleRate: number) {
+    console.log("Raw audio sample rate set to", sampleRate);
+    this.sampleRate = sampleRate;
+  }
+
   writeData(buffer: AudioBuffer) {
+    console.log("Write data called with a buffer");
+    console.log(buffer);
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;

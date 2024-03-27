@@ -216,6 +216,11 @@ mergeInto(LibraryManager.library, {
     Module.board.audio.default.init(sample_rate);
   },
 
+  mp_js_hal_audio_set_rate: function (/** @type {number} */ sample_rate) {
+    // @ts-expect-error
+    Module.board.audio.default.setSampleRate(sample_rate);
+  },
+
   mp_js_hal_audio_write_data: function (
     /** @type {number} */ buf,
     /** @type {number} */ num_samples
@@ -285,21 +290,29 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_microphone_start_recording: function (
     /** @type {number} */ buf,
     /** @type {number} */ max_len,
+    // This is a pointer to the size_t length that we update, not the length itself
     /** @type {number} */ cur_len,
     /** @type {number} */ rate
   ) {
-    Module.board.audio.startRecording(function (
-      /** @type {Float32Array} */ chunk,
-      /** @type {number} */ actualSampleRate
-    ) {
-      const heap = Module.HEAPU8;
-      let base = buf + heap[cur_len];
-      const length = Math.max(chunk.length, max_len - cur_len);
-      heap[cur_len] += length;
-      for (let i = 0; i < length; ++i) {
-        heap[base + i] = (chunk[i] + 1) * 0.5 * 255;
+    const cur_len_v = new Uint32Array(
+      Module.HEAPU8.buffer.slice(cur_len, cur_len + 4)
+    );
+    cur_len_v[0] = 0;
+
+    Module.board.audio.startRecording(
+      rate,
+      max_len,
+      function (/** @type {Float32Array} */ chunk) {
+        console.log(cur_len_v[0]);
+        const heap = Module.HEAPU8;
+        let base = buf + cur_len_v[0];
+        const length = Math.max(chunk.length, max_len - cur_len);
+        for (let i = 0; i < length; ++i) {
+          heap[base + i] = (chunk[i] + 1) * 0.5 * 255;
+        }
+        cur_len_v[0] += length;
       }
-    });
+    );
   },
   mp_js_hal_microphone_is_recording: function () {
     return Module.board.audio.isRecording();

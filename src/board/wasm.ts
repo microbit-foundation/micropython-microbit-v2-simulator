@@ -16,6 +16,7 @@ export interface EmscriptenModule {
   _microbit_radio_rx_buffer(): number;
 
   HEAPU8: Uint8Array;
+  HEAPU32: Uint32Array;
 
   // Added by us at module creation time for jshal to access.
   board: Board;

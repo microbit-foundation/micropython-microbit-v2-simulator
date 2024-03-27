@@ -161,10 +161,6 @@ mergeInto(LibraryManager.library, {
     Module.board.display.setPixel(x, y, value);
   },
 
-  mp_js_hal_display_clear: function () {
-    Module.board.display.clear();
-  },
-
   mp_js_hal_display_read_light_level: function () {
     return Module.board.display.lightLevel.value;
   },

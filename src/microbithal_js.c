@@ -318,10 +318,6 @@ void microbit_hal_display_enable(int value) {
     */
 }
 
-void microbit_hal_display_clear(void) {
-    mp_js_hal_display_clear();
-}
-
 int microbit_hal_display_get_pixel(int x, int y) {
     return mp_js_hal_display_get_pixel(x, y);
 }

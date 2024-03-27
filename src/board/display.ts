@@ -42,11 +42,6 @@ export class Display {
     this.render();
   }
 
-  clear() {
-    this.state = this.initialState();
-    this.render();
-  }
-
   setPixel(x: number, y: number, value: number) {
     value = clamp(value, 0, 9);
     this.state[x][y] = value;

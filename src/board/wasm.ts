@@ -9,13 +9,14 @@ export interface EmscriptenModule {
   // See EXPORTED_FUNCTIONS in the Makefile.
   _mp_js_request_stop(): void;
   _mp_js_force_stop(): void;
-  _microbit_hal_audio_ready_callback(): void;
+  _microbit_hal_audio_raw_ready_callback(): void;
   _microbit_hal_audio_speech_ready_callback(): void;
   _microbit_hal_gesture_callback(gesture: number): void;
   _microbit_hal_level_detector_callback(level: number): void;
   _microbit_radio_rx_buffer(): number;
 
   HEAPU8: Uint8Array;
+  HEAPU32: Uint32Array;
 
   // Added by us at module creation time for jshal to access.
   board: Board;

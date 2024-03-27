@@ -13,7 +13,7 @@ interface AudioOptions {
   speechAudioCallback: () => void;
 }
 
-export class Audio {
+export class BoardAudio {
   private frequency: number = 440;
   // You can mute the sim before it's running so we can't immediately write to the muteNode.
   private muted: boolean = false;
@@ -26,6 +26,7 @@ export class Audio {
   speech: BufferedAudio | undefined;
   soundExpression: BufferedAudio | undefined;
   currentSoundExpressionCallback: undefined | (() => void);
+  private stopActiveRecording: (() => void) | undefined;
 
   constructor() {}
 
@@ -155,7 +156,80 @@ export class Audio {
     }
   }
 
+  isRecording(): boolean {
+    return !!this.stopActiveRecording;
+  }
+
+  stopRecording() {
+    if (this.stopActiveRecording) {
+      this.stopActiveRecording();
+    }
+  }
+
+  async startRecording(
+    sampleRate: number,
+    samplesNeeded: number,
+    onChunk: (chunk: Float32Array) => void
+  ) {
+    let samplesSent = 0;
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      return;
+    }
+    this.stopRecording();
+
+    this.stopActiveRecording = () => {};
+    let micStream: MediaStream | undefined;
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true,
+      });
+    } catch (e) {
+      console.error(e);
+      this.stopRecording();
+      return;
+    }
+
+    const source = this.context!.createMediaStreamSource(micStream);
+    // TODO: wire up microphone sensitivity to this gain node
+    const gain = this.context!.createGain();
+    source.connect(gain);
+    // TODO: consider AudioWorklet - worth it? Browser support?
+    //       consider alternative resampling approaches
+    //       what sample rates are actually supported this way?
+    const recorder = this.context!.createScriptProcessor(2048, 1, 1);
+    recorder.onaudioprocess = (e) => {
+      const offlineContext = new OfflineAudioContext({
+        sampleRate,
+        length: sampleRate * (e.inputBuffer.length / e.inputBuffer.sampleRate),
+        numberOfChannels: 1,
+      });
+      const source = offlineContext.createBufferSource();
+      source.buffer = e.inputBuffer;
+      source.connect(offlineContext.destination);
+      source.start();
+      offlineContext.addEventListener("complete", (e) => {
+        onChunk(e.renderedBuffer.getChannelData(0));
+        samplesSent += e.renderedBuffer.length;
+        if (samplesSent >= samplesNeeded) {
+          this.stopRecording();
+        }
+      });
+      offlineContext.startRendering();
+    };
+    gain.connect(recorder);
+    recorder.connect(this.context!.destination);
+
+    this.stopActiveRecording = () => {
+      recorder.disconnect();
+      gain.disconnect();
+      source.disconnect();
+      this.stopActiveRecording = undefined;
+    };
+  }
+
   boardStopped() {
+    this.stopRecording();
     this.stopOscillator();
     this.speech?.dispose();
     this.soundExpression?.dispose();
@@ -190,7 +264,14 @@ class BufferedAudio {
     return this.context.createBuffer(1, length, this.sampleRate);
   }
 
+  setSampleRate(sampleRate: number) {
+    console.log("Raw audio sample rate set to", sampleRate);
+    this.sampleRate = sampleRate;
+  }
+
   writeData(buffer: AudioBuffer) {
+    console.log("Write data called with a buffer");
+    console.log(buffer);
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;

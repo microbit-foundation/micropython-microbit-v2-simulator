@@ -24,8 +24,6 @@
  * THE SOFTWARE.
  */
 
-import { convertToUnit8Array } from "./board/conversions";
-
 // @ts-check
 /// <reference path="./jshal.d.ts" />
 
@@ -294,8 +292,13 @@ mergeInto(LibraryManager.library, {
       /** @type {Float32Array} */ chunk,
       /** @type {number} */ actualSampleRate
     ) {
-      // TODO: convert from float to int and resample here
-      convertToUnit8Array(Module.HEAPU8, buffer, chunk)
+      const heap = Module.HEAPU8;
+      let base = buf + heap[cur_len];
+      const length = Math.max(chunk.length, max_len - cur_len);
+      heap[cur_len] += length;
+      for (let i = 0; i < length; ++i) {
+        heap[base + i] = (chunk[i] + 1) * 0.5 * 255;
+      }
     });
   },
   mp_js_hal_microphone_is_recording: function () {

@@ -56,7 +56,6 @@ int mp_js_hal_pin_set_analog_period_us(int pin, int period);
 
 int mp_js_hal_display_get_pixel(int x, int y);
 void mp_js_hal_display_set_pixel(int x, int y, int value);
-void mp_js_hal_display_clear(void);
 int mp_js_hal_display_read_light_level(void);
 
 int mp_js_hal_accelerometer_get_x(void);

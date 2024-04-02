@@ -294,23 +294,20 @@ mergeInto(LibraryManager.library, {
     /** @type {number} */ cur_len,
     /** @type {number} */ rate
   ) {
-    const cur_len_v = new Uint32Array(
-      Module.HEAPU8.buffer.slice(cur_len, cur_len + 4)
-    );
-    cur_len_v[0] = 0;
+    setValue(cur_len, 0, "i32");
 
     Module.board.audio.startRecording(
       rate,
       max_len,
       function (/** @type {Float32Array} */ chunk) {
-        console.log(cur_len_v[0]);
         const heap = Module.HEAPU8;
-        let base = buf + cur_len_v[0];
+        let cur_len_v = getValue(cur_len, "i32");
+        let base = buf + cur_len_v;
         const length = Math.max(chunk.length, max_len - cur_len);
         for (let i = 0; i < length; ++i) {
           heap[base + i] = (chunk[i] + 1) * 0.5 * 255;
         }
-        cur_len_v[0] += length;
+        setValue(cur_len, cur_len_v + length, "i32");
       }
     );
   },

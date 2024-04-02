@@ -265,13 +265,10 @@ class BufferedAudio {
   }
 
   setSampleRate(sampleRate: number) {
-    console.log("Raw audio sample rate set to", sampleRate);
     this.sampleRate = sampleRate;
   }
 
   writeData(buffer: AudioBuffer) {
-    console.log("Write data called with a buffer");
-    console.log(buffer);
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;

@@ -5,6 +5,7 @@ import { parseSoundEffects } from "./sound-expressions";
 declare global {
   interface Window {
     webkitAudioContext: typeof AudioContext;
+    webkitOfflineAudioContext: typeof OfflineAudioContext;
   }
 }
 
@@ -199,7 +200,8 @@ export class BoardAudio {
     //       what sample rates are actually supported this way?
     const recorder = this.context!.createScriptProcessor(2048, 1, 1);
     recorder.onaudioprocess = (e) => {
-      const offlineContext = new OfflineAudioContext({
+      const offlineContext = new (OfflineAudioContext ||
+        window.webkitOfflineAudioContext)({
         sampleRate,
         length: sampleRate * (e.inputBuffer.length / e.inputBuffer.sampleRate),
         numberOfChannels: 1,

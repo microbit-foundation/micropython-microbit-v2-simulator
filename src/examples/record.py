@@ -8,8 +8,8 @@ frame = microphone.record(3000)
 print("Button A to play")
 while True:
     if button_a.was_pressed():
-        audio.play(frame)
-        print("Rate played", rates[rate_index])
+        audio.play(frame, wait=False)
+        print("Rate playing", rates[rate_index])
 
     if button_b.was_pressed():
         rate_index = (rate_index + 1) % len(rates)

@@ -139,7 +139,6 @@ export class TouchPin extends BasePin {
   getAndClearTouches() {
     const touches = this._touches;
     this._touches = 0;
-    console.log("got touch ", touches);
     return touches;
   }
 

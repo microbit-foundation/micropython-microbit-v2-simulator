@@ -2,7 +2,7 @@ import { Board } from ".";
 import * as conversions from "./conversions";
 import { FileSystem } from "./fs";
 
-export interface EmscriptenModule {
+export interface SimulatorEmscriptenModule extends EmscriptenModule {
   cwrap: any;
   ExitStatus: Error;
 
@@ -15,9 +15,6 @@ export interface EmscriptenModule {
   _microbit_hal_level_detector_callback(level: number): void;
   _microbit_radio_rx_buffer(): number;
 
-  HEAPU8: Uint8Array;
-  HEAPU32: Uint32Array;
-
   // Added by us at module creation time for jshal to access.
   board: Board;
   fs: FileSystem;
@@ -27,7 +24,7 @@ export interface EmscriptenModule {
 export class ModuleWrapper {
   private main: () => Promise<void>;
 
-  constructor(private module: EmscriptenModule) {
+  constructor(private module: SimulatorEmscriptenModule) {
     const main = module.cwrap("mp_js_main", "null", ["number"], {
       async: true,
     });

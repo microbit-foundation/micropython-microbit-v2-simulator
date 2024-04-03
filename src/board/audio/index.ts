@@ -201,11 +201,11 @@ export class BoardAudio {
     const recorder = this.context!.createScriptProcessor(2048, 1, 1);
     recorder.onaudioprocess = (e) => {
       const offlineContext = new (window.OfflineAudioContext ||
-        window.webkitOfflineAudioContext)({
-        sampleRate,
-        length: sampleRate * (e.inputBuffer.length / e.inputBuffer.sampleRate),
-        numberOfChannels: 1,
-      });
+        window.webkitOfflineAudioContext)(
+        1,
+        sampleRate * (e.inputBuffer.length / e.inputBuffer.sampleRate),
+        sampleRate
+      );
       const source = offlineContext.createBufferSource();
       source.buffer = e.inputBuffer;
       source.connect(offlineContext.destination);

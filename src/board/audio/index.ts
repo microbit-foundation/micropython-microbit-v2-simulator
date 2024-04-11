@@ -226,6 +226,7 @@ export class BoardAudio {
       recorder.disconnect();
       gain.disconnect();
       source.disconnect();
+      micStream.getTracks().forEach(track => track.stop())
       this.stopActiveRecording = undefined;
     };
   }

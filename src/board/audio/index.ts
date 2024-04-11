@@ -29,7 +29,9 @@ export class BoardAudio {
   currentSoundExpressionCallback: undefined | (() => void);
   private stopActiveRecording: (() => void) | undefined;
 
-  constructor() {}
+  constructor(
+    private microphoneEl: SVGElement
+  ) {}
 
   initializeCallbacks({
     defaultAudioCallback,
@@ -190,6 +192,7 @@ export class BoardAudio {
       this.stopRecording();
       return;
     }
+    this.microphoneEl.style.display = "unset"
 
     const source = this.context!.createMediaStreamSource(micStream);
     // TODO: wire up microphone sensitivity to this gain node
@@ -227,6 +230,7 @@ export class BoardAudio {
       gain.disconnect();
       source.disconnect();
       micStream.getTracks().forEach(track => track.stop())
+      this.microphoneEl.style.display = "none"
       this.stopActiveRecording = undefined;
     };
   }

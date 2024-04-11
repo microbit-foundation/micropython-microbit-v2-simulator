@@ -202,7 +202,7 @@ export class Board {
     this.pins[MICROBIT_HAL_PIN_P19] = new StubPin("pin19");
     this.pins[MICROBIT_HAL_PIN_P20] = new StubPin("pin20");
 
-    this.audio = new BoardAudio();
+    this.audio = new BoardAudio(this.svg.querySelector("#LitMicrophone")!);
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
     this.compass = new Compass();

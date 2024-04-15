@@ -303,9 +303,9 @@ View at http://localhost:8000/demo.html
 
 ### Branch deployments
 
-There is a Netlify based build for development purposes. Do not embed
-the simulator via this URL. Netlify's GitHub integration will comment
-on PRs with deployment details.
+There is a CloudFlare pages based build for development purposes only. Do not
+embed the simulator via this URL as it may be removed at any time. CloudFlare's
+GitHub integration will comment on PRs with deployment details.
 
 Branches in this repository are also deployed via CircleCI to https://review-python-simulator.usermbit.org/{branchName}/. This requires the user pushing code to have
 permissions for the relevant Micro:bit Educational Foundation infrastructure.

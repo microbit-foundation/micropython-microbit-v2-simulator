@@ -15,6 +15,22 @@ declare global {
   }
 }
 
+function initServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").then(
+        function (_registration) {
+          console.log("Simulator ServiceWorker registration successful");
+        },
+        function (err) {
+          console.log("Simulator ServiceWorker registration failed: ", err);
+        }
+      );
+    });
+  }
+}
+
+initServiceWorker();
 const fs = new FileSystem();
 const board = createBoard(new Notifications(window.parent), fs);
 window.addEventListener("message", createMessageListener(board));

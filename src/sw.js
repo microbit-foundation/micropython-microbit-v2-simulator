@@ -1,68 +1,46 @@
-function initSimulatorServiceWorker() {
-  const simUrls = ["simulator.html", "build/simulator.js", "build/firmware.js"];
-  let didInstall = false;
-  const cacheName = "simulator";
+const version = "v0.0.1";
+const assets = ["simulator.html", "build/simulator.js", "build/firmware.js"];
+const cacheName = `simulator-${version}`;
 
-  self.addEventListener("install", function (ev) {
-    didInstall = true;
-    console.log("Installing service worker...");
-    ev.waitUntil(
-      caches
-        .open(cacheName)
-        .then(function (cache) {
-          console.log("Opened cache");
-          return cache.addAll(simUrls);
-        })
-        .then(function () {
-          return self.skipWaiting();
-        })
-    );
-  });
+self.addEventListener("install", (event) => {
+  console.log("Installing simulator service worker...");
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(cacheName);
+      await cache.addAll(assets);
+      self.skipWaiting();
+    })()
+  );
+});
 
-  self.addEventListener("activate", function (ev) {
-    console.log("Activating service worker...");
-    ev.waitUntil(
-      caches
-        .keys()
-        .then(function (_cacheNames) {
-          // Delete old versions in cache here.
-        })
-        .then(function () {
-          if (didInstall) {
-            // Only notify clients for the first activation
-            didInstall = false;
-            // Necessary?
-            return notifyAllClientsAsync();
+self.addEventListener("activate", (event) => {
+  console.log("Activating simulator service worker...");
+  event.waitUntil(
+    (async () => {
+      const names = await caches.keys();
+      await Promise.all(
+        names.map((name) => {
+          if (name !== cacheName) {
+            return caches.delete(name);
           }
-          return Promise.resolve();
         })
-    );
-  });
+      );
+      await clients.claim();
+    })()
+  );
+});
 
-  self.addEventListener("fetch", function (ev) {
-    ev.respondWith(
-      caches.match(ev.request).then(function (response) {
-        return response || fetch(ev.request);
-      })
-    );
-  });
-
-  function notifyAllClientsAsync() {
-    var scope = self;
-    return scope.clients
-      .claim()
-      .then(function () {
-        return scope.clients.matchAll();
-      })
-      .then(function (clients) {
-        clients.forEach(function (client) {
-          return client.postMessage({
-            type: "serviceworker",
-            state: "activated",
-          });
-        });
-      });
-  }
-}
-
-initSimulatorServiceWorker();
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    (async () => {
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      const response = await fetch(event.request);
+      const cache = await caches.open(cacheName);
+      cache.put(event.request, response.clone());
+      return response;
+    })()
+  );
+});

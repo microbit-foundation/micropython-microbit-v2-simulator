@@ -16,18 +16,22 @@ declare global {
 }
 
 function initServiceWorker() {
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
+  window.addEventListener("load", () => {
+    if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js").then(
-        function (_registration) {
-          console.log("Simulator ServiceWorker registration successful");
+        (registration) => {
+          console.log("Simulator service worker registration successful");
         },
-        function (err) {
-          console.log("Simulator ServiceWorker registration failed: ", err);
+        (error) => {
+          console.error(
+            `Simulator service worker registration failed: ${error}`
+          );
         }
       );
-    });
-  }
+    } else {
+      console.error("Service workers are not supported.");
+    }
+  });
 }
 
 initServiceWorker();

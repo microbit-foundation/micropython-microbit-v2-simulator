@@ -1,14 +1,14 @@
-const version = "v0.0.1";
+const version = "v0.0.2";
 const assets = ["simulator.html", "build/simulator.js", "build/firmware.js"];
 const cacheName = `simulator-${version}`;
 
 self.addEventListener("install", (event) => {
   console.log("Installing simulator service worker...");
+  self.skipWaiting();
   event.waitUntil(
     (async () => {
       const cache = await caches.open(cacheName);
       await cache.addAll(assets);
-      self.skipWaiting();
     })()
   );
 });

@@ -19,8 +19,22 @@ function initServiceWorker() {
   window.addEventListener("load", () => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js").then(
-        (_registration) => {
+        (registration) => {
           console.log("Simulator service worker registration successful");
+          // Reload the page when a new service worker is installed.
+          registration.onupdatefound = function () {
+            const installingWorker = registration.installing;
+            if (installingWorker) {
+              installingWorker.onstatechange = function () {
+                if (
+                  installingWorker.state === "installed" &&
+                  navigator.serviceWorker.controller
+                ) {
+                  window.location.reload();
+                }
+              };
+            }
+          };
         },
         (error) => {
           console.error(

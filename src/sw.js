@@ -1,4 +1,4 @@
-const version = "v0.0.2";
+const version = "v0.0.3";
 const assets = ["simulator.html", "build/simulator.js", "build/firmware.js"];
 const cacheName = `simulator-${version}`;
 

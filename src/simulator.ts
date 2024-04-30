@@ -7,6 +7,7 @@ import {
   createMessageListener,
   Notifications,
 } from "./board";
+import { flags } from "./flags";
 
 declare global {
   interface Window {
@@ -48,7 +49,9 @@ function initServiceWorker() {
   });
 }
 
-initServiceWorker();
+if (flags.sw) {
+  initServiceWorker();
+}
 const fs = new FileSystem();
 const board = createBoard(new Notifications(window.parent), fs);
 window.addEventListener("message", createMessageListener(board));

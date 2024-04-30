@@ -5,7 +5,7 @@ declare const self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
 const assets = ["simulator.html", "build/simulator.js", "build/firmware.js"];
-const cacheName = `simulator-${process.env.version}`;
+const cacheName = `simulator-${process.env.VERSION}`;
 
 self.addEventListener("install", (event) => {
   console.log("Installing simulator service worker...");

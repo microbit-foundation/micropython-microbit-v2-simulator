@@ -1,6 +1,11 @@
-const version = "v0.0.3";
+/// <reference lib="WebWorker" />
+// Empty export required due to --isolatedModules flag in tsconfig.json
+export type {};
+declare const self: ServiceWorkerGlobalScope;
+declare const clients: Clients;
+
 const assets = ["simulator.html", "build/simulator.js", "build/firmware.js"];
-const cacheName = `simulator-${version}`;
+const cacheName = `simulator-${process.env.version}`;
 
 self.addEventListener("install", (event) => {
   console.log("Installing simulator service worker...");

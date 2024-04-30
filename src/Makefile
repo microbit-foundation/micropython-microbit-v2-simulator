@@ -147,6 +147,7 @@ $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 
 simulator-js:
 	npx esbuild ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
+	npx esbuild --define:process.env.version=$$(cat ../package.json | jq .version) ./sw.ts --bundle --outfile=$(BUILD)/sw.js
 
 include $(TOP)/py/mkrules.mk
 

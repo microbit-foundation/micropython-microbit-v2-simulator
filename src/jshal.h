@@ -83,6 +83,7 @@ void mp_js_hal_audio_stop_expression(void);
 bool mp_js_hal_audio_is_expression_active(void);
 
 void mp_js_hal_microphone_init(void);
+void mp_js_hal_microphone_set_sensitivity(float value);
 void mp_js_hal_microphone_set_threshold(int kind, int value);
 int mp_js_hal_microphone_get_level(void);
 void mp_js_hal_microphone_start_recording(uint8_t *buf, size_t max_len, size_t *cur_len, int rate);

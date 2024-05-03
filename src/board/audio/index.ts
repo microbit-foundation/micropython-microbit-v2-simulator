@@ -22,6 +22,7 @@ export class BoardAudio {
   private oscillator: OscillatorNode | undefined;
   private volumeNode: GainNode | undefined;
   private muteNode: GainNode | undefined;
+  private sensitivityNode: GainNode | undefined;
 
   default: BufferedAudio | undefined;
   speech: BufferedAudio | undefined;
@@ -46,6 +47,11 @@ export class BoardAudio {
       this.context.currentTime
     );
     this.muteNode.connect(this.context.destination);
+    this.sensitivityNode = this.context.createGain();
+    this.sensitivityNode.gain.setValueAtTime(
+      0.2, // sensitivity medium level
+      this.context.currentTime
+    );
     this.volumeNode = this.context.createGain();
     this.volumeNode.connect(this.muteNode);
 
@@ -133,6 +139,14 @@ export class BoardAudio {
     }
   }
 
+  setSensitivity(sensitivity: number) {
+    this.sensitivityNode!.gain.setValueAtTime(
+      // check if this is correct
+      sensitivity, 
+      this.context!.currentTime
+    )
+  }
+
   setVolume(volume: number) {
     this.volumeNode!.gain.setValueAtTime(
       volume / 255,
@@ -195,9 +209,7 @@ export class BoardAudio {
     this.microphoneEl.style.display = "unset"
 
     const source = this.context!.createMediaStreamSource(micStream);
-    // TODO: wire up microphone sensitivity to this gain node
-    const gain = this.context!.createGain();
-    source.connect(gain);
+    source.connect(this.sensitivityNode!);
     // TODO: consider AudioWorklet - worth it? Browser support?
     //       consider alternative resampling approaches
     //       what sample rates are actually supported this way?
@@ -222,12 +234,12 @@ export class BoardAudio {
       });
       offlineContext.startRendering();
     };
-    gain.connect(recorder);
+    this.sensitivityNode!.connect(recorder);
     recorder.connect(this.context!.destination);
 
     this.stopActiveRecording = () => {
       recorder.disconnect();
-      gain.disconnect();
+      this.sensitivityNode!.disconnect();
       source.disconnect();
       micStream.getTracks().forEach(track => track.stop())
       this.microphoneEl.style.display = "none"

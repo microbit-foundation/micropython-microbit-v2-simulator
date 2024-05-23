@@ -128,6 +128,7 @@ extern uint32_t rng_generate_random_word(void);
 #define MICROPY_MAKE_POINTER_CALLABLE(p) \
     ((mp_raise_NotImplementedError(MP_ERROR_TEXT("simulator limitation: asm_thumb code"))), p)
 
-#define AUDIO_OUTPUT_BUFFER_SIZE (256) // this can be any value, defaults to 32 bytes
+// The latency of fetching 32 byte audio frames is too much so increase the size
+#define AUDIO_OUTPUT_BUFFER_SIZE (128)
 
 #endif

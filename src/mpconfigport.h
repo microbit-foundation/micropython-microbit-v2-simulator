@@ -63,6 +63,7 @@
 #define MICROPY_USE_INTERNAL_PRINTF             (0)
 #define MICROPY_ENABLE_PYSTACK                  (1)
 #define MICROPY_ENABLE_SCHEDULER                (1)
+#define MICROPY_SCHEDULER_STATIC_NODES          (1)
 
 // Fine control over Python builtins, classes, modules, etc
 #define MICROPY_PY_BUILTINS_STR_UNICODE         (1)
@@ -126,5 +127,7 @@ extern uint32_t rng_generate_random_word(void);
 
 #define MICROPY_MAKE_POINTER_CALLABLE(p) \
     ((mp_raise_NotImplementedError(MP_ERROR_TEXT("simulator limitation: asm_thumb code"))), p)
+
+#define AUDIO_OUTPUT_BUFFER_SIZE (256) // this can be any value, defaults to 32 bytes
 
 #endif

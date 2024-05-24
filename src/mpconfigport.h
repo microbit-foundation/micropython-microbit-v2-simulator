@@ -129,6 +129,6 @@ extern uint32_t rng_generate_random_word(void);
     ((mp_raise_NotImplementedError(MP_ERROR_TEXT("simulator limitation: asm_thumb code"))), p)
 
 // The latency of fetching 32 byte audio frames is too much so increase the size
-#define AUDIO_OUTPUT_BUFFER_SIZE (128)
+#define AUDIO_OUTPUT_BUFFER_SIZE (64)
 
 #endif

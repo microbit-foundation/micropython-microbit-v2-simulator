@@ -30,9 +30,7 @@ export class BoardAudio {
   currentSoundExpressionCallback: undefined | (() => void);
   private stopActiveRecording: (() => void) | undefined;
 
-  constructor(
-    private microphoneEl: SVGElement
-  ) {}
+  constructor(private microphoneEl: SVGElement) {}
 
   initializeCallbacks({
     defaultAudioCallback,
@@ -142,9 +140,9 @@ export class BoardAudio {
   setSensitivity(sensitivity: number) {
     this.sensitivityNode!.gain.setValueAtTime(
       // check if this is correct
-      sensitivity, 
+      sensitivity,
       this.context!.currentTime
-    )
+    );
   }
 
   setVolume(volume: number) {
@@ -206,7 +204,7 @@ export class BoardAudio {
       this.stopRecording();
       return;
     }
-    this.microphoneEl.style.display = "unset"
+    this.microphoneEl.style.display = "unset";
 
     const source = this.context!.createMediaStreamSource(micStream);
     source.connect(this.sensitivityNode!);
@@ -241,8 +239,8 @@ export class BoardAudio {
       recorder.disconnect();
       this.sensitivityNode!.disconnect();
       source.disconnect();
-      micStream.getTracks().forEach(track => track.stop())
-      this.microphoneEl.style.display = "none"
+      micStream.getTracks().forEach((track) => track.stop());
+      this.microphoneEl.style.display = "none";
       this.stopActiveRecording = undefined;
     };
   }
@@ -274,8 +272,9 @@ class BufferedAudio {
   ) {}
 
   init(sampleRate: number) {
+    // This is called for each new audio source so don't reset nextStartTime
+    // or we start to overlap audio
     this.sampleRate = sampleRate;
-    this.nextStartTime = -1;
   }
 
   createBuffer(length: number) {
@@ -291,19 +290,23 @@ class BufferedAudio {
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;
-    source.onended = this.callback;
+    source.onended = this.callCallback;
     source.connect(this.destination);
     const currentTime = this.context.currentTime;
     const first = this.nextStartTime < currentTime;
     const startTime = first ? currentTime : this.nextStartTime;
     this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
-    // For audio frames, we're frequently out of data. Speech is smooth.
     if (first) {
       // We're just getting started so buffer another frame.
       this.callback();
     }
     source.start(startTime);
   }
+
+  private callCallback = () => {
+    // Indirect so we can clear callback later
+    this.callback();
+  };
 
   dispose() {
     // Prevent calls into WASM when the buffer nodes finish.

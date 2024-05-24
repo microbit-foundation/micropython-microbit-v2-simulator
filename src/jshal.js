@@ -278,10 +278,8 @@ mergeInto(LibraryManager.library, {
     Module.board.microphone.microphoneOn();
   },
 
-  mp_js_hal_microphone_set_sensitivity: function (
-    /** @type {number} */ value
-  ) {
-    Module.board.audio.setSensitivity(value)
+  mp_js_hal_microphone_set_sensitivity: function (/** @type {number} */ value) {
+    Module.board.audio.setSensitivity(value);
   },
   mp_js_hal_microphone_set_threshold: function (
     /** @type {number} */ kind,

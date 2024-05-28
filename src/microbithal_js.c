@@ -455,16 +455,7 @@ void microbit_hal_audio_raw_set_rate(uint32_t sample_rate) {
 }
 
 void microbit_hal_audio_raw_write_data(const uint8_t *buf, size_t num_samples) {
-    bool silence = true;
-    for (const uint8_t *sample = buf; sample < buf + num_samples; ++sample) {
-        if (*sample != 128) {
-            silence = false;
-            break;
-        }
-    }
-    if (!silence) {
-        mp_js_hal_audio_write_data(buf, num_samples);
-    }
+    mp_js_hal_audio_write_data(buf, num_samples);
 }
 
 void microbit_hal_audio_speech_init(uint32_t sample_rate) {

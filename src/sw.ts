@@ -25,7 +25,7 @@ self.addEventListener("activate", (event) => {
       const names = await caches.keys();
       await Promise.all(
         names.map((name) => {
-          if (name !== cacheName) {
+          if (/^simulator-/.test(name) && name !== cacheName) {
             return caches.delete(name);
           }
         })

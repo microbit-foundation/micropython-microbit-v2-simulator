@@ -51,7 +51,17 @@ function initServiceWorker() {
 
 if (flags.sw) {
   initServiceWorker();
+} else {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    if (registrations.length > 0) {
+      // We should only have one service worker to unregister.
+      registrations[0].unregister().then(() => {
+        window.location.reload();
+      })
+    } 
+  })
 }
+
 const fs = new FileSystem();
 const board = createBoard(new Notifications(window.parent), fs);
 window.addEventListener("message", createMessageListener(board));

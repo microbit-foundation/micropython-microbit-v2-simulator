@@ -18,48 +18,44 @@ declare global {
 
 function initServiceWorker() {
   window.addEventListener("load", () => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js").then(
-        (registration) => {
-          console.log("Simulator service worker registration successful");
-          // Reload the page when a new service worker is installed.
-          registration.onupdatefound = function () {
-            const installingWorker = registration.installing;
-            if (installingWorker) {
-              installingWorker.onstatechange = function () {
-                if (
-                  installingWorker.state === "installed" &&
-                  navigator.serviceWorker.controller
-                ) {
-                  window.location.reload();
-                }
-              };
-            }
-          };
-        },
-        (error) => {
-          console.error(
-            `Simulator service worker registration failed: ${error}`
-          );
-        }
-      );
-    } else {
-      console.error("Service workers are not supported.");
-    }
+    navigator.serviceWorker.register("sw.js").then(
+      (registration) => {
+        console.log("Simulator service worker registration successful");
+        // Reload the page when a new service worker is installed.
+        registration.onupdatefound = function () {
+          const installingWorker = registration.installing;
+          if (installingWorker) {
+            installingWorker.onstatechange = function () {
+              if (
+                installingWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                window.location.reload();
+              }
+            };
+          }
+        };
+      },
+      (error) => {
+        console.error(`Simulator service worker registration failed: ${error}`);
+      }
+    );
   });
 }
 
-if (flags.sw) {
-  initServiceWorker();
-} else {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    if (registrations.length > 0) {
-      // We should only have one service worker to unregister.
-      registrations[0].unregister().then(() => {
-        window.location.reload();
-      })
-    } 
-  })
+if ("serviceWorker" in navigator) {
+  if (flags.sw) {
+    initServiceWorker();
+  } else {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      if (registrations.length > 0) {
+        // We should only have one service worker to unregister.
+        registrations[0].unregister().then(() => {
+          window.location.reload();
+        });
+      }
+    });
+  }
 }
 
 const fs = new FileSystem();

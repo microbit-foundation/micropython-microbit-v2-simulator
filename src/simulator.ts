@@ -7,11 +7,54 @@ import {
   createMessageListener,
   Notifications,
 } from "./board";
+import { flags } from "./flags";
 
 declare global {
   interface Window {
     // Provided by firmware.js
     createModule: (args: object) => Promise<EmscriptenModule>;
+  }
+}
+
+function initServiceWorker() {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then(
+      (registration) => {
+        console.log("Simulator service worker registration successful");
+        // Reload the page when a new service worker is installed.
+        registration.onupdatefound = function () {
+          const installingWorker = registration.installing;
+          if (installingWorker) {
+            installingWorker.onstatechange = function () {
+              if (
+                installingWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                window.location.reload();
+              }
+            };
+          }
+        };
+      },
+      (error) => {
+        console.error(`Simulator service worker registration failed: ${error}`);
+      }
+    );
+  });
+}
+
+if ("serviceWorker" in navigator) {
+  if (flags.sw) {
+    initServiceWorker();
+  } else {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      if (registrations.length > 0) {
+        // We should only have one service worker to unregister.
+        registrations[0].unregister().then(() => {
+          window.location.reload();
+        });
+      }
+    });
   }
 }
 

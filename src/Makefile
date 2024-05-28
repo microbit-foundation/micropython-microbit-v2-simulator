@@ -146,7 +146,8 @@ $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
 
 simulator-js:
-	npx esbuild ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
+	npx esbuild '--define:process.env.STAGE="$(STAGE)"' ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
+	npx esbuild --define:process.env.VERSION="$$(node -e 'process.stdout.write(`"` + require("../package.json").version + `"`)')" ./sw.ts --bundle --outfile=$(BUILD)/sw.js
 
 include $(TOP)/py/mkrules.mk
 

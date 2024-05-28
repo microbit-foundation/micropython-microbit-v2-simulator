@@ -4,7 +4,7 @@ export type {};
 declare const self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
-const assets = ["simulator.html", "build/simulator.js", "build/firmware.js"];
+const assets = ["simulator.html", "build/simulator.js", "build/firmware.js", "build/firmware.wasm"];
 const cacheName = `simulator-${process.env.VERSION}`;
 
 self.addEventListener("install", (event) => {

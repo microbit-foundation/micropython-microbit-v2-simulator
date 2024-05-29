@@ -47,13 +47,10 @@ if ("serviceWorker" in navigator) {
   if (flags.sw) {
     initServiceWorker();
   } else {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      if (registrations.length > 0) {
-        // We should only have one service worker to unregister.
-        registrations[0].unregister().then(() => {
-          window.location.reload();
-        });
-      }
+    navigator.serviceWorker.getRegistration().then((registration) => {
+      registration?.unregister().then(() => {
+        window.location.reload();
+      });
     });
   }
 }

@@ -1,6 +1,6 @@
 import svgText from "../microbit-drawing.svg";
 import { Accelerometer } from "./accelerometer";
-import { Audio } from "./audio";
+import { BoardAudio } from "./audio";
 import { Button } from "./buttons";
 import { Compass } from "./compass";
 import {
@@ -92,7 +92,7 @@ export class Board {
   display: Display;
   buttons: Button[];
   pins: Pin[];
-  audio: Audio;
+  audio: BoardAudio;
   temperature: RangeSensor;
   microphone: Microphone;
   accelerometer: Accelerometer;
@@ -202,7 +202,7 @@ export class Board {
     this.pins[MICROBIT_HAL_PIN_P19] = new StubPin("pin19");
     this.pins[MICROBIT_HAL_PIN_P20] = new StubPin("pin20");
 
-    this.audio = new Audio();
+    this.audio = new BoardAudio(this.svg.querySelector("#LitMicrophone")!);
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
     this.compass = new Compass();
@@ -249,7 +249,7 @@ export class Board {
     });
     const module = new ModuleWrapper(wrapped);
     this.audio.initializeCallbacks({
-      defaultAudioCallback: wrapped._microbit_hal_audio_ready_callback,
+      defaultAudioCallback: wrapped._microbit_hal_audio_raw_ready_callback,
       speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
     });
     this.accelerometer.initializeCallbacks(

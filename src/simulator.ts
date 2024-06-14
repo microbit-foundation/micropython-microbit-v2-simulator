@@ -1,6 +1,6 @@
 import * as conversions from "./board/conversions";
 import { FileSystem } from "./board/fs";
-import { EmscriptenModule } from "./board/wasm";
+import { SimulatorEmscriptenModule } from "./board/wasm";
 import {
   Board,
   createBoard,
@@ -12,7 +12,7 @@ import { flags } from "./flags";
 declare global {
   interface Window {
     // Provided by firmware.js
-    createModule: (args: object) => Promise<EmscriptenModule>;
+    createModule: (args: object) => Promise<SimulatorEmscriptenModule>;
   }
 }
 

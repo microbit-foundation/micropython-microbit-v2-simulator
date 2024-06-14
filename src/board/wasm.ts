@@ -2,20 +2,18 @@ import { Board } from ".";
 import * as conversions from "./conversions";
 import { FileSystem } from "./fs";
 
-export interface EmscriptenModule {
+export interface SimulatorEmscriptenModule extends EmscriptenModule {
   cwrap: any;
   ExitStatus: Error;
 
   // See EXPORTED_FUNCTIONS in the Makefile.
   _mp_js_request_stop(): void;
   _mp_js_force_stop(): void;
-  _microbit_hal_audio_ready_callback(): void;
+  _microbit_hal_audio_raw_ready_callback(): void;
   _microbit_hal_audio_speech_ready_callback(): void;
   _microbit_hal_gesture_callback(gesture: number): void;
   _microbit_hal_level_detector_callback(level: number): void;
   _microbit_radio_rx_buffer(): number;
-
-  HEAPU8: Uint8Array;
 
   // Added by us at module creation time for jshal to access.
   board: Board;
@@ -26,7 +24,7 @@ export interface EmscriptenModule {
 export class ModuleWrapper {
   private main: () => Promise<void>;
 
-  constructor(private module: EmscriptenModule) {
+  constructor(private module: SimulatorEmscriptenModule) {
     const main = module.cwrap("mp_js_main", "null", ["number"], {
       async: true,
     });

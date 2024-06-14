@@ -59,13 +59,11 @@
 #define MICROPY_FLOAT_IMPL                      (MICROPY_FLOAT_IMPL_FLOAT)
 #define MICROPY_STREAMS_NON_BLOCK               (1)
 #define MICROPY_MODULE_BUILTIN_INIT             (1)
-#define MICROPY_MODULE_WEAK_LINKS               (1)
-#define MICROPY_MODULE_FROZEN_MPY               (1)
-#define MICROPY_QSTR_EXTRA_POOL                 mp_qstr_frozen_const_pool
 #define MICROPY_USE_INTERNAL_ERRNO              (1)
 #define MICROPY_USE_INTERNAL_PRINTF             (0)
 #define MICROPY_ENABLE_PYSTACK                  (1)
 #define MICROPY_ENABLE_SCHEDULER                (1)
+#define MICROPY_SCHEDULER_STATIC_NODES          (1)
 
 // Fine control over Python builtins, classes, modules, etc
 #define MICROPY_PY_BUILTINS_STR_UNICODE         (1)
@@ -83,13 +81,14 @@
 #define MICROPY_PY_SYS_PLATFORM                 "microbit"
 
 // Extended modules
-#define MICROPY_PY_UERRNO                       (1)
-#define MICROPY_PY_UTIME_MP_HAL                 (1)
-#define MICROPY_PY_URANDOM                      (1)
-#define MICROPY_PY_URANDOM_SEED_INIT_FUNC       (rng_generate_random_word())
-#define MICROPY_PY_URANDOM_EXTRA_FUNCS          (1)
-#define MICROPY_PY_MACHINE                      (1)
+#define MICROPY_PY_ERRNO                        (1)
+#define MICROPY_PY_RANDOM                       (1)
+#define MICROPY_PY_RANDOM_SEED_INIT_FUNC        (rng_generate_random_word())
+#define MICROPY_PY_RANDOM_EXTRA_FUNCS           (1)
+#define MICROPY_PY_TIME                         (1)
 #define MICROPY_PY_MACHINE_PULSE                (1)
+
+#define MICROPY_PY_SPEECH_DEFAULT_MODE          (3)
 
 #define MICROPY_HW_ENABLE_RNG                   (1)
 
@@ -109,44 +108,6 @@
 
 #define MP_STATE_PORT MP_STATE_VM
 
-extern const struct _mp_obj_module_t antigravity_module;
-extern const struct _mp_obj_module_t audio_module;
-extern const struct _mp_obj_module_t log_module;
-extern const struct _mp_obj_module_t love_module;
-extern const struct _mp_obj_module_t machine_module;
-extern const struct _mp_obj_module_t microbit_module;
-extern const struct _mp_obj_module_t music_module;
-extern const struct _mp_obj_module_t os_module;
-extern const struct _mp_obj_module_t power_module;
-extern const struct _mp_obj_module_t radio_module;
-extern const struct _mp_obj_module_t speech_module;
-extern const struct _mp_obj_module_t this_module;
-extern const struct _mp_obj_module_t utime_module;
-
-#define MICROPY_PORT_BUILTIN_MODULES \
-    { MP_ROM_QSTR(MP_QSTR_antigravity), MP_ROM_PTR(&antigravity_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_audio), MP_ROM_PTR(&audio_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_log), MP_ROM_PTR(&log_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_love), MP_ROM_PTR(&love_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_machine), MP_ROM_PTR(&machine_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_microbit), MP_ROM_PTR(&microbit_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_music), MP_ROM_PTR(&music_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_os), MP_ROM_PTR(&os_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_power), MP_ROM_PTR(&power_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_radio), MP_ROM_PTR(&radio_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_speech), MP_ROM_PTR(&speech_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_this), MP_ROM_PTR(&this_module) }, \
-    { MP_ROM_QSTR(MP_QSTR_utime), MP_ROM_PTR(&utime_module) }, \
-
-#define MICROPY_PORT_ROOT_POINTERS \
-    const char *readline_hist[8]; \
-    void *display_data; \
-    uint8_t *radio_buf; \
-    void *audio_source; \
-    void *speech_data; \
-    struct _music_data_t *music_data; \
-    struct _microbit_soft_timer_entry_t *soft_timer_heap; \
-
 #define MP_SSIZE_MAX (0x7fffffff)
 
 // Type definitions for the specific machine
@@ -157,7 +118,7 @@ typedef long mp_off_t;
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>
 
-// Needed for MICROPY_PY_URANDOM_SEED_INIT_FUNC.
+// Needed for MICROPY_PY_RANDOM_SEED_INIT_FUNC.
 extern uint32_t rng_generate_random_word(void);
 
 // Intercept modmachine memory access.
@@ -166,5 +127,8 @@ extern uint32_t rng_generate_random_word(void);
 
 #define MICROPY_MAKE_POINTER_CALLABLE(p) \
     ((mp_raise_NotImplementedError(MP_ERROR_TEXT("simulator limitation: asm_thumb code"))), p)
+
+// The latency of fetching 32 byte audio frames is too much so increase the size
+#define AUDIO_OUTPUT_BUFFER_SIZE (64)
 
 #endif

@@ -131,6 +131,10 @@ mergeInto(LibraryManager.library, {
     return Module.board.pins[pin].isTouched();
   },
 
+  mp_js_hal_pin_get_touches: function (/** @type {number} */ pin) {
+    return Module.board.pins[pin].getAndClearTouches();
+  },
+
   mp_js_hal_pin_get_analog_period_us: function (/** @type {number} */ pin) {
     return Module.board.pins[pin].getAnalogPeriodUs();
   },
@@ -155,10 +159,6 @@ mergeInto(LibraryManager.library, {
     /** @type {number} */ value
   ) {
     Module.board.display.setPixel(x, y, value);
-  },
-
-  mp_js_hal_display_clear: function () {
-    Module.board.display.clear();
   },
 
   mp_js_hal_display_read_light_level: function () {
@@ -214,6 +214,11 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_audio_init: function (/** @type {number} */ sample_rate) {
     // @ts-expect-error
     Module.board.audio.default.init(sample_rate);
+  },
+
+  mp_js_hal_audio_set_rate: function (/** @type {number} */ sample_rate) {
+    // @ts-expect-error
+    Module.board.audio.default.setSampleRate(sample_rate);
   },
 
   mp_js_hal_audio_write_data: function (
@@ -273,6 +278,9 @@ mergeInto(LibraryManager.library, {
     Module.board.microphone.microphoneOn();
   },
 
+  mp_js_hal_microphone_set_sensitivity: function (/** @type {number} */ value) {
+    Module.board.audio.setSensitivity(value);
+  },
   mp_js_hal_microphone_set_threshold: function (
     /** @type {number} */ kind,
     /** @type {number} */ value
@@ -282,7 +290,36 @@ mergeInto(LibraryManager.library, {
       value
     );
   },
+  mp_js_hal_microphone_start_recording: function (
+    /** @type {number} */ buf,
+    /** @type {number} */ max_len,
+    // This is a pointer to the size_t length that we update, not the length itself
+    /** @type {number} */ cur_len,
+    /** @type {number} */ rate
+  ) {
+    setValue(cur_len, 0, "i32");
 
+    Module.board.audio.startRecording(
+      rate,
+      max_len,
+      function (/** @type {Float32Array} */ chunk) {
+        const heap = Module.HEAPU8;
+        let cur_len_v = getValue(cur_len, "i32");
+        let base = buf + cur_len_v;
+        const length = Math.max(chunk.length, max_len - cur_len);
+        for (let i = 0; i < length; ++i) {
+          heap[base + i] = (chunk[i] + 1) * 0.5 * 255;
+        }
+        setValue(cur_len, cur_len_v + length, "i32");
+      }
+    );
+  },
+  mp_js_hal_microphone_is_recording: function () {
+    return Module.board.audio.isRecording();
+  },
+  mp_js_hal_microphone_stop_recording: function () {
+    Module.board.audio.stopRecording();
+  },
   mp_js_hal_microphone_get_level: function () {
     return Module.board.microphone.soundLevel.value;
   },

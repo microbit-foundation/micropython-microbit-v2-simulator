@@ -15,6 +15,13 @@ QSTR_DEFS = $(CODAL_PORT)/qstrdefsport.h
 
 # Include py core make definitions.
 include $(TOP)/py/py.mk
+include $(TOP)/extmod/extmod.mk
+
+# The micropython-lib submodule is not needed by this project, but the MicroPython
+# build system requires it if FROZEN_MANIFEST is set (which it is below).  To avoid
+# needing to check out the micropython-lib submodule, point MPY_LIB_DIR to a dummy
+# location that has a README.md file.
+MPY_LIB_DIR = $(TOP)
 
 CC = emcc
 LD = emcc
@@ -49,7 +56,7 @@ JSFLAGS += -s ASYNCIFY_STACK_SIZE=262144
 JSFLAGS += -s EXIT_RUNTIME
 JSFLAGS += -s MODULARIZE=1
 JSFLAGS += -s EXPORT_NAME=createModule
-JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer','_mp_js_force_stop','_mp_js_request_stop']"
+JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_microbit_hal_audio_raw_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer','_mp_js_force_stop','_mp_js_request_stop']"
 JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
 
 ifdef DEBUG
@@ -101,7 +108,6 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	modradio.c \
 	modspeech.c \
 	modthis.c \
-	modutime.c \
 	mphalport.c \
 	)
 
@@ -117,7 +123,7 @@ SRC_C += \
 	$(abspath $(LOCAL_LIB_DIR)/sam/debug.c) \
 
 SRC_O += \
-	lib/utils/gchelper_m3.o \
+	lib/utils/gchelper_thumb2.o \
 
 OBJ = $(PY_O)
 OBJ += $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
@@ -138,8 +144,7 @@ all: $(MBIT_VER_FILE) $(BUILD)/micropython.js
 $(MBIT_VER_FILE): FORCE
 	$(Q)mkdir -p $(HEADER_BUILD)
 	(cd $(TOP) && $(PYTHON) py/makeversionhdr.py $(abspath $(MP_VER_FILE)))
-	$(PYTHON) $(TOP)/py/makeversionhdr.py $(MBIT_VER_FILE).pre
-	$(CAT) $(MBIT_VER_FILE).pre | $(SED) s/MICROPY_/MICROBIT_/ > $(MBIT_VER_FILE)
+	(cd ../lib/micropython-microbit-v2 && $(PYTHON) src/codal_port/make_microbit_version_hdr.py $(abspath $(MBIT_VER_FILE)))
 
 $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 	$(ECHO) "LINK $(BUILD)/firmware.js"

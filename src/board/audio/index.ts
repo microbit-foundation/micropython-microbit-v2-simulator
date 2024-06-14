@@ -5,6 +5,7 @@ import { parseSoundEffects } from "./sound-expressions";
 declare global {
   interface Window {
     webkitAudioContext: typeof AudioContext;
+    webkitOfflineAudioContext: typeof OfflineAudioContext;
   }
 }
 
@@ -13,7 +14,7 @@ interface AudioOptions {
   speechAudioCallback: () => void;
 }
 
-export class Audio {
+export class BoardAudio {
   private frequency: number = 440;
   // You can mute the sim before it's running so we can't immediately write to the muteNode.
   private muted: boolean = false;
@@ -21,13 +22,15 @@ export class Audio {
   private oscillator: OscillatorNode | undefined;
   private volumeNode: GainNode | undefined;
   private muteNode: GainNode | undefined;
+  private sensitivityNode: GainNode | undefined;
 
   default: BufferedAudio | undefined;
   speech: BufferedAudio | undefined;
   soundExpression: BufferedAudio | undefined;
   currentSoundExpressionCallback: undefined | (() => void);
+  private stopActiveRecording: (() => void) | undefined;
 
-  constructor() {}
+  constructor(private microphoneEl: SVGElement) {}
 
   initializeCallbacks({
     defaultAudioCallback,
@@ -42,6 +45,11 @@ export class Audio {
       this.context.currentTime
     );
     this.muteNode.connect(this.context.destination);
+    this.sensitivityNode = this.context.createGain();
+    this.sensitivityNode.gain.setValueAtTime(
+      0.2, // sensitivity medium level
+      this.context.currentTime
+    );
     this.volumeNode = this.context.createGain();
     this.volumeNode.connect(this.muteNode);
 
@@ -129,6 +137,14 @@ export class Audio {
     }
   }
 
+  setSensitivity(sensitivity: number) {
+    this.sensitivityNode!.gain.setValueAtTime(
+      // check if this is correct
+      sensitivity,
+      this.context!.currentTime
+    );
+  }
+
   setVolume(volume: number) {
     this.volumeNode!.gain.setValueAtTime(
       volume / 255,
@@ -155,7 +171,82 @@ export class Audio {
     }
   }
 
+  isRecording(): boolean {
+    return !!this.stopActiveRecording;
+  }
+
+  stopRecording() {
+    if (this.stopActiveRecording) {
+      this.stopActiveRecording();
+    }
+  }
+
+  async startRecording(
+    sampleRate: number,
+    samplesNeeded: number,
+    onChunk: (chunk: Float32Array) => void
+  ) {
+    let samplesSent = 0;
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      return;
+    }
+    this.stopRecording();
+
+    this.stopActiveRecording = () => {};
+    let micStream: MediaStream | undefined;
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true,
+      });
+    } catch (e) {
+      console.error(e);
+      this.stopRecording();
+      return;
+    }
+    this.microphoneEl.style.display = "unset";
+
+    const source = this.context!.createMediaStreamSource(micStream);
+    source.connect(this.sensitivityNode!);
+    // TODO: consider AudioWorklet - worth it? Browser support?
+    //       consider alternative resampling approaches
+    //       what sample rates are actually supported this way?
+    const recorder = this.context!.createScriptProcessor(2048, 1, 1);
+    recorder.onaudioprocess = (e) => {
+      const offlineContext = new (window.OfflineAudioContext ||
+        window.webkitOfflineAudioContext)(
+        1,
+        sampleRate * (e.inputBuffer.length / e.inputBuffer.sampleRate),
+        sampleRate
+      );
+      const source = offlineContext.createBufferSource();
+      source.buffer = e.inputBuffer;
+      source.connect(offlineContext.destination);
+      source.start();
+      offlineContext.addEventListener("complete", (e) => {
+        onChunk(e.renderedBuffer.getChannelData(0));
+        samplesSent += e.renderedBuffer.length;
+        if (samplesSent >= samplesNeeded) {
+          this.stopRecording();
+        }
+      });
+      offlineContext.startRendering();
+    };
+    this.sensitivityNode!.connect(recorder);
+    recorder.connect(this.context!.destination);
+
+    this.stopActiveRecording = () => {
+      recorder.disconnect();
+      this.sensitivityNode!.disconnect();
+      source.disconnect();
+      micStream.getTracks().forEach((track) => track.stop());
+      this.microphoneEl.style.display = "none";
+      this.stopActiveRecording = undefined;
+    };
+  }
+
   boardStopped() {
+    this.stopRecording();
     this.stopOscillator();
     this.speech?.dispose();
     this.soundExpression?.dispose();
@@ -181,8 +272,9 @@ class BufferedAudio {
   ) {}
 
   init(sampleRate: number) {
+    // This is called for each new audio source so don't reset nextStartTime
+    // or we start to overlap audio
     this.sampleRate = sampleRate;
-    this.nextStartTime = -1;
   }
 
   createBuffer(length: number) {
@@ -190,23 +282,31 @@ class BufferedAudio {
     return this.context.createBuffer(1, length, this.sampleRate);
   }
 
+  setSampleRate(sampleRate: number) {
+    this.sampleRate = sampleRate;
+  }
+
   writeData(buffer: AudioBuffer) {
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;
-    source.onended = this.callback;
+    source.onended = this.callCallback;
     source.connect(this.destination);
     const currentTime = this.context.currentTime;
     const first = this.nextStartTime < currentTime;
     const startTime = first ? currentTime : this.nextStartTime;
     this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
-    // For audio frames, we're frequently out of data. Speech is smooth.
     if (first) {
       // We're just getting started so buffer another frame.
       this.callback();
     }
     source.start(startTime);
   }
+
+  private callCallback = () => {
+    // Indirect so we can clear callback later
+    this.callback();
+  };
 
   dispose() {
     // Prevent calls into WASM when the buffer nodes finish.

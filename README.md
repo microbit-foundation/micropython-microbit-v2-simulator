@@ -318,7 +318,7 @@ Tagged releases with a `v` prefix are deployed to https://python-simulator.userm
 
 1. Update the lib/micropython-microbit-v2 to the relevant hash. Make sure that its lib/micropython submodule is updated (see checkout instructions above).
 2. Review the full diff for micropython-microbit-v2. In particular, note changes to:
-   1. main.c, src/Makefile and mpconfigport.h all which have simulator versions that may need updates
+   1. main.c, src/Makefile and mpconfigport.h, microbitfs.c, drv_radio.c all which have simulator versions that may need updates
    2. the HAL, which may require implementing in the simulator
    3. the filesystem, which has a JavaScript implementation.
 

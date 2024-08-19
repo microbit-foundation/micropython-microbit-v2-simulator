@@ -79,6 +79,8 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	help.c \
 	iters.c \
 	microbit_accelerometer.c \
+	microbit_audiorecording.c \
+	microbit_audiotrack.c \
 	microbit_button.c \
 	microbit_compass.c \
 	microbit_display.c \
@@ -109,6 +111,7 @@ SRC_C += $(addprefix $(CODAL_PORT)/, \
 	modspeech.c \
 	modthis.c \
 	mphalport.c \
+	utils.c \
 	)
 
 SRC_C += \

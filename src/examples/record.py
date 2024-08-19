@@ -4,14 +4,14 @@ rates = [7812, 3906, 15624]
 rate_index = 0
 
 print("Recording...")
-frame = microphone.record(3000)
+my_track = microphone.record(3000)
 print("Button A to play")
 while True:
     if button_a.was_pressed():
-        audio.play(frame, wait=False)
+        audio.play(my_track, wait=False)
         print("Rate playing", rates[rate_index])
 
     if button_b.was_pressed():
         rate_index = (rate_index + 1) % len(rates)
         print("Rate change to", rates[rate_index])
-        frame.set_rate(rates[rate_index])
+        my_track.set_rate(rates[rate_index])

@@ -110,7 +110,7 @@ void mp_js_main(int heap_size) {
     }
 }
 
-STATIC void microbit_display_exception(mp_obj_t exc_in) {
+static void microbit_display_exception(mp_obj_t exc_in) {
     // Construct the message string ready for display.
     mp_uint_t n, *values;
     mp_obj_exception_get_traceback(exc_in, &n, &values);
@@ -184,7 +184,7 @@ void nlr_jump_fail(void *val) {
     exit(1);
 }
 
-STATIC void gc_scan_func(void *begin, void *end) {
+static void gc_scan_func(void *begin, void *end) {
     gc_collect_root((void **)begin, (void **)end - (void **)begin + 1);
 }
 

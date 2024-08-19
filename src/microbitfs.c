@@ -42,7 +42,7 @@
 /******************************************************************************/
 // os-level functions
 
-STATIC mp_obj_t os_mbfs_listdir(void) {
+static mp_obj_t os_mbfs_listdir(void) {
     mp_obj_t res = mp_obj_new_list(0, NULL);
     char buf[MAX_FILENAME_LENGTH];
     for (size_t i = 0;; ++i) {
@@ -65,7 +65,7 @@ typedef struct {
     uint8_t idx;
 } os_mbfs_ilistdir_it_t;
 
-STATIC mp_obj_t os_mbfs_ilistdir_it_iternext(mp_obj_t self_in) {
+static mp_obj_t os_mbfs_ilistdir_it_iternext(mp_obj_t self_in) {
     os_mbfs_ilistdir_it_t *self = MP_OBJ_TO_PTR(self_in);
     for (;;) {
         char buf[MAX_FILENAME_LENGTH];
@@ -85,7 +85,7 @@ STATIC mp_obj_t os_mbfs_ilistdir_it_iternext(mp_obj_t self_in) {
     }
 }
 
-STATIC mp_obj_t os_mbfs_ilistdir(void) {
+static mp_obj_t os_mbfs_ilistdir(void) {
     os_mbfs_ilistdir_it_t *iter = mp_obj_malloc(os_mbfs_ilistdir_it_t, &mp_type_polymorph_iter);
     iter->iternext = os_mbfs_ilistdir_it_iternext;
     iter->idx = 0;
@@ -93,7 +93,7 @@ STATIC mp_obj_t os_mbfs_ilistdir(void) {
 }
 MP_DEFINE_CONST_FUN_OBJ_0(os_mbfs_ilistdir_obj, os_mbfs_ilistdir);
 
-STATIC mp_obj_t os_mbfs_remove(mp_obj_t filename_in) {
+static mp_obj_t os_mbfs_remove(mp_obj_t filename_in) {
     size_t name_len;
     const char *name = mp_obj_str_get_data(filename_in, &name_len);
     int idx = mp_js_hal_filesystem_find(name, name_len);
@@ -105,7 +105,7 @@ STATIC mp_obj_t os_mbfs_remove(mp_obj_t filename_in) {
 }
 MP_DEFINE_CONST_FUN_OBJ_1(os_mbfs_remove_obj, os_mbfs_remove);
 
-STATIC mp_obj_t os_mbfs_stat(mp_obj_t filename_in) {
+static mp_obj_t os_mbfs_stat(mp_obj_t filename_in) {
     size_t name_len;
     const char *name = mp_obj_str_get_data(filename_in, &name_len);
     int idx = mp_js_hal_filesystem_find(name, name_len);
@@ -141,26 +141,26 @@ typedef struct _mbfs_file_obj_t {
     bool binary;
 } mbfs_file_obj_t;
 
-STATIC mp_obj_t os_mbfs_file___exit__(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t os_mbfs_file___exit__(size_t n_args, const mp_obj_t *args) {
     (void)n_args;
     return mp_stream_close(args[0]);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(os_mbfs_file___exit___obj, 4, 4, os_mbfs_file___exit__);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(os_mbfs_file___exit___obj, 4, 4, os_mbfs_file___exit__);
 
-STATIC mp_obj_t os_mbfs_file_name(mp_obj_t self_in) {
+static mp_obj_t os_mbfs_file_name(mp_obj_t self_in) {
     mbfs_file_obj_t *self = MP_OBJ_TO_PTR(self_in);
     char buf[MAX_FILENAME_LENGTH];
     int len = mp_js_hal_filesystem_name(self->idx, buf);
     return mp_obj_new_str(buf, len);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(os_mbfs_file_name_obj, os_mbfs_file_name);
+static MP_DEFINE_CONST_FUN_OBJ_1(os_mbfs_file_name_obj, os_mbfs_file_name);
 
-STATIC mp_obj_t microbit_file_writable(mp_obj_t self) {
+static mp_obj_t microbit_file_writable(mp_obj_t self) {
     return mp_obj_new_bool(((mbfs_file_obj_t *)MP_OBJ_TO_PTR(self))->writable);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(microbit_file_writable_obj, microbit_file_writable);
+static MP_DEFINE_CONST_FUN_OBJ_1(microbit_file_writable_obj, microbit_file_writable);
 
-STATIC const mp_rom_map_elem_t os_mbfs_file_locals_dict_table[] = {
+static const mp_rom_map_elem_t os_mbfs_file_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR___enter__), MP_ROM_PTR(&mp_identity_obj) },
     { MP_ROM_QSTR(MP_QSTR___exit__), MP_ROM_PTR(&os_mbfs_file___exit___obj) },
     { MP_ROM_QSTR(MP_QSTR_name), MP_ROM_PTR(&os_mbfs_file_name_obj) },
@@ -172,15 +172,15 @@ STATIC const mp_rom_map_elem_t os_mbfs_file_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_readline), MP_ROM_PTR(&mp_stream_unbuffered_readline_obj) },
     { MP_ROM_QSTR(MP_QSTR_write), MP_ROM_PTR(&mp_stream_write_obj) },
 };
-STATIC MP_DEFINE_CONST_DICT(os_mbfs_file_locals_dict, os_mbfs_file_locals_dict_table);
+static MP_DEFINE_CONST_DICT(os_mbfs_file_locals_dict, os_mbfs_file_locals_dict_table);
 
-STATIC void check_file_open(mbfs_file_obj_t *self) {
+static void check_file_open(mbfs_file_obj_t *self) {
     if (!self->open) {
         mp_raise_ValueError(MP_ERROR_TEXT("I/O operation on closed file"));
     }
 }
 
-STATIC mp_uint_t microbit_file_read(mp_obj_t self_in, void *buf_in, mp_uint_t size, int *errcode) {
+static mp_uint_t microbit_file_read(mp_obj_t self_in, void *buf_in, mp_uint_t size, int *errcode) {
     mbfs_file_obj_t *self = MP_OBJ_TO_PTR(self_in);
     check_file_open(self);
     if (self->writable) {
@@ -201,7 +201,7 @@ STATIC mp_uint_t microbit_file_read(mp_obj_t self_in, void *buf_in, mp_uint_t si
     return bytes_read;
 }
 
-STATIC mp_uint_t microbit_file_write(mp_obj_t self_in, const void *buf, mp_uint_t size, int *errcode) {
+static mp_uint_t microbit_file_write(mp_obj_t self_in, const void *buf, mp_uint_t size, int *errcode) {
     mbfs_file_obj_t *self = MP_OBJ_TO_PTR(self_in);
     check_file_open(self);
     if (!self->writable) {
@@ -216,7 +216,7 @@ STATIC mp_uint_t microbit_file_write(mp_obj_t self_in, const void *buf, mp_uint_
     return size;
 }
 
-STATIC mp_uint_t microbit_file_ioctl(mp_obj_t self_in, mp_uint_t request, uintptr_t arg, int *errcode) {
+static mp_uint_t microbit_file_ioctl(mp_obj_t self_in, mp_uint_t request, uintptr_t arg, int *errcode) {
     mbfs_file_obj_t *self = MP_OBJ_TO_PTR(self_in);
 
     if (request == MP_STREAM_CLOSE) {
@@ -228,7 +228,7 @@ STATIC mp_uint_t microbit_file_ioctl(mp_obj_t self_in, mp_uint_t request, uintpt
     }
 }
 
-STATIC const mp_stream_p_t textio_stream_p = {
+static const mp_stream_p_t textio_stream_p = {
     .read = microbit_file_read,
     .write = microbit_file_write,
     .ioctl = microbit_file_ioctl,
@@ -244,7 +244,7 @@ MP_DEFINE_CONST_OBJ_TYPE(
     );
 
 
-STATIC const mp_stream_p_t fileio_stream_p = {
+static const mp_stream_p_t fileio_stream_p = {
     .read = microbit_file_read,
     .write = microbit_file_write,
     .ioctl = microbit_file_ioctl,
@@ -258,7 +258,7 @@ MP_DEFINE_CONST_OBJ_TYPE(
     locals_dict, &os_mbfs_file_locals_dict
     );
 
-STATIC mbfs_file_obj_t *microbit_file_open(const char *name, size_t name_len, bool write, bool binary) {
+static mbfs_file_obj_t *microbit_file_open(const char *name, size_t name_len, bool write, bool binary) {
     if (name_len > MAX_FILENAME_LENGTH) {
         return NULL;
     }
@@ -298,7 +298,7 @@ mp_import_stat_t mp_import_stat(const char *path) {
     }
 }
 
-STATIC mp_uint_t file_readbyte(void *self_in) {
+static mp_uint_t file_readbyte(void *self_in) {
     mbfs_file_obj_t *self = self_in;
     int chr = mp_js_hal_filesystem_readbyte(self->idx, self->offset);
     if (chr < 0) {
@@ -308,7 +308,7 @@ STATIC mp_uint_t file_readbyte(void *self_in) {
     return chr;
 }
 
-STATIC void file_close(void *self_in) {
+static void file_close(void *self_in) {
     mbfs_file_obj_t *self = self_in;
     self->open = false;
 }

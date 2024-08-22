@@ -1,11 +1,12 @@
-from microbit import microphone, audio, button_a, button_b
+from microbit import microphone, audio, button_a, button_b, sleep
 
 rates = [7812, 3906, 15624]
 rate_index = 0
 
 print("Recording...")
-my_recording = microphone.record(3000)
-my_track = my_recording.track()
+my_recording = audio.AudioRecording(3000)
+my_track = microphone.record_into(my_recording, wait=False)
+sleep(3000)
 print("Button A to play")
 while True:
     if button_a.was_pressed():

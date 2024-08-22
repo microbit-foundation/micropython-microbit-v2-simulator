@@ -98,12 +98,11 @@ export function convertAccelerometerNumberToString(value: number): string {
 export const convertAudioBuffer = (
   heap: Uint8Array,
   source: number,
-  target: AudioBuffer
+  target: Float32Array
 ) => {
-  const channel = target.getChannelData(0);
-  for (let i = 0; i < channel.length; ++i) {
+  for (let i = 0; i < target.length; ++i) {
     // Convert from uint8 to -1..+1 float.
-    channel[i] = (heap[source + i] / 255) * 2 - 1;
+    target[i] = (heap[source + i] / 255) * 2 - 1;
   }
   return target;
 };

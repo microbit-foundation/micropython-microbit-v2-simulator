@@ -1,3 +1,4 @@
+import { create as createResampler } from "@alexanderolsen/libsamplerate-js";
 import svgText from "../microbit-drawing.svg";
 import { Accelerometer } from "./accelerometer";
 import { BoardAudio } from "./audio";
@@ -247,10 +248,22 @@ export class Board {
       noInitialRun: true,
       instantiateWasm,
     });
+
+    // We update the sample rates before use.
+    const recordingResampler = await createResampler(1, 48000, 48000);
+    const defaultResampler = await createResampler(1, 48000, 48000);
+    const speechResampler = await createResampler(1, 48000, 48000);
+    // Probably this one is never used so would be nice to avoid
+    const soundExpressionResampler = await createResampler(1, 48000, 48000);
+
     const module = new ModuleWrapper(wrapped);
     this.audio.initializeCallbacks({
       defaultAudioCallback: wrapped._microbit_hal_audio_raw_ready_callback,
+      defaultResampler,
       speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
+      speechResampler,
+      soundExpressionResampler,
+      recordingResampler,
     });
     this.accelerometer.initializeCallbacks(
       wrapped._microbit_hal_gesture_callback

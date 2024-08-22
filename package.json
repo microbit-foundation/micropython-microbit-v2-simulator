@@ -28,5 +28,8 @@
     "esbuild": "^0.14.49",
     "prettier": "2.6.0",
     "vitest": "^0.22.1"
+  },
+  "dependencies": {
+    "@alexanderolsen/libsamplerate-js": "microbit-foundation/libsamplerate-js#v2.1.2-microbit.1"
   }
 }

@@ -230,8 +230,7 @@ mergeInto(LibraryManager.library, {
       Module.conversions.convertAudioBuffer(
         Module.HEAPU8,
         buf,
-        // @ts-expect-error
-        Module.board.audio.default.createBuffer(num_samples)
+        new Float32Array(num_samples)
       )
     );
   },
@@ -246,21 +245,10 @@ mergeInto(LibraryManager.library, {
     /** @type {number} */ num_samples
   ) {
     /** @type {AudioBuffer | undefined} */ let webAudioBuffer;
-    try {
-      // @ts-expect-error
-      webAudioBuffer = Module.board.audio.speech.createBuffer(num_samples);
-    } catch (e) {
-      // Swallow error on older Safari to keep the sim in a good state.
-      // @ts-expect-error
-      if (e.name === "NotSupportedError") {
-        return;
-      } else {
-        throw e;
-      }
-    }
+    const jsBuf = new Float32Array(num_samples);
     // @ts-expect-error
     Module.board.audio.speech.writeData(
-      Module.conversions.convertAudioBuffer(Module.HEAPU8, buf, webAudioBuffer)
+      Module.conversions.convertAudioBuffer(Module.HEAPU8, buf, jsBuf)
     );
   },
 

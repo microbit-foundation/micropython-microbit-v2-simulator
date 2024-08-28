@@ -331,6 +331,26 @@ Steps for WASM debugging in Chrome:
 - Enable "WebAssembly Debugging: Enable DWARF support" in DevTools Experiments
 - DEBUG=1 make
 
+## License
+
+This software is under the MIT open source license.
+
+[SPDX-License-Identifier: MIT](LICENSE)
+
+MicroPython for micro:bit is included in the build process via a submodule.
+
+We use dependencies via the NPM registry as specified by the package.json file under common Open Source licenses.
+
+Full details of each package can be found by running `license-checker`:
+
+```bash
+$ npx license-checker --direct --summary --production
+```
+
+Omit the flags as desired to obtain more detail.
+
+A fork of libsamplerate_js to reduce bundle size is [hosted on GitHub](https://github.com/microbit-foundation/libsamplerate-js).
+
 ## Code of Conduct
 
 Trust, partnership, simplicity and passion are our core values we live and

@@ -231,10 +231,17 @@
       });
       fetchProgram(sample.value);
 
+      document
+        .querySelector("#flash")
+        .addEventListener("click", async () => {});
+
       document.querySelector("#stop").addEventListener("click", async () => {
         simulator.postMessage(
           {
-            kind: "stop",
+            kind: "flash",
+            filesystem: {
+              "main.py": new TextEncoder().encode(program.value),
+            },
           },
           "*"
         );

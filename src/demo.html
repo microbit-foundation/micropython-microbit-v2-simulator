@@ -112,6 +112,7 @@
             >
             </textarea>
             <div class="actions">
+              <button id="flash">Flash</button>
               <button id="stop">Stop</button>
               <button id="reset">Reset</button>
               <button id="mute">Mute</button>
@@ -231,17 +232,22 @@
       });
       fetchProgram(sample.value);
 
-      document
-        .querySelector("#flash")
-        .addEventListener("click", async () => {});
-
-      document.querySelector("#stop").addEventListener("click", async () => {
+      document.querySelector("#flash").addEventListener("click", async () => {
         simulator.postMessage(
           {
             kind: "flash",
             filesystem: {
               "main.py": new TextEncoder().encode(program.value),
             },
+          },
+          "*"
+        );
+      });
+
+      document.querySelector("#stop").addEventListener("click", async () => {
+        simulator.postMessage(
+          {
+            kind: "stop",
           },
           "*"
         );

@@ -9,7 +9,6 @@
   "scripts": {
     "build": "make",
     "test": "vitest",
-    "ci:update-version": "update-ci-version",
     "deploy": "website-deploy-aws",
     "invalidate": "aws cloudfront create-invalidation --distribution-id $(printenv ${STAGE}_CLOUDFRONT_DISTRIBUTION_ID) --paths \"/*\""
   },

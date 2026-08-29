@@ -318,7 +318,7 @@ Tagged releases with a `v` prefix are deployed to https://python-simulator.userm
 
 1. Update the lib/micropython-microbit-v2 to the relevant hash. Make sure that its lib/micropython submodule is updated (see checkout instructions above).
 2. Review the full diff for micropython-microbit-v2. In particular, note changes to:
-   1. main.c, src/Makefile and mpconfigport.h all which have simulator versions that may need updates
+   1. main.c, src/Makefile and mpconfigport.h, microbitfs.c, drv_radio.c all which have simulator versions that may need updates
    2. the HAL, which may require implementing in the simulator
    3. the filesystem, which has a JavaScript implementation.
 
@@ -330,6 +330,26 @@ Steps for WASM debugging in Chrome:
 - Install the C/C++ debug extension: https://helpgoo.gle/wasm-debugging-extension
 - Enable "WebAssembly Debugging: Enable DWARF support" in DevTools Experiments
 - DEBUG=1 make
+
+## License
+
+This software is under the MIT open source license.
+
+[SPDX-License-Identifier: MIT](LICENSE)
+
+MicroPython for micro:bit is included in the build process via a submodule.
+
+We use dependencies via the NPM registry as specified by the package.json file under common Open Source licenses.
+
+Full details of each package can be found by running `license-checker`:
+
+```bash
+$ npx license-checker --direct --summary --production
+```
+
+Omit the flags as desired to obtain more detail.
+
+A fork of libsamplerate_js to reduce bundle size is [hosted on GitHub](https://github.com/microbit-foundation/libsamplerate-js).
 
 ## Code of Conduct
 

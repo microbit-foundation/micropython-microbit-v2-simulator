@@ -23,8 +23,12 @@
   },
   "homepage": "https://github.com/microbit-foundation/micropython-microbit-v2-simulator#readme",
   "devDependencies": {
+    "@types/emscripten": "^1.39.10",
     "esbuild": "^0.14.49",
     "prettier": "2.6.0",
     "vitest": "^0.22.1"
+  },
+  "dependencies": {
+    "@alexanderolsen/libsamplerate-js": "microbit-foundation/libsamplerate-js#v2.1.2-microbit.1"
   }
 }

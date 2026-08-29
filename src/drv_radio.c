@@ -84,3 +84,5 @@ const uint8_t *microbit_radio_peek(void) {
 void microbit_radio_pop(void) {
     mp_js_radio_pop();
 }
+
+MP_REGISTER_ROOT_POINTER(uint8_t *radio_buf);

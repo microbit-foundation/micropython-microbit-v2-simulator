@@ -1,6 +1,7 @@
+import { create as createResampler } from "@alexanderolsen/libsamplerate-js";
 import svgText from "../microbit-drawing.svg";
 import { Accelerometer } from "./accelerometer";
-import { Audio } from "./audio";
+import { BoardAudio } from "./audio";
 import { Button } from "./buttons";
 import { Compass } from "./compass";
 import {
@@ -92,7 +93,7 @@ export class Board {
   display: Display;
   buttons: Button[];
   pins: Pin[];
-  audio: Audio;
+  audio: BoardAudio;
   temperature: RangeSensor;
   microphone: Microphone;
   accelerometer: Accelerometer;
@@ -202,7 +203,7 @@ export class Board {
     this.pins[MICROBIT_HAL_PIN_P19] = new StubPin("pin19");
     this.pins[MICROBIT_HAL_PIN_P20] = new StubPin("pin20");
 
-    this.audio = new Audio();
+    this.audio = new BoardAudio(this.svg.querySelector("#LitMicrophone")!);
     this.temperature = new RangeSensor("temperature", -5, 50, 21, "°C");
     this.accelerometer = new Accelerometer(onChange);
     this.compass = new Compass();
@@ -247,10 +248,22 @@ export class Board {
       noInitialRun: true,
       instantiateWasm,
     });
+
+    // We update the sample rates before use.
+    const recordingResampler = await createResampler(1, 48000, 48000);
+    const defaultResampler = await createResampler(1, 48000, 48000);
+    const speechResampler = await createResampler(1, 48000, 48000);
+    // Probably this one is never used so would be nice to avoid
+    const soundExpressionResampler = await createResampler(1, 48000, 48000);
+
     const module = new ModuleWrapper(wrapped);
     this.audio.initializeCallbacks({
-      defaultAudioCallback: wrapped._microbit_hal_audio_ready_callback,
+      defaultAudioCallback: wrapped._microbit_hal_audio_raw_ready_callback,
+      defaultResampler,
       speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
+      speechResampler,
+      soundExpressionResampler,
+      recordingResampler,
     });
     this.accelerometer.initializeCallbacks(
       wrapped._microbit_hal_gesture_callback

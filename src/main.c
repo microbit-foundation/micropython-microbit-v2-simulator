@@ -40,6 +40,7 @@
 #include "drv_display.h"
 #include "modmicrobit.h"
 #include "microbithal_js.h"
+#include "ports/nrf/modules/os/microbitfs.h"
 
 // Set to true if a soft-timer callback can use mp_sched_exception to propagate out an exception.
 bool microbit_outer_nlr_will_handle_soft_timer_exceptions;
@@ -109,7 +110,7 @@ void mp_js_main(int heap_size) {
     }
 }
 
-STATIC void microbit_display_exception(mp_obj_t exc_in) {
+static void microbit_display_exception(mp_obj_t exc_in) {
     // Construct the message string ready for display.
     mp_uint_t n, *values;
     mp_obj_exception_get_traceback(exc_in, &n, &values);
@@ -149,7 +150,7 @@ void microbit_pyexec_file(const char *filename) {
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
         // Parse and comple the file.
-        mp_lexer_t *lex = mp_lexer_new_from_file(filename);
+        mp_lexer_t *lex = mp_lexer_new_from_file(qstr_from_str(filename));
         qstr source_name = lex->source_name;
         mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
         mp_obj_t module_fun = mp_compile(&parse_tree, source_name, false);
@@ -183,7 +184,7 @@ void nlr_jump_fail(void *val) {
     exit(1);
 }
 
-STATIC void gc_scan_func(void *begin, void *end) {
+static void gc_scan_func(void *begin, void *end) {
     gc_collect_root((void **)begin, (void **)end - (void **)begin + 1);
 }
 

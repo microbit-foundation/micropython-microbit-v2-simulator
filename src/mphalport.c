@@ -15,8 +15,9 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
     return ret;
 }
 
-void mp_hal_stdout_tx_strn(const char *str, size_t len) {
+mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
     mp_js_hal_stdout_tx_strn(str, len);
+    return len;
 }
 
 int mp_hal_stdin_rx_chr(void) {

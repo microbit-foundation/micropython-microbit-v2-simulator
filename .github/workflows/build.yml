@@ -30,13 +30,13 @@ jobs:
       - name: Configure node
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
           cache: "npm"
           registry-url: "https://npm.pkg.github.com"
       - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm install --no-save @microbit-foundation/website-deploy-aws@0.3.0 @microbit-foundation/website-deploy-aws-config@0.7.1
+      - run: npm install --no-save @microbit-foundation/website-deploy-aws@1.0.1
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: node ./bin/print-ci-env.js >> $GITHUB_ENV
@@ -46,6 +46,9 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.WEB_DEPLOY_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.WEB_DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          # Set to 1 for one deploy after changing params in deployment.js,
+          # as unchanged files are otherwise skipped.
+          WEBSITE_DEPLOY_FORCE: 0
       - run: npm run invalidate
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.WEB_DEPLOY_AWS_ACCESS_KEY_ID }}

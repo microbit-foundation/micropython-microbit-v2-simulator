@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: read
     env:
       AWS_DEFAULT_REGION: eu-west-1
       PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID: E15FPP46STH15O
@@ -32,13 +31,7 @@ jobs:
         with:
           node-version: 24.x
           cache: "npm"
-          registry-url: "https://npm.pkg.github.com"
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm install --no-save @microbit-foundation/website-deploy-aws@1.0.1
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: node ./bin/print-ci-env.js >> $GITHUB_ENV
       - uses: microbit-foundation/npm-package-versioner-action@v3
       - run: ./ci-build.sh

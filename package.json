@@ -9,7 +9,7 @@
   "scripts": {
     "build": "make",
     "test": "vitest",
-    "deploy": "website-deploy-aws",
+    "deploy": "website-deploy-s3",
     "invalidate": "aws cloudfront create-invalidation --distribution-id $(printenv ${STAGE}_CLOUDFRONT_DISTRIBUTION_ID) --paths \"/*\""
   },
   "repository": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/microbit-foundation/micropython-microbit-v2-simulator#readme",
   "devDependencies": {
+    "@microbit/website-deploy-s3": "^1.2.0",
     "esbuild": "^0.14.49",
     "prettier": "2.6.0",
     "vitest": "^0.22.1"

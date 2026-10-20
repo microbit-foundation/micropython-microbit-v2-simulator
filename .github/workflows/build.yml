@@ -16,11 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     env:
       AWS_DEFAULT_REGION: eu-west-1
-      PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID: E15FPP46STH15O
-      STAGING_CLOUDFRONT_DISTRIBUTION_ID: E15FPP46STH15O
-      REVIEW_CLOUDFRONT_DISTRIBUTION_ID: E2DW5F7PA9W7JD
 
     steps:
       # Note: This workflow will not run on forks without modification; we're open to making steps
@@ -35,14 +33,16 @@ jobs:
       - run: node ./bin/print-ci-env.js >> $GITHUB_ENV
       - uses: microbit-foundation/npm-package-versioner-action@v3
       - run: ./ci-build.sh
+      # The buckets, distributions and roles are in
+      # microbit-foundation/microbit-org's apps/simulator. Only main and
+      # release tags can assume the role for staging and releases.
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        with:
+          role-to-assume: arn:aws:iam::700731169244:role/github-actions-deploy-simulator-content${{ env.STAGE != 'REVIEW' && '-release' || '' }}
+          aws-region: eu-west-1
       - run: npm run deploy
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.WEB_DEPLOY_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEB_DEPLOY_AWS_SECRET_ACCESS_KEY }}
           # Set to 1 for one deploy after changing params in deployment.js,
           # as unchanged files are otherwise skipped.
           WEBSITE_DEPLOY_FORCE: 0
       - run: npm run invalidate
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.WEB_DEPLOY_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEB_DEPLOY_AWS_SECRET_ACCESS_KEY }}

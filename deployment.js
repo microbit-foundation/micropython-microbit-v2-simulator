@@ -7,25 +7,30 @@ const {
   createDeploymentDetailsFromOptions,
 } = require("@microbit/website-deploy-s3");
 
+// The buckets and their distributions are defined in
+// microbit-foundation/microbit-org (apps/simulator), along with the version
+// aliases such as /v/0.1/, which move when a release is added there.
 const { s3Config } = createDeploymentDetailsFromOptions({
   production: {
-    bucket: "python-simulator.usermbit.org",
+    bucket: "python-simulator-usermbit-org-production",
     mode: "patch",
   },
   staging: {
-    bucket: "python-simulator.usermbit.org",
+    bucket: "python-simulator-usermbit-org-production",
     prefix: "staging",
   },
   review: {
-    bucket: "review-python-simulator.usermbit.org",
+    bucket: "python-simulator-usermbit-org-review",
     mode: "branch-prefix",
   },
 });
 module.exports = {
   ...s3Config,
   region: "eu-west-1",
+  // The buckets are private (BucketOwnerEnforced), so objects take no ACL.
+  acl: null,
+  findDistribution: true,
   removeNonexistentObjects: true,
-  redirects: [],
   params: {
     "**/*": {
       CacheControl: "public, max-age=0, must-revalidate",

@@ -21,7 +21,6 @@ test.describe("lifecycle", () => {
   test("stop and run again", async ({ simulator }) => {
     await simulator.run("while True:\n    sleep(100)\n");
     await simulator.stop();
-    await simulator.waitForState((s) => (s.radio as any)?.enabled === false);
     await simulator.run("print('again')\n");
     await simulator.expectFinished();
   });

@@ -22,6 +22,7 @@ export interface SimulatorMessage {
 
 export class Simulator {
   private started = false;
+  private running = false;
   /**
    * Errors matching these don't fail the test. Use for tests that deliberately
    * provoke an error.
@@ -50,16 +51,20 @@ export class Simulator {
    */
   async run(main: string, files: Record<string, string> = {}): Promise<void> {
     const filesystem = { ...files, "main.py": main };
-    await this.page.evaluate((filesystem) => {
-      const w = window as any;
-      w.serial = "";
-      w.filesystem = Object.fromEntries(
-        Object.entries(filesystem).map(([k, v]) => [
-          k,
-          new TextEncoder().encode(v),
-        ]),
-      );
-    }, filesystem);
+    await this.page.evaluate(
+      ({ filesystem, running }) => {
+        const w = window as any;
+        w.serial = "";
+        w.clearSerialOnStop = running;
+        w.filesystem = Object.fromEntries(
+          Object.entries(filesystem).map(([k, v]) => [
+            k,
+            new TextEncoder().encode(v),
+          ]),
+        );
+      },
+      { filesystem, running: this.running },
+    );
     await this.frame.locator("body").evaluate(() => {
       const recording = (window as any).__audioRecording;
       if (recording) {
@@ -75,6 +80,7 @@ export class Simulator {
       await this.frame.locator(".play-button").click();
       this.started = true;
     }
+    this.running = true;
   }
 
   /** Audio output since the last run. Needs the recordAudio option. */
@@ -88,13 +94,18 @@ export class Simulator {
             "Audio isn't recorded without the recordAudio option",
           );
         }
-        const samples: number[] = [];
-        for (const chunk of recording.chunks) {
-          samples.push(...chunk);
+        const chunks: Float32Array[] = recording.chunks;
+        const samples = new Float32Array(
+          chunks.reduce((total, chunk) => total + chunk.length, 0),
+        );
+        let offset = 0;
+        for (const chunk of chunks) {
+          samples.set(chunk, offset);
+          offset += chunk.length;
         }
         return { sampleRate: recording.sampleRate, samples };
       });
-    return new AudioRecording(new Float32Array(samples), sampleRate);
+    return new AudioRecording(samples, sampleRate);
   }
 
   /** Serial output since the last run, with line endings normalised. */
@@ -138,8 +149,16 @@ export class Simulator {
     await this.send({ kind: "radio_input", data });
   }
 
+  /** Stops the program and waits until it has stopped. */
   async stop(): Promise<void> {
+    const stopCount = () =>
+      this.page.evaluate(() => (window as any).stopCount as number);
+    const before = await stopCount();
     await this.send({ kind: "stop" });
+    if (this.running) {
+      await expect.poll(stopCount).toBeGreaterThan(before);
+      this.running = false;
+    }
   }
 
   async mute(): Promise<void> {

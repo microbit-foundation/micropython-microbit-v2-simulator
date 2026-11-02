@@ -15,6 +15,11 @@
       window.messages = [];
       window.serial = "";
       window.filesystem = {};
+      // The board posts its full state when a program stops.
+      window.stopCount = 0;
+      // A program that is replaced by a flash can still print until it stops,
+      // so the fixture sets this to discard that output.
+      window.clearSerialOnStop = false;
 
       window.send = (message) => iframe.contentWindow.postMessage(message, "*");
 
@@ -26,6 +31,16 @@
         switch (message.kind) {
           case "serial_output":
             window.serial += message.data;
+            break;
+          case "state_change":
+            // Component changes only include their own keys.
+            if ("radio" in message.change && "buttonA" in message.change) {
+              window.stopCount++;
+              if (window.clearSerialOnStop) {
+                window.serial = "";
+                window.clearSerialOnStop = false;
+              }
+            }
             break;
           case "internal_error":
             // Error objects don't survive page.evaluate serialization.

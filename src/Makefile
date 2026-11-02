@@ -59,6 +59,11 @@ ESBUILD_TARGET = chrome85,firefox79,safari14.1
 # roughly 10 KB compressed.
 JSFLAGS += --profiling-funcs
 
+# emcc doesn't see COPT when linking. Without an -O flag here it links at -O0,
+# which skips Binaryen's optimizations (including after ASYNCIFY) and enables
+# assertions in production.
+JSFLAGS += -O3
+
 JSFLAGS += -s ASYNCIFY
 # We can hit lower values due to user stack use. See stack_size.py example.
 JSFLAGS += -s ASYNCIFY_STACK_SIZE=262144

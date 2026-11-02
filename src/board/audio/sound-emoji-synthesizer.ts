@@ -48,7 +48,7 @@ export class SoundEmojiSynthesizer {
   constructor(
     id: number,
     private onDone: () => void,
-    sampleRate = EMOJI_SYNTHESIZER_SAMPLE_RATE
+    sampleRate = EMOJI_SYNTHESIZER_SAMPLE_RATE,
   ) {
     this.position = 0;
     this.bufferSize = EMOJI_SYNTHESIZER_BUFFER_SIZE;
@@ -106,7 +106,7 @@ export class SoundEmojiSynthesizer {
       this.effect.effects[i].step = 0;
       this.effect.effects[i].steps = Math.max(this.effect.effects[i].steps, 1);
       this.samplesPerStep[i] = Math.floor(
-        this.samplesToWrite / this.effect.effects[i].steps
+        this.samplesToWrite / this.effect.effects[i].steps,
       );
     }
     return false;
@@ -187,7 +187,7 @@ export class SoundEmojiSynthesizer {
           // Synthesize a sample
           let s = this.effect.tone.tonePrint(
             this.effect.tone.parameter,
-            Math.max(this.position, 0)
+            Math.max(this.position, 0),
           );
 
           // Apply volume scaling and OR mask (if specified).

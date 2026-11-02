@@ -67,7 +67,7 @@ export class TouchPin extends BasePin {
   constructor(
     private id: "pin0" | "pin1" | "pin2" | "pinLogo",
     private ui: { element: SVGElement; label: () => string } | null,
-    private onChange: (changes: Partial<State>) => void
+    private onChange: (changes: Partial<State>) => void,
   ) {
     super(id);
 
@@ -147,14 +147,14 @@ export class TouchPin extends BasePin {
   press() {
     this.setValueInternal(
       this.state.value === this.state.min ? this.state.max : this.state.min,
-      true
+      true,
     );
   }
 
   release() {
     this.setValueInternal(
       this.state.value === this.state.max ? this.state.min : this.state.max,
-      true
+      true,
     );
   }
 

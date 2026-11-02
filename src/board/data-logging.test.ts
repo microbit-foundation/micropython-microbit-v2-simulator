@@ -21,7 +21,7 @@ describe("DataLogging", () => {
     onLogOutput,
     onSerialOutput,
     onLogDelete,
-    onChange
+    onChange,
   );
 
   afterEach(() => {
@@ -34,7 +34,7 @@ describe("DataLogging", () => {
       onLogOutput,
       onSerialOutput,
       onLogDelete,
-      onChange
+      onChange,
     );
   });
 

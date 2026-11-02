@@ -5,7 +5,7 @@ const encoder = new TextEncoder();
 const msg = encoder.encode("hello");
 const altMsg = encoder.encode("goodbye");
 const longMsg = encoder.encode(
-  "This is a message that is longer than 32 bytes"
+  "This is a message that is longer than 32 bytes",
 );
 // Truncated to 32 bytes - 3 bytes for header info.
 const longMsgTruncated = encoder.encode("This is a message that is lon");
@@ -114,7 +114,7 @@ describe("Radio", () => {
         group: 2,
       });
     }).toThrowError(
-      new Error("If queue or payload change then should call disable/enable.")
+      new Error("If queue or payload change then should call disable/enable."),
     );
   });
 

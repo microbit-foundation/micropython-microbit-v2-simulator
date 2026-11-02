@@ -17,7 +17,7 @@ import {
 } from "./constants";
 
 export function convertSoundThresholdNumberToString(
-  value: number
+  value: number,
 ): "low" | "high" {
   switch (value) {
     case MICROBIT_HAL_MICROPHONE_SET_THRESHOLD_LOW:
@@ -98,7 +98,7 @@ export function convertAccelerometerNumberToString(value: number): string {
 export const convertAudioBuffer = (
   heap: Uint8Array,
   source: number,
-  target: AudioBuffer
+  target: AudioBuffer,
 ) => {
   const channel = target.getChannelData(0);
   for (let i = 0; i < channel.length; ++i) {

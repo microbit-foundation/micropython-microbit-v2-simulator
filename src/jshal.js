@@ -50,21 +50,21 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_stdout_tx_strn: function (
     /** @type {number} */ ptr,
-    /** @type {number} */ len
+    /** @type {number} */ len,
   ) {
     Module.board.writeSerialOutput(UTF8ToString(ptr, len));
   },
 
   mp_js_hal_filesystem_find: function (
     /** @type {number} */ name,
-    /** @type {number} */ len
+    /** @type {number} */ len,
   ) {
     return Module.fs.find(UTF8ToString(name, len));
   },
 
   mp_js_hal_filesystem_create: function (
     /** @type {number} */ name,
-    /** @type {number} */ len
+    /** @type {number} */ len,
   ) {
     const filename = UTF8ToString(name, len);
     return Module.fs.create(filename);
@@ -72,7 +72,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_filesystem_name: function (
     /** @type {number} */ idx,
-    /** @type {number} */ buf
+    /** @type {number} */ buf,
   ) {
     const name = Module.fs.name(idx);
     if (name === undefined) {
@@ -93,7 +93,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_filesystem_readbyte: function (
     /** @type {number} */ idx,
-    /** @type {number} */ offset
+    /** @type {number} */ offset,
   ) {
     return Module.fs.readbyte(idx, offset);
   },
@@ -101,7 +101,7 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_filesystem_write: function (
     /** @type {number} */ idx,
     /** @type {number} */ buf,
-    /** @type {number} */ len
+    /** @type {number} */ len,
   ) {
     const data = new Uint8Array(Module.HEAPU8.buffer, buf, len);
     return Module.fs.write(idx, data);
@@ -137,14 +137,14 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_pin_set_analog_period_us: function (
     /** @type {number} */ pin,
-    /** @type {number} */ period
+    /** @type {number} */ period,
   ) {
     return Module.board.pins[pin].setAnalogPeriodUs(period);
   },
 
   mp_js_hal_display_get_pixel: function (
     /** @type {number} */ x,
-    /** @type {number} */ y
+    /** @type {number} */ y,
   ) {
     return Module.board.display.getPixel(x, y);
   },
@@ -152,7 +152,7 @@ mergeInto(LibraryManager.library, {
   mp_js_hal_display_set_pixel: function (
     /** @type {number} */ x,
     /** @type {number} */ y,
-    /** @type {number} */ value
+    /** @type {number} */ value,
   ) {
     Module.board.display.setPixel(x, y, value);
   },
@@ -179,7 +179,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_accelerometer_get_gesture: function () {
     return Module.conversions.convertAccelerometerStringToNumber(
-      Module.board.accelerometer.state.gesture.value
+      Module.board.accelerometer.state.gesture.value,
     );
   },
 
@@ -218,7 +218,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_audio_write_data: function (
     /** @type {number} */ buf,
-    /** @type {number} */ num_samples
+    /** @type {number} */ num_samples,
   ) {
     // @ts-expect-error
     Module.board.audio.default.writeData(
@@ -226,8 +226,8 @@ mergeInto(LibraryManager.library, {
         Module.HEAPU8,
         buf,
         // @ts-expect-error
-        Module.board.audio.default.createBuffer(num_samples)
-      )
+        Module.board.audio.default.createBuffer(num_samples),
+      ),
     );
   },
 
@@ -238,7 +238,7 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_audio_speech_write_data: function (
     /** @type {number} */ buf,
-    /** @type {number} */ num_samples
+    /** @type {number} */ num_samples,
   ) {
     /** @type {AudioBuffer | undefined} */ let webAudioBuffer;
     try {
@@ -255,7 +255,7 @@ mergeInto(LibraryManager.library, {
     }
     // @ts-expect-error
     Module.board.audio.speech.writeData(
-      Module.conversions.convertAudioBuffer(Module.HEAPU8, buf, webAudioBuffer)
+      Module.conversions.convertAudioBuffer(Module.HEAPU8, buf, webAudioBuffer),
     );
   },
 
@@ -264,7 +264,7 @@ mergeInto(LibraryManager.library, {
   },
 
   mp_js_hal_audio_amplitude_u10: function (
-    /** @type {number} */ amplitude_u10
+    /** @type {number} */ amplitude_u10,
   ) {
     Module.board.audio.setAmplitudeU10(amplitude_u10);
   },
@@ -275,11 +275,11 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_microphone_set_threshold: function (
     /** @type {number} */ kind,
-    /** @type {number} */ value
+    /** @type {number} */ value,
   ) {
     Module.board.microphone.setThreshold(
       Module.conversions.convertSoundThresholdNumberToString(kind),
-      value
+      value,
     );
   },
 
@@ -302,7 +302,7 @@ mergeInto(LibraryManager.library, {
   mp_js_radio_enable: function (
     /** @type {number} */ group,
     /** @type {number} */ max_payload,
-    /** @type {number} */ queue
+    /** @type {number} */ queue,
   ) {
     Module.board.radio.enable({ group, maxPayload: max_payload, queue });
   },
@@ -314,7 +314,7 @@ mergeInto(LibraryManager.library, {
   mp_js_radio_update_config: function (
     /** @type {number} */ group,
     /** @type {number} */ max_payload,
-    /** @type {number} */ queue
+    /** @type {number} */ queue,
   ) {
     Module.board.radio.updateConfig({ group, maxPayload: max_payload, queue });
   },
@@ -323,7 +323,7 @@ mergeInto(LibraryManager.library, {
     /** @type {number} */ buf,
     /** @type {number} */ len,
     /** @type {number} */ buf2,
-    /** @type {number} */ len2
+    /** @type {number} */ len2,
   ) {
     const data = new Uint8Array(len + len2);
     data.set(Module.HEAPU8.slice(buf, buf + len));
@@ -366,11 +366,11 @@ mergeInto(LibraryManager.library, {
 
   mp_js_hal_log_data: function (
     /** @type {number} */ key,
-    /** @type {number} */ value
+    /** @type {number} */ value,
   ) {
     return Module.board.dataLogging.logData(
       UTF8ToString(key),
-      UTF8ToString(value)
+      UTF8ToString(value),
     );
   },
 });

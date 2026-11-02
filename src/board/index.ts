@@ -153,10 +153,10 @@ export class Board {
   constructor(
     private notifications: Notifications,
     private fs: FileSystem,
-    private svg: SVGElement
+    private svg: SVGElement,
   ) {
     this.display = new Display(
-      Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use"))
+      Array.from(this.svg.querySelector("#LEDsOn")!.querySelectorAll("use")),
     );
     const onChange = this.notifications.onStateChange;
     this.buttons = [
@@ -164,13 +164,13 @@ export class Board {
         "buttonA",
         this.svg.querySelector("#ButtonA")!,
         () => this.formattedMessage({ id: "button-a" }),
-        onChange
+        onChange,
       ),
       new Button(
         "buttonB",
         this.svg.querySelector("#ButtonB")!,
         () => this.formattedMessage({ id: "button-b" }),
-        onChange
+        onChange,
       ),
     ];
     this.pins = Array(33);
@@ -180,7 +180,7 @@ export class Board {
         element: this.svg.querySelector("#Logo")!,
         label: () => this.formattedMessage({ id: "touch-logo" }),
       },
-      onChange
+      onChange,
     );
     this.pins[MICROBIT_HAL_PIN_P0] = new TouchPin("pin0", null, onChange);
     this.pins[MICROBIT_HAL_PIN_P1] = new TouchPin("pin1", null, onChange);
@@ -208,21 +208,21 @@ export class Board {
     this.compass = new Compass();
     this.microphone = new Microphone(
       this.svg.querySelector("#LitMicrophone")!,
-      onChange
+      onChange,
     );
 
     const currentTimeMillis = this.ticksMilliseconds.bind(this);
     this.radio = new Radio(
       this.notifications.onRadioOutput.bind(this.notifications),
       onChange,
-      currentTimeMillis
+      currentTimeMillis,
     );
     this.dataLogging = new DataLogging(
       currentTimeMillis,
       this.notifications.onLogOutput,
       this.notifications.onSerialOutput,
       this.notifications.onLogDelete,
-      onChange
+      onChange,
     );
 
     this.stoppedOverlay = document.querySelector(".play-button-container")!;
@@ -253,10 +253,10 @@ export class Board {
       speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
     });
     this.accelerometer.initializeCallbacks(
-      wrapped._microbit_hal_gesture_callback
+      wrapped._microbit_hal_gesture_callback,
     );
     this.microphone.initializeCallbacks(
-      wrapped._microbit_hal_level_detector_callback
+      wrapped._microbit_hal_level_detector_callback,
     );
     return module;
   }
@@ -756,7 +756,7 @@ export class Notifications {
         kind,
         ...data,
       },
-      "*"
+      "*",
     );
   }
 }
@@ -821,13 +821,13 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
 };
 
 function isFileSystem(
-  fileSystem: any
+  fileSystem: any,
 ): fileSystem is Record<string, Uint8Array> {
   if (typeof fileSystem !== "object") {
     return false;
   }
   return Object.entries(fileSystem).every(
-    ([k, v]) => typeof k === "string" && v instanceof Uint8Array
+    ([k, v]) => typeof k === "string" && v instanceof Uint8Array,
   );
 }
 

@@ -16,7 +16,7 @@ export class Button {
     private id: "buttonA" | "buttonB",
     private element: SVGElement,
     private label: () => string,
-    private onChange: (change: Partial<State>) => void
+    private onChange: (change: Partial<State>) => void,
   ) {
     this._presses = 0;
     this.state = new RangeSensor(id, 0, 1, 0, undefined);
@@ -97,14 +97,14 @@ export class Button {
   press() {
     this.setValueInternal(
       this.state.value === this.state.min ? this.state.max : this.state.min,
-      true
+      true,
     );
   }
 
   release() {
     this.setValueInternal(
       this.state.value === this.state.max ? this.state.min : this.state.max,
-      true
+      true,
     );
   }
 

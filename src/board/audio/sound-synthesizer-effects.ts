@@ -20,14 +20,14 @@ import { ToneEffect } from "./sound-expressions";
 
 export function noInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {}
 
 // Linear interpolate function.
 // parameter[0]: end frequency
 export function linearInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   let interval =
     (context.parameter[0] - synth.effect.frequency) / context.steps;
@@ -38,7 +38,7 @@ export function linearInterpolation(
 // parameter[0]: end frequency
 export function logarithmicInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     synth.effect.frequency +
@@ -51,7 +51,7 @@ export function logarithmicInterpolation(
 // parameter[0]: end frequency
 export function curveInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     Math.sin((context.step * 3.12159) / 180.0) *
@@ -63,7 +63,7 @@ export function curveInterpolation(
 // parameter[0]: end frequency
 export function slowVibratoInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     Math.sin(context.step / 10) * context.parameter[0] + synth.effect.frequency;
@@ -73,7 +73,7 @@ export function slowVibratoInterpolation(
 // parameter[0]: end frequency
 export function warbleInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     Math.sin(context.step) * (context.parameter[0] - synth.effect.frequency) +
@@ -84,7 +84,7 @@ export function warbleInterpolation(
 // parameter[0]: end frequency
 export function vibratoInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     synth.effect.frequency + Math.sin(context.step) * context.parameter[0];
@@ -94,7 +94,7 @@ export function vibratoInterpolation(
 // parameter[0]: end frequency
 export function exponentialRisingInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     synth.effect.frequency +
@@ -104,7 +104,7 @@ export function exponentialRisingInterpolation(
 // Exponential falling function
 export function exponentialFallingInterpolation(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency =
     synth.effect.frequency +
@@ -114,23 +114,23 @@ export function exponentialFallingInterpolation(
 // Argeppio functions
 export function appregrioAscending(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency = calculateFrequencyFromProgression(
     synth.effect.frequency,
     context.parameter_p[0],
-    context.step
+    context.step,
   );
 }
 
 export function appregrioDescending(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   synth.frequency = calculateFrequencyFromProgression(
     synth.effect.frequency,
     context.parameter_p[0],
-    context.steps - context.step - 1
+    context.steps - context.step - 1,
   );
 }
 
@@ -142,7 +142,7 @@ export function appregrioDescending(
 // parameter[0]: vibrato frequency multiplier
 export function frequencyVibratoEffect(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   if (context.step == 0) return;
 
@@ -154,7 +154,7 @@ export function frequencyVibratoEffect(
 // parameter[0]: vibrato volume multiplier
 export function volumeVibratoEffect(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   if (context.step == 0) return;
 
@@ -173,7 +173,7 @@ export function volumeVibratoEffect(
  */
 export function adsrVolumeEffect(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   let halfSteps = context.steps * 0.5;
 
@@ -193,7 +193,7 @@ export function adsrVolumeEffect(
  */
 export function volumeRampEffect(
   synth: SoundEmojiSynthesizer,
-  context: ToneEffect
+  context: ToneEffect,
 ) {
   let delta = (context.parameter[0] - synth.effect.volume) / context.steps;
   synth.volume = synth.effect.volume + context.step * delta;

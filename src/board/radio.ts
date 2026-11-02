@@ -14,7 +14,7 @@ export class Radio {
   constructor(
     private onSend: (data: Uint8Array) => void,
     private onChange: (changes: Partial<State>) => void,
-    private ticksMilliseconds: () => number
+    private ticksMilliseconds: () => number,
   ) {}
 
   peek(): Uint8Array | undefined {
@@ -69,7 +69,7 @@ export class Radio {
       config.maxPayload !== this.config.maxPayload
     ) {
       throw new Error(
-        "If queue or payload change then should call disable/enable."
+        "If queue or payload change then should call disable/enable.",
       );
     }
 

@@ -12,7 +12,7 @@ export class Display {
     0,
     255,
     127,
-    undefined
+    undefined,
   );
   private state: Array<Array<number>>;
   constructor(private leds: SVGElement[]) {

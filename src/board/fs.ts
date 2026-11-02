@@ -92,7 +92,10 @@ export class FileSystem {
 const EMPTY_ARRAY = new Uint8Array(0);
 
 class FsFile {
-  constructor(public name: string, private buffer: Uint8Array = EMPTY_ARRAY) {}
+  constructor(
+    public name: string,
+    private buffer: Uint8Array = EMPTY_ARRAY,
+  ) {}
   readbyte(offset: number) {
     if (offset < this.buffer.length) {
       return this.buffer[offset];

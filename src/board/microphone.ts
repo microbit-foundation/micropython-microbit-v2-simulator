@@ -14,13 +14,13 @@ export class Microphone {
     0,
     undefined,
     75,
-    150
+    150,
   );
   private soundLevelCallback: SoundLevelCallback | undefined;
 
   constructor(
     private element: SVGElement,
-    private onChange: (changes: Partial<State>) => void
+    private onChange: (changes: Partial<State>) => void,
   ) {}
 
   microphoneOn() {

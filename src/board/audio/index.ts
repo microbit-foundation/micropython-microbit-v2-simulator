@@ -39,7 +39,7 @@ export class Audio {
     this.muteNode = this.context.createGain();
     this.muteNode.gain.setValueAtTime(
       this.muted ? 0 : 1,
-      this.context.currentTime
+      this.context.currentTime,
     );
     this.muteNode.connect(this.context.destination);
     this.volumeNode = this.context.createGain();
@@ -48,12 +48,12 @@ export class Audio {
     this.default = new BufferedAudio(
       this.context,
       this.volumeNode,
-      defaultAudioCallback
+      defaultAudioCallback,
     );
     this.speech = new BufferedAudio(
       this.context,
       this.volumeNode,
-      speechAudioCallback
+      speechAudioCallback,
     );
     this.soundExpression = new BufferedAudio(
       this.context,
@@ -62,7 +62,7 @@ export class Audio {
         if (this.currentSoundExpressionCallback) {
           this.currentSoundExpressionCallback();
         }
-      }
+      },
     );
   }
 
@@ -93,7 +93,7 @@ export class Audio {
         const target = this.context.createBuffer(
           1,
           source.length,
-          synth.sampleRate
+          synth.sampleRate,
         );
         const channel = target.getChannelData(0);
         for (let i = 0; i < source.length; i++) {
@@ -132,7 +132,7 @@ export class Audio {
   setVolume(volume: number) {
     this.volumeNode!.gain.setValueAtTime(
       volume / 255,
-      this.context!.currentTime
+      this.context!.currentTime,
     );
   }
 
@@ -177,7 +177,7 @@ class BufferedAudio {
   constructor(
     private context: AudioContext,
     private destination: AudioNode,
-    private callback: () => void
+    private callback: () => void,
   ) {}
 
   init(sampleRate: number) {

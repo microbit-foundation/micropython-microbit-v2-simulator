@@ -3,10 +3,7 @@ import { EnumSensor, RangeSensor, State } from "./state";
 import { clamp } from "./util";
 
 type StateKeys =
-  | "accelerometerX"
-  | "accelerometerY"
-  | "accelerometerZ"
-  | "gesture";
+  "accelerometerX" | "accelerometerY" | "accelerometerZ" | "gesture";
 
 type GestureCallback = (v: number) => void;
 
@@ -41,7 +38,7 @@ export class Accelerometer {
           "8g",
           "shake",
         ],
-        "none"
+        "none",
       ),
     };
   }
@@ -50,7 +47,7 @@ export class Accelerometer {
     this.state[id].setValue(value);
     if (id === "gesture" && this.gestureCallback) {
       this.gestureCallback(
-        convertAccelerometerStringToNumber(this.state.gesture.value)
+        convertAccelerometerStringToNumber(this.state.gesture.value),
       );
     }
   }

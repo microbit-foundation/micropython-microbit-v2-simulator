@@ -38,7 +38,7 @@ function initServiceWorker() {
       },
       (error) => {
         console.error(`Simulator service worker registration failed: ${error}`);
-      }
+      },
     );
   });
 }

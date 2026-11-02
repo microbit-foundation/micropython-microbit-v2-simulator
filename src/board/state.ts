@@ -38,13 +38,16 @@ export interface State {
 }
 
 export abstract class Sensor {
-  constructor(public type: string, public id: string) {}
+  constructor(
+    public type: string,
+    public id: string,
+  ) {}
 
   abstract setValue(value: any): void;
 
   protected valueError(value: any) {
     return new Error(
-      `${this.id} given invalid value: ${JSON.stringify(value)}`
+      `${this.id} given invalid value: ${JSON.stringify(value)}`,
     );
   }
 }
@@ -59,7 +62,7 @@ export class RangeSensor extends Sensor {
     initial: number,
     public unit: string | undefined,
     public lowThreshold?: number,
-    public highThreshold?: number
+    public highThreshold?: number,
   ) {
     super("range", id);
     this.value = initial;
@@ -88,7 +91,11 @@ export class RangeSensor extends Sensor {
 export class EnumSensor extends Sensor {
   public value: string;
 
-  constructor(id: string, public choices: string[], initial: string) {
+  constructor(
+    id: string,
+    public choices: string[],
+    initial: string,
+  ) {
     super("enum", id);
     this.id = id;
     this.choices = choices;

@@ -4,7 +4,12 @@ export type {};
 declare const self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
-const assets = ["simulator.html", "build/simulator.js", "build/firmware.js", "build/firmware.wasm"];
+const assets = [
+  "simulator.html",
+  "build/simulator.js",
+  "build/firmware.js",
+  "build/firmware.wasm",
+];
 const cacheName = `simulator-${process.env.VERSION}`;
 
 self.addEventListener("install", (event) => {
@@ -14,7 +19,7 @@ self.addEventListener("install", (event) => {
     (async () => {
       const cache = await caches.open(cacheName);
       await cache.addAll(assets);
-    })()
+    })(),
   );
 });
 
@@ -28,10 +33,10 @@ self.addEventListener("activate", (event) => {
           if (/^simulator-/.test(name) && name !== cacheName) {
             return caches.delete(name);
           }
-        })
+        }),
       );
       await clients.claim();
-    })()
+    })(),
   );
 });
 
@@ -46,6 +51,6 @@ self.addEventListener("fetch", (event) => {
       const cache = await caches.open(cacheName);
       cache.put(event.request, response.clone());
       return response;
-    })()
+    })(),
   );
 });

@@ -25,13 +25,13 @@ const flagsForParams = (stage: Stage, params: URLSearchParams) => {
   const allFlagsDefault = enableFlags.has("none")
     ? false
     : enableFlags.has("*")
-    ? true
-    : undefined;
+      ? true
+      : undefined;
   return Object.fromEntries(
     allFlags.map((f) => [
       f.name,
       isEnabled(f, stage, allFlagsDefault, enableFlags.has(f.name)),
-    ])
+    ]),
   ) as Flags;
 };
 
@@ -39,7 +39,7 @@ const isEnabled = (
   f: FlagMetadata,
   stage: Stage,
   allFlagsDefault: boolean | undefined,
-  thisFlagOn: boolean
+  thisFlagOn: boolean,
 ): boolean => {
   if (thisFlagOn) {
     return true;

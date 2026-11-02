@@ -115,7 +115,7 @@ export const wholeTone: Progression = {
 export function calculateFrequencyFromProgression(
   root: number,
   progression: Progression,
-  offset: number
+  offset: number,
 ) {
   let octave = Math.floor(offset / progression.length);
   let index = offset % progression.length;

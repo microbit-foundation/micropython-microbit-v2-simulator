@@ -11,7 +11,11 @@ export PYTHON=python3.7 # Needed by Emscripten in Netlify's build image.
 git clone https://github.com/emscripten-core/emsdk.git -b $VERSION ~/.emsdk
 ~/.emsdk/emsdk install $VERSION
 ~/.emsdk/emsdk activate $VERSION
+# emsdk_env.sh puts its bundled Node first on PATH, which is too old for our JS
+# tooling. Emscripten finds its Node via EMSDK_NODE/.emscripten, not PATH.
+NODE_BIN="$(dirname "$(command -v node)")"
 source ~/.emsdk/emsdk_env.sh
+export PATH="$NODE_BIN:$PATH"
 
 # mpy-cross is built with the host compiler and -Werror, and the host GCC has
 # moved several releases beyond the pinned MicroPython: it now rejects the tree

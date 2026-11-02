@@ -31,7 +31,7 @@ export class DataLogging {
     private onLogOutput: (data: LogEntry) => void,
     private onSerialOutput: (data: string) => void,
     private onLogDelete: () => void,
-    private onChange: (state: Partial<State>) => void
+    private onChange: (state: Partial<State>) => void,
   ) {}
 
   setMirroring(mirroring: boolean) {
@@ -75,7 +75,7 @@ export class DataLogging {
       if (this.timestamp !== MICROBIT_HAL_LOG_TIMESTAMP_NONE) {
         this.logData(
           timestampToHeading(this.timestamp),
-          formatTimestamp(this.timestamp, this.currentTimeMillis())
+          formatTimestamp(this.timestamp, this.currentTimeMillis()),
         );
       }
       entry.data = this.row;

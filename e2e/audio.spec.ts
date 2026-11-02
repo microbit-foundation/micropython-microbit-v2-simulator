@@ -1,4 +1,4 @@
-import { AudioStats } from "./audio";
+import { AudioRecording, AudioStats } from "./audio";
 import { expect, Simulator, test } from "./fixtures";
 
 test.use({ recordAudio: true });
@@ -137,6 +137,31 @@ test("AudioFrame playback", async ({ simulator }) => {
 test.fail("AudioFrame playback has no dropouts", async ({ simulator }) => {
   const audio = await runToEnd(simulator, audioFrameProgram);
   expect(audio.stats().gaps).toBe(0);
+});
+
+test("stopping the program stops the sound", async ({ simulator }) => {
+  await simulator.run(
+    "from microbit import *\nimport music\nmusic.pitch(440, wait=False)\nprint('playing')\nwhile True:\n    sleep(100)\n",
+  );
+  await simulator.expectSerial(/playing/);
+  await simulator.page.waitForTimeout(500);
+  await simulator.stop();
+  const atStop = (await simulator.audio()).samples.length;
+  await simulator.page.waitForTimeout(1000);
+  const audio = await simulator.audio();
+  const afterStop = new AudioRecording(
+    audio.samples.subarray(atStop),
+    audio.sampleRate,
+  );
+  expect(audio.stats().soundSeconds).toBeGreaterThan(0.3);
+  // Allow for the buffer that was already playing.
+  expectWithin(afterStop.stats(), "soundSeconds", 0, 0.2);
+  expect(
+    afterStop
+      .windows(0.1)
+      .slice(2)
+      .every((w) => w.rms === 0),
+  ).toBe(true);
 });
 
 test("muting from the embedder silences output", async ({ simulator }) => {

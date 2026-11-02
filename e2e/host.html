@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simulator test host</title>
+  </head>
+  <body>
+    <iframe id="simulator" width="400" height="330"></iframe>
+    <script>
+      const iframe = document.querySelector("#simulator");
+      const params = new URLSearchParams(location.search);
+      iframe.src = "/simulator.html?" + params.toString();
+
+      // Read by the Playwright fixture.
+      window.messages = [];
+      window.serial = "";
+      window.filesystem = {};
+
+      window.send = (message) => iframe.contentWindow.postMessage(message, "*");
+
+      window.addEventListener("message", (e) => {
+        if (e.source !== iframe.contentWindow) {
+          return;
+        }
+        const message = e.data;
+        switch (message.kind) {
+          case "serial_output":
+            window.serial += message.data;
+            break;
+          case "internal_error":
+            // Error objects don't survive page.evaluate serialization.
+            message.error = String(message.error?.stack ?? message.error);
+            break;
+          case "request_flash":
+            window.send({ kind: "flash", filesystem: window.filesystem });
+            break;
+        }
+        window.messages.push(message);
+      });
+    </script>
+  </body>
+</html>

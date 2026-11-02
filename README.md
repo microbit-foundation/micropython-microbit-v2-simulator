@@ -301,6 +301,26 @@ View at http://localhost:3000/demo.html
 
 View at http://localhost:8000/demo.html
 
+### Tests
+
+Unit tests for the TypeScript board code:
+
+    $ npm test
+
+End-to-end tests run the built simulator in Chromium with Playwright, against
+both the release and debug (`?flag=debugWasm`) firmware. Build first, then:
+
+    $ npx playwright install chromium
+    $ npm run test:e2e
+
+They use a server on port 3000 if one is running (e.g. `npx serve build`),
+otherwise they start one. Any console error, uncaught exception,
+`internal_error` message or firmware abort fails the test. Every file in
+`src/examples` must have an entry in `e2e/examples.spec.ts`.
+
+`e2e/audio.spec.ts` records the simulator's audio output and checks broad
+statistics (duration, level, pitch, dropouts) rather than exact samples.
+
 ### Branch deployments
 
 There is a CloudFlare pages based build for development purposes only. Do not

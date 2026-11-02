@@ -8,9 +8,10 @@
   },
   "scripts": {
     "build": "make",
-    "test": "vitest",
+    "test": "vitest --dir src",
     "deploy": "website-deploy-s3",
-    "invalidate": "invalidate-cloudfront-distribution"
+    "invalidate": "invalidate-cloudfront-distribution",
+    "test:e2e": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,10 @@
   "homepage": "https://github.com/microbit-foundation/micropython-microbit-v2-simulator#readme",
   "devDependencies": {
     "@microbit/website-deploy-s3": "^1.2.0",
+    "@playwright/test": "1.64.1",
     "esbuild": "^0.28.2",
     "prettier": "3.9.10",
+    "serve": "^14.2.6",
     "vitest": "^5.0.5"
   },
   "allowScripts": {

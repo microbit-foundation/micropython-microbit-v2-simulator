@@ -45,34 +45,13 @@ async function installServiceWorker(page: Page) {
   });
 }
 
-test("runs offline after a visit with the service worker", async ({
-  page,
-  context,
-}) => {
+test("runs offline straight after installing", async ({ page, context }) => {
   await page.addInitScript(embedInSelf);
   await installServiceWorker(page);
-  // The page itself is cached by this visit, as the precached simulator.html
-  // doesn't match the URL with the flag.
-  await page.reload();
-  await expectRunsProgram(page);
-
   await context.setOffline(true);
   await page.reload();
   await expectRunsProgram(page);
 });
-
-// The service worker precaches simulator.html, but caches.match compares the
-// query string too, so the page is only cached once the worker handles a load.
-test.fail(
-  "runs offline straight after installing",
-  async ({ page, context }) => {
-    await page.addInitScript(embedInSelf);
-    await installServiceWorker(page);
-    await context.setOffline(true);
-    await page.reload();
-    await expectRunsProgram(page);
-  },
-);
 
 test("without the flag an installed service worker is removed", async ({
   page,

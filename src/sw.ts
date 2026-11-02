@@ -43,7 +43,11 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
-      const cachedResponse = await caches.match(event.request);
+      // The page reads its query string (flags, colour) client-side, so any
+      // variant can be served from the precached simulator.html.
+      const cachedResponse = await caches.match(event.request, {
+        ignoreSearch: event.request.mode === "navigate",
+      });
       if (cachedResponse) {
         return cachedResponse;
       }

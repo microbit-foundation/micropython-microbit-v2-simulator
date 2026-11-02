@@ -27,12 +27,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <emscripten.h>
+#include <emscripten/stack.h>
 
 #include "py/gc.h"
 #include "py/compile.h"
 #include "py/mperrno.h"
 #include "py/mphal.h"
 #include "py/runtime.h"
+#include "py/stackctrl.h"
 #include "shared/readline/readline.h"
 #include "shared/runtime/gchelper.h"
 #include "shared/runtime/pyexec.h"
@@ -64,6 +66,12 @@ void mp_js_main(int heap_size) {
         microbit_hal_init();
         microbit_system_init();
         microbit_display_init();
+
+        // Check against Emscripten's stack in linear memory (STACK_SIZE). This
+        // is where MP_STACK_CHECK measures, not the browser's native stack.
+        // The margin covers unchecked C frames below the last check.
+        mp_stack_set_top((void *)emscripten_stack_get_base());
+        mp_stack_set_limit(emscripten_stack_get_base() - emscripten_stack_get_end() - 8 * 1024);
 
         #if MICROPY_ENABLE_GC
         char *heap = (char *)malloc(heap_size * sizeof(char));

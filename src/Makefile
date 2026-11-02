@@ -50,6 +50,10 @@ endif
 JSFLAGS += -s MIN_SAFARI_VERSION=140100
 ESBUILD_TARGET = chrome85,firefox79,safari14.1
 
+# Keep function names so stack traces in error reports are readable. Costs
+# roughly 10 KB compressed.
+JSFLAGS += --profiling-funcs
+
 JSFLAGS += -s ASYNCIFY
 # We can hit lower values due to user stack use. See stack_size.py example.
 JSFLAGS += -s ASYNCIFY_STACK_SIZE=262144

@@ -63,6 +63,11 @@ describe("Radio", () => {
     });
   });
 
+  it("ignores messages while the radio is off", () => {
+    radio.boardStopped();
+    expect(() => radio.receive(msg)).not.toThrow();
+  });
+
   it("receives a message that is too big and truncates it appropriately", () => {
     radio.receive(longMsg);
     expect(radio.peek()!.join("")).not.toContain(longMsg.join(""));

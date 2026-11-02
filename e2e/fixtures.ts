@@ -86,6 +86,9 @@ export class Simulator {
       });
     } else {
       await this.frame.locator(".play-button").click();
+      // The host sends the flash as soon as it sees this, so messages sent
+      // after it reach the simulator after the flash.
+      await this.waitForMessage("request_flash");
       this.started = true;
     }
     this.running = true;

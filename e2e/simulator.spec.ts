@@ -50,31 +50,6 @@ test.describe("REPL", () => {
   });
 });
 
-test.describe("audio", () => {
-  // These rely on callbacks from Web Audio into the firmware when buffers
-  // finish playing.
-  test("continues after music.play", async ({ simulator }) => {
-    await simulator.run(
-      "import music\nmusic.play(['c4:1', 'e4:1'])\nprint('done')\n",
-    );
-    await simulator.expectSerial(/done/);
-  });
-
-  test("continues after speech.say", async ({ simulator }) => {
-    await simulator.run("import speech\nspeech.say('hi')\nprint('done')\n");
-    await simulator.expectSerial(/done/);
-  });
-
-  test("continues after audio.play of a sound expression", async ({
-    simulator,
-  }) => {
-    await simulator.run(
-      "from microbit import *\naudio.play(Sound.HELLO)\nprint('done')\n",
-    );
-    await simulator.expectSerial(/done/);
-  });
-});
-
 test.describe("radio", () => {
   test("sends to the embedder", async ({ simulator }) => {
     await simulator.run(

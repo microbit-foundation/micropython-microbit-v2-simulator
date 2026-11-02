@@ -34,6 +34,7 @@ import { Pin, StubPin, TouchPin } from "./pins";
 import { Radio } from "./radio";
 import { RangeSensor, State } from "./state";
 import { ModuleWrapper } from "./wasm";
+import { flags } from "../flags";
 
 enum StopKind {
   /**
@@ -240,6 +241,7 @@ export class Board {
   }
 
   private async createModule(): Promise<ModuleWrapper> {
+    await firmwareScriptPromise;
     const wrapped = await window.createModule({
       board: this,
       fs: this.fs,
@@ -831,8 +833,22 @@ function isFileSystem(
   );
 }
 
+const firmwareName = flags.debugWasm ? "firmware-debug" : "firmware";
+
+const loadFirmwareScript = () =>
+  new Promise<void>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = `./build/${firmwareName}.js`;
+    script.onload = () => resolve();
+    script.onerror = () =>
+      reject(new Error(`Failed to load ${firmwareName}.js`));
+    document.head.appendChild(script);
+  });
+
+const firmwareScriptPromise = loadFirmwareScript();
+
 const fetchWasm = async () => {
-  const response = await fetch("./build/firmware.wasm");
+  const response = await fetch(`./build/${firmwareName}.wasm`);
   if (!response.ok) {
     throw new Error(response.statusText);
   }

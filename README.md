@@ -324,12 +324,25 @@ Tagged releases with a `v` prefix are deployed to https://python-simulator.userm
 
 ### Web Assembly debugging
 
-Steps for WASM debugging in Chrome:
+The production firmware keeps function names, so stack traces from crashes
+are readable without extra tooling.
 
-- Add the source folder in dev tools
-- Install the C/C++ debug extension: https://helpgoo.gle/wasm-debugging-extension
-- Enable "WebAssembly Debugging: Enable DWARF support" in DevTools Experiments
-- DEBUG=1 make
+Each build also includes `firmware-debug`, which enables Emscripten assertions
+and has DWARF debug info in a separate file that DevTools fetches on demand.
+Load it with `simulator.html?flag=debugWasm`. It is less optimised than the
+default firmware, so a crash that depends on optimisation may not reproduce
+with it. Source-level debugging needs `WebAssembly.compileStreaming`, so is not
+available in Safari 14.
+
+Steps for source-level debugging in Chrome:
+
+- Install the C/C++ debug extension: https://goo.gle/wasm-debugging-extension
+- In the extension's options, add a path substitution from `/simulator` to
+  your local checkout of this repository, at the same commit as the build
+- Open `simulator.html?flag=debugWasm`, either deployed or local
+
+`DEBUG=1 make` builds the default firmware with debug info and C assertions
+enabled, for local use.
 
 ## Code of Conduct
 

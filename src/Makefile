@@ -38,10 +38,15 @@ CFLAGS += $(INC) $(CWARN) -std=c99 -funsigned-char $(CFLAGS_MOD) $(CFLAGS_ARCH) 
 # Debugging/Optimization
 ifdef DEBUG
 COPT += -O3
-CFLAGS += -g
 else
 COPT += -O3 -DNDEBUG
 endif
+
+# Always compile with DWARF so firmware-debug can be linked from the same
+# objects. It only reaches the output when linking with -g, so firmware.wasm is
+# unaffected. The prefix map gives sources a stable path to substitute in
+# DevTools, whichever machine built them.
+CFLAGS += -g -fdebug-prefix-map=$(abspath ..)=/simulator
 
 # Browser floor for both firmware.js and the esbuild bundles. Safari 14.1
 # matches the Python Editor's floor and is the oldest Emscripten 6.0.6 can
@@ -66,6 +71,13 @@ JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'HEAPU8']" --js-libra
 ifdef DEBUG
 JSFLAGS += -g
 endif
+
+# firmware-debug is only loaded with the debugWasm flag. DevTools fetches the
+# separate DWARF file relative to the Wasm URL, which needs compileStreaming
+# (see compileWasm), so source-level debugging is unavailable in Safari 14.
+# Linking with -g limits Binaryen's optimizations, so this binary differs from
+# firmware.wasm beyond the debug info.
+DEBUG_JSFLAGS = -g -gseparate-dwarf=$(BUILD)/firmware-debug.dwarf.wasm -s ASSERTIONS=2
 
 SRC_C += \
 	drv_radio.c \
@@ -155,6 +167,8 @@ $(MBIT_VER_FILE): FORCE
 $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 	$(ECHO) "LINK $(BUILD)/firmware.js"
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
+	$(ECHO) "LINK $(BUILD)/firmware-debug.js"
+	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware-debug.js $(OBJ) $(JSFLAGS) $(DEBUG_JSFLAGS)
 
 simulator-js:
 	npx esbuild --target=$(ESBUILD_TARGET) '--define:process.env.STAGE="$(STAGE)"' ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text

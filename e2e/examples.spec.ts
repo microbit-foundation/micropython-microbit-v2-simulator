@@ -12,6 +12,8 @@ interface ExampleSpec {
   check?: (simulator: Simulator) => Promise<void>;
   /** Most examples loop forever. These reach the REPL prompt. */
   finishes?: boolean;
+  /** The example deliberately ends with an uncaught exception. */
+  raises?: boolean;
   timeout?: number;
 }
 
@@ -48,7 +50,20 @@ const specs: Record<string, ExampleSpec> = {
     },
   },
   display: { finishes: true, timeout: 30_000 },
-  inline_assembler: {},
+  inline_assembler: {
+    raises: true,
+    check: async (sim) => {
+      await sim.setValue("buttonA", 1);
+      await sim.setValue("buttonA", 0);
+      await sim.expectSerial(/^3\n/);
+      await sim.setValue("buttonB", 1);
+      await sim.setValue("buttonB", 0);
+      await sim.expectSerial(
+        /NotImplementedError: simulator limitation: asm_thumb code/,
+      );
+      await sim.skipErrorScroll();
+    },
+  },
   microphone: {
     check: async (sim) => {
       await sim.setValue("soundLevel", 123);
@@ -56,7 +71,14 @@ const specs: Record<string, ExampleSpec> = {
     },
   },
   music: { finishes: true },
-  pin_logo: {},
+  pin_logo: {
+    check: async (sim) => {
+      await sim.setValue("pinLogo", 1);
+      await sim.expectSerial(/touched\n/);
+      await sim.setValue("pinLogo", 0);
+      await sim.expectSerial(/touched\nreleased\n/);
+    },
+  },
   radio: {
     check: async (sim) => {
       await sim.waitForState((s) => (s.radio as any)?.enabled === true);
@@ -84,7 +106,12 @@ const specs: Record<string, ExampleSpec> = {
     finishes: true,
     check: (sim) => sim.expectSerial("maximum recursion depth g(): 126"),
   },
-  volume: {},
+  volume: {
+    check: async (sim) => {
+      await sim.setValue("lightLevel", 100);
+      await sim.expectSerial(/volume 100\n/);
+    },
+  },
 };
 
 const examples = fs
@@ -110,7 +137,9 @@ for (const name of examples) {
     } else if (!spec.check) {
       await simulator.page.waitForTimeout(2_000);
     }
-    // Errors in the user's program are printed as a traceback.
-    expect(await simulator.serial()).not.toMatch(/Traceback/);
+    if (!spec.raises) {
+      // Errors in the user's program are printed as a traceback.
+      expect(await simulator.serial()).not.toMatch(/Traceback/);
+    }
   });
 }

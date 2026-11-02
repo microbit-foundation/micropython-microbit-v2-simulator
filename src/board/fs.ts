@@ -39,9 +39,15 @@ export class FileSystem {
     return -1;
   }
 
+  /**
+   * The name of the file at idx, "" for a deleted file, or undefined past the
+   * last file.
+   */
   name(idx: number) {
-    const file = this._content[idx];
-    return file ? file.name : undefined;
+    if (idx >= this._content.length) {
+      return undefined;
+    }
+    return this._content[idx]?.name ?? "";
   }
 
   size(idx: number) {

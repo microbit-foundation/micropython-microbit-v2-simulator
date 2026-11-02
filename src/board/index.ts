@@ -836,12 +836,23 @@ const fetchWasm = async () => {
   if (!response.ok) {
     throw new Error(response.statusText);
   }
-  return response.arrayBuffer();
+  return response;
 };
 
 const compileWasm = async () => {
-  // Can't use streaming in Safari 14 but would be nice to feature detect.
-  return WebAssembly.compile(new Uint8Array(await fetchWasm()));
+  // Safari 14 lacks compileStreaming. Streaming also gives the module its URL,
+  // which DevTools needs to find a separate DWARF file.
+  if (typeof WebAssembly.compileStreaming === "function") {
+    try {
+      return await WebAssembly.compileStreaming(fetchWasm());
+    } catch (e) {
+      // Requires an application/wasm content type, which a proxy might not
+      // preserve.
+      console.warn("Streaming Wasm compile failed, retrying without", e);
+    }
+  }
+  const response = await fetchWasm();
+  return WebAssembly.compile(await response.arrayBuffer());
 };
 
 let compiledWasmPromise: Promise<WebAssembly.Module> = compileWasm();

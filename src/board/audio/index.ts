@@ -194,7 +194,7 @@ class BufferedAudio {
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;
-    source.onended = this.callback;
+    source.onended = () => this.callback();
     source.connect(this.destination);
     const currentTime = this.context.currentTime;
     const first = this.nextStartTime < currentTime;

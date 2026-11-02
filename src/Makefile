@@ -43,6 +43,13 @@ else
 COPT += -O3 -DNDEBUG
 endif
 
+# Browser floor for both firmware.js and the esbuild bundles. Safari 14.1
+# matches the Python Editor's floor and is the oldest Emscripten 6.0.6 can
+# target; later Emscripten releases require Safari 15. Chrome and Firefox are
+# Emscripten's own floors.
+JSFLAGS += -s MIN_SAFARI_VERSION=140100
+ESBUILD_TARGET = chrome85,firefox79,safari14.1
+
 JSFLAGS += -s ASYNCIFY
 # We can hit lower values due to user stack use. See stack_size.py example.
 JSFLAGS += -s ASYNCIFY_STACK_SIZE=262144
@@ -50,7 +57,7 @@ JSFLAGS += -s EXIT_RUNTIME
 JSFLAGS += -s MODULARIZE=1
 JSFLAGS += -s EXPORT_NAME=createModule
 JSFLAGS += -s EXPORTED_FUNCTIONS="['_mp_js_main','_microbit_hal_audio_ready_callback','_microbit_hal_audio_speech_ready_callback','_microbit_hal_gesture_callback','_microbit_hal_level_detector_callback','_microbit_radio_rx_buffer','_mp_js_force_stop','_mp_js_request_stop']"
-JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" --js-library jshal.js
+JSFLAGS += -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'HEAPU8']" --js-library jshal.js
 
 ifdef DEBUG
 JSFLAGS += -g
@@ -146,8 +153,8 @@ $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 	$(Q)emcc $(LDFLAGS) -o $(BUILD)/firmware.js $(OBJ) $(JSFLAGS)
 
 simulator-js:
-	npx esbuild '--define:process.env.STAGE="$(STAGE)"' ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
-	npx esbuild --define:process.env.VERSION="$$(node -e 'process.stdout.write(`"` + require("../package.json").version + `"`)')" ./sw.ts --bundle --outfile=$(BUILD)/sw.js
+	npx esbuild --target=$(ESBUILD_TARGET) '--define:process.env.STAGE="$(STAGE)"' ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
+	npx esbuild --target=$(ESBUILD_TARGET) --define:process.env.VERSION="$$(node -e 'process.stdout.write(`"` + require("../package.json").version + `"`)')" ./sw.ts --bundle --outfile=$(BUILD)/sw.js
 
 include $(TOP)/py/mkrules.mk
 

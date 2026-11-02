@@ -23,9 +23,9 @@ jobs:
     steps:
       # Note: This workflow will not run on forks without modification; we're open to making steps
       #       that rely on our deployment infrastructure conditional. Please open an issue.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Configure node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24.x
           cache: "npm"
@@ -36,7 +36,7 @@ jobs:
       # The buckets, distributions and roles are in
       # microbit-foundation/microbit-org's apps/simulator. Only main and
       # release tags can assume the role for staging and releases.
-      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: arn:aws:iam::700731169244:role/github-actions-deploy-simulator-content${{ env.STAGE != 'REVIEW' && '-release' || '' }}
           aws-region: eu-west-1

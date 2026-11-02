@@ -73,15 +73,11 @@ export class RangeSensor extends Sensor {
     if (typeof value === "number") {
       proposed = value;
     } else if (typeof value === "string") {
-      try {
-        proposed = parseInt(value, 10);
-      } catch (e) {
-        throw this.valueError(value);
-      }
+      proposed = parseInt(value, 10);
     } else {
       throw this.valueError(value);
     }
-    if (proposed > this.max || proposed < this.min) {
+    if (isNaN(proposed) || proposed > this.max || proposed < this.min) {
       throw this.valueError(value);
     }
     this.value = proposed;

@@ -30,7 +30,11 @@ export class Radio {
   }
 
   receive(data: Uint8Array) {
-    if (this.rxQueue!.length === this.config!.queue) {
+    if (!this.rxQueue || !this.config) {
+      // The radio is off, so there's nothing to receive the message.
+      return;
+    }
+    if (this.rxQueue.length === this.config.queue) {
       // Drop the message as the queue is full.
     } else {
       // Truncate at the payload size as we're writing to a fixed size buffer.

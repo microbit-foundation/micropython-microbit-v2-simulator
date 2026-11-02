@@ -69,12 +69,24 @@
         <div class="simulator column">
           <iframe
             id="simulator"
-            src="simulator.html?color=%230075ff"
             title="Simulator"
             frameborder="0"
             scrolling="no"
             sandbox="allow-scripts allow-same-origin"
           ></iframe>
+          <script>
+            // Pass flags through so e.g. demo.html?flag=debugWasm works.
+            (() => {
+              const params = new URLSearchParams({ color: "#0075ff" });
+              for (const flag of new URLSearchParams(
+                window.location.search,
+              ).getAll("flag")) {
+                params.append("flag", flag);
+              }
+              document.querySelector("#simulator").src =
+                `simulator.html?${params}`;
+            })();
+          </script>
           <div id="sensors" class="column"></div>
         </div>
         <div class="column">

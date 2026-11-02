@@ -11,7 +11,7 @@ import { flags } from "./flags";
 
 declare global {
   interface Window {
-    // Provided by firmware.js
+    // Provided by the firmware script that board/index.ts loads.
     createModule: (args: object) => Promise<EmscriptenModule>;
   }
 }

@@ -5,18 +5,28 @@ import { Stage, stage as stageFromEnvironment } from "./environment";
  */
 export type Flag =
   /**
+   * Loads firmware-debug instead of firmware.
+   *
+   * It enables Emscripten assertions and has separate DWARF for the DevTools
+   * C/C++ debugging extension.
+   */
+  | "debugWasm"
+  /**
    * Enables service worker registration.
    *
    * Registers the service worker and enables offline use.
    */
-  "sw";
+  | "sw";
 
 interface FlagMetadata {
   defaultOnStages: Stage[];
   name: Flag;
 }
 
-const allFlags: FlagMetadata[] = [{ name: "sw", defaultOnStages: [] }];
+const allFlags: FlagMetadata[] = [
+  { name: "debugWasm", defaultOnStages: [] },
+  { name: "sw", defaultOnStages: [] },
+];
 
 type Flags = Record<Flag, boolean>;
 

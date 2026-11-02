@@ -43,6 +43,14 @@ export class Simulator {
     const params = new URLSearchParams(this.flags.map((f) => ["flag", f]));
     await this.page.goto(`/e2e-host.html?${params}`);
     await this.waitForMessage("ready");
+    // A server that redirects simulator.html can drop the query string.
+    const search = await this.frame
+      .locator("body")
+      .evaluate(() => location.search);
+    expect(
+      new URLSearchParams(search).getAll("flag"),
+      "The simulator didn't receive its flags",
+    ).toEqual(this.flags);
   }
 
   /**

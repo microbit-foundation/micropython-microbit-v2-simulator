@@ -313,10 +313,13 @@ both the release and debug (`?flag=debugWasm`) firmware. Build first, then:
     $ npx playwright install chromium
     $ npm run test:e2e
 
-They use a server on port 3000 if one is running (e.g. `npx serve build`),
-otherwise they start one. Any console error, uncaught exception,
-`internal_error` message or firmware abort fails the test. Every file in
-`src/examples` must have an entry in `e2e/examples.spec.ts`.
+They use a server on port 3000 if one is running, otherwise they start one.
+A server you start yourself must not redirect `simulator.html`, as that drops
+the flags, e.g. `npx serve build -c ../e2e/serve.json`.
+
+Any console error, uncaught exception, `internal_error` message or firmware
+abort fails the test. Every file in `src/examples` must have an entry in
+`e2e/examples.spec.ts`.
 
 `e2e/audio.spec.ts` records the simulator's audio output and checks broad
 statistics (duration, level, pitch, dropouts) rather than exact samples.

@@ -27,7 +27,8 @@ export default defineConfig<SimulatorOptions>({
     },
   ],
   webServer: {
-    command: `npx serve build -l ${port}`,
+    // The config turns off clean URLs, whose redirects drop the flags.
+    command: `npx serve build -l ${port} -c ../e2e/serve.json`,
     url: `http://localhost:${port}/simulator.html`,
     reuseExistingServer: !process.env.CI,
   },

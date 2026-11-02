@@ -25,6 +25,45 @@ test.describe("lifecycle", () => {
     await simulator.expectFinished();
   });
 
+  test("flashing interrupts a long sleep", async ({ simulator }) => {
+    await simulator.run("print('sleeping')\nsleep(60000)\n");
+    await simulator.expectSerial(/sleeping/);
+    await simulator.run("print('awake')\n");
+    await simulator.expectSerial(/^awake\n/, { timeout: 2_000 });
+  });
+
+  test("reset during a scroll starts again cleanly", async ({ simulator }) => {
+    await simulator.run(
+      "from microbit import *\nprint('start')\ndisplay.scroll('Hello micro:bit', delay=50)\nprint('done')\n",
+    );
+    await simulator.expectSerial(/start/);
+    await simulator.page.waitForTimeout(200);
+    await simulator.reset();
+    await simulator.expectSerial(/^start\nstart\n[\s\S]*done\n/);
+  });
+
+  test("machine.reset runs the program again", async ({ simulator }) => {
+    await simulator.run(`import machine, os
+if 'flag' in os.listdir():
+    print('after reset')
+else:
+    open('flag', 'w').close()
+    print('before reset')
+    machine.reset()
+`);
+    await simulator.expectSerial(/before reset\n[\s\S]*after reset\n/);
+  });
+
+  test("running_time keeps pace with real time", async ({ simulator }) => {
+    await simulator.run(
+      "from microbit import *\nstart = running_time()\nsleep(1000)\nprint(running_time() - start)\n",
+    );
+    await simulator.expectFinished();
+    const elapsed = Number((await simulator.serial()).split("\n")[0]);
+    expect(elapsed).toBeGreaterThanOrEqual(1000);
+    expect(elapsed).toBeLessThan(1100);
+  });
+
   test("Ctrl-C interrupts a busy loop", async ({ simulator }) => {
     await simulator.run("print('looping')\nwhile True:\n    pass\n");
     await simulator.expectSerial(/looping/);

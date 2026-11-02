@@ -9,6 +9,9 @@ const hostHtml = fs.readFileSync(path.join(__dirname, "host.html"));
 // Python raising an exception.
 const firmwareFailure = /FATAL:|Aborted\(/;
 
+// From src/board/display.ts, to map LED opacity back to a 0-9 brightness.
+const brightMap = [0, 20, 40, 60, 80, 120, 160, 190, 220, 255];
+
 export interface SimulatorOptions {
   simulatorFlags: string[];
   /** Records audio output for {@link Simulator.audio}. */
@@ -174,6 +177,49 @@ export class Simulator {
 
   async mute(): Promise<void> {
     await this.send({ kind: "mute" });
+  }
+
+  async unmute(): Promise<void> {
+    await this.send({ kind: "unmute" });
+  }
+
+  async config(
+    language: string,
+    translations: Record<string, string>,
+  ): Promise<void> {
+    await this.send({ kind: "config", language, translations });
+  }
+
+  /** Brightness 0-9 of each LED as rows, i.e. display[y][x]. */
+  async display(): Promise<number[][]> {
+    const opacities = await this.frame
+      .locator("#LEDsOn use")
+      .evaluateAll((leds: SVGElement[]) =>
+        leds.map((led) =>
+          led.style.display === "inline" ? Number(led.style.opacity) : 0,
+        ),
+      );
+    // The LEDs are in column order.
+    return [0, 1, 2, 3, 4].map((y) =>
+      [0, 1, 2, 3, 4].map((x) => {
+        const bright = Math.round(opacities[x * 5 + y] * 255);
+        return brightMap.findIndex((b) => Math.abs(b - bright) <= 1);
+      }),
+    );
+  }
+
+  /** Waits for the display to show an image in MicroPython's string form. */
+  async expectDisplay(
+    image: string,
+    options: { timeout?: number } = {},
+  ): Promise<void> {
+    const expected = image
+      .replace(/:$/, "")
+      .split(":")
+      .map((row) => [...row].map(Number));
+    await expect
+      .poll(() => this.display(), { timeout: options.timeout ?? 10_000 })
+      .toEqual(expected);
   }
 
   async reset(): Promise<void> {

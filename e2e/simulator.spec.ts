@@ -81,9 +81,7 @@ test.describe("radio", () => {
       "import radio\nradio.on()\nradio.send_bytes(b'ping')\n",
     );
     const message = await simulator.waitForMessage("radio_output");
-    expect(
-      new TextDecoder().decode(new Uint8Array(message.data as number[])),
-    ).toBe("ping");
+    expect(new TextDecoder().decode(message.data as Uint8Array)).toBe("ping");
   });
 
   test("ignores input while the radio is off", async ({ simulator }) => {

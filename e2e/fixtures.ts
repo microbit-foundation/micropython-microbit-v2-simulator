@@ -135,14 +135,7 @@ export class Simulator {
   }
 
   async radioInput(data: Uint8Array): Promise<void> {
-    await this.page.evaluate(
-      (bytes) =>
-        (window as any).send({
-          kind: "radio_input",
-          data: new Uint8Array(bytes),
-        }),
-      Array.from(data),
-    );
+    await this.send({ kind: "radio_input", data });
   }
 
   async stop(): Promise<void> {
@@ -158,18 +151,13 @@ export class Simulator {
   }
 
   async messages(kind?: string): Promise<SimulatorMessage[]> {
-    // Typed arrays don't serialize, so convert them to plain arrays.
-    const all: SimulatorMessage[] = await this.page.evaluate(() =>
-      (window as any).messages.map((m: Record<string, unknown>) =>
-        Object.fromEntries(
-          Object.entries(m).map(([k, v]) => [
-            k,
-            v instanceof Uint8Array ? Array.from(v) : v,
-          ]),
+    return this.page.evaluate(
+      (kind) =>
+        (window as any).messages.filter(
+          (m: SimulatorMessage) => !kind || m.kind === kind,
         ),
-      ),
+      kind,
     );
-    return kind ? all.filter((m) => m.kind === kind) : all;
   }
 
   async waitForMessage(

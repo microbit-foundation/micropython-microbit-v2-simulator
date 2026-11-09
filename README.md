@@ -127,7 +127,8 @@ by the running program. The simulator starts stopped with no program flashed.
 }
 ```
 
-<td>Serial output suitable for a terminal or other use.
+<td>Serial output suitable for a terminal or other use. Output is batched, so one message may contain the output of several writes.
+By default, output is limited to the device's baud rate (115200). See <code>serialFlowControl</code> in the <code>config</code> message to instead have the simulator wait for you to process output.
 
 <tr>
 <td>radio_output
@@ -167,6 +168,28 @@ If you send string data from the program then it will be prepended with the thre
 <th>Example
 <th>Description
 <tbody>
+<tr>
+<td>config
+<td>
+
+```javascript
+{
+  "kind": "config",
+  "language": "en",
+  "translations": {
+    "button-a": "Button A",
+    "button-b": "Button B",
+    "touch-logo": "Touch logo",
+    "start-simulator": "Start simulator"
+  },
+  "serialFlowControl": true
+}
+```
+
+<td>Configure the simulator. Send the full configuration each time. Typically sent after the <code>ready</code> message and when the language changes.
+<code>language</code> and <code>translations</code> set the language and the labels used in the simulator.
+<code>serialFlowControl</code> is optional and defaults to <code>false</code>. If <code>true</code>, serial output is no longer limited to the device's baud rate. Instead, the program waits when too much output is unacknowledged, until you send <code>serial_output_ack</code>. If you enable it, you must acknowledge all serial output or the program will stop making progress whenever it prints.
+
 <tr>
 <td>flash
 <td>
@@ -244,6 +267,18 @@ If you send string data from the program then it will be prepended with the thre
 ```
 
 <td>Serial input. If the REPL is active it will echo this text via <code>serial_write</code>.
+<tr>
+<td>serial_output_ack
+<td>
+
+```javascript
+{
+  "kind": "serial_output_ack",
+  "length": 4
+}
+```
+
+<td>With <code>serialFlowControl</code> enabled via <code>config</code>, acknowledges serial output you have processed. The length is the total length of the <code>data</code> strings processed (JavaScript string length), so you can send one acknowledgement for several messages. For example, acknowledge when your terminal has finished writing the data.
 <tr>
 <td>sensor_set
 <td>

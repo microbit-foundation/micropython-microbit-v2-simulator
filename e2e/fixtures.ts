@@ -151,6 +151,15 @@ export class Simulator {
     await this.expectFinished();
   }
 
+  /** Length of the serial output since the last run, as sent. */
+  async serialLength(): Promise<number> {
+    return this.page.evaluate(() => (window as any).serial.length as number);
+  }
+
+  async acknowledgeSerialOutput(length: number): Promise<void> {
+    await this.send({ kind: "serial_output_ack", length });
+  }
+
   async sendSerial(data: string): Promise<void> {
     await this.send({ kind: "serial_input", data });
   }
@@ -186,8 +195,9 @@ export class Simulator {
   async config(
     language: string,
     translations: Record<string, string>,
+    options: { serialFlowControl?: boolean } = {},
   ): Promise<void> {
-    await this.send({ kind: "config", language, translations });
+    await this.send({ kind: "config", language, translations, ...options });
   }
 
   /** Brightness 0-9 of each LED as rows, i.e. display[y][x]. */

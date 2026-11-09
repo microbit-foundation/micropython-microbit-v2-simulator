@@ -55,6 +55,13 @@ test.describe("invalid messages", () => {
     { kind: "radio_input", data: "not bytes" },
     { kind: "set_value", id: 42, value: 1 },
     { kind: "set_value", id: "temperature", value: 99 },
+    {
+      kind: "config",
+      language: "en",
+      translations: {},
+      serialFlowControl: "yes",
+    },
+    { kind: "serial_output_ack", length: -1 },
   ];
   for (const message of invalid) {
     test(`${JSON.stringify(message)} is rejected without stopping the program`, async ({
@@ -82,6 +89,51 @@ test.describe("invalid messages", () => {
     await expect
       .poll(() => simulator.errors.length, { timeout: 2_000 })
       .toBeGreaterThan(0);
+  });
+});
+
+test.describe("serial output", () => {
+  // 100 characters per line with the \r\n.
+  const printLoop = "while True:\n    print('x' * 98)\n";
+
+  test("is limited to the baud rate by default", async ({ simulator }) => {
+    await simulator.run(printLoop);
+    await expect.poll(() => simulator.serialLength()).toBeGreaterThan(0);
+    const before = await simulator.serialLength();
+    await simulator.page.waitForTimeout(1000);
+    const perSecond = (await simulator.serialLength()) - before;
+    // 115200 baud is 11520 bytes a second. Allow for timer slop.
+    expect(perSecond).toBeGreaterThan(5_000);
+    expect(perSecond).toBeLessThan(15_000);
+    await simulator.stop();
+  });
+
+  test("with flow control waits for acknowledgement", async ({ simulator }) => {
+    await simulator.config(
+      "en",
+      {
+        "button-a": "Button A",
+        "button-b": "Button B",
+        "touch-logo": "Touch logo",
+        "start-simulator": "Start simulator",
+      },
+      { serialFlowControl: true },
+    );
+    await simulator.run(printLoop);
+    // Without acknowledgements output stops at about 32K.
+    await expect.poll(() => simulator.serialLength()).toBeGreaterThan(30_000);
+    await simulator.page.waitForTimeout(500);
+    const stalled = await simulator.serialLength();
+    expect(stalled).toBeLessThan(34_000);
+    await simulator.page.waitForTimeout(500);
+    expect(await simulator.serialLength()).toBe(stalled);
+
+    await simulator.acknowledgeSerialOutput(stalled);
+    await expect
+      .poll(() => simulator.serialLength())
+      .toBeGreaterThan(stalled + 30_000);
+    // A program waiting for acknowledgement can still be stopped.
+    await simulator.stop();
   });
 });
 

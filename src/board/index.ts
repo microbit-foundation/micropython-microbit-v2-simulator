@@ -76,8 +76,9 @@ export class ResetError extends Error {
 
 const stoppedOpactity = "0.5";
 
-// Serial output is limited to the rate of the device's UART: 115200 baud with
-// 10 bits per byte (8N1). The baud rate is set by CODAL's NRF52Serial.
+// Unless the host opts in to serial flow control, serial output is limited to
+// the rate of the device's UART: 115200 baud with 10 bits per byte (8N1).
+// The baud rate is set by CODAL's NRF52Serial.
 const serialOutputMsPerByte = (10 * 1000) / 115200;
 // Output that can be queued before writes block, like the device's TX buffer.
 // The device's buffer is 20 bytes (CODAL_SERIAL_DEFAULT_BUFFER_SIZE) but it
@@ -87,6 +88,11 @@ const serialOutputMsPerByte = (10 * 1000) / 115200;
 const serialOutputBufferMs = 256 * serialOutputMsPerByte;
 // How often batched serial output is sent to the host page.
 const serialOutputBatchMs = 16;
+// With serial flow control, the amount of output (as JS string length) the
+// host can leave unacknowledged before writes wait. A judgement call: large
+// enough that throughput (about this much per acknowledgement round trip)
+// isn't a limit, small enough that the host never holds much.
+const serialOutputUnacknowledgedLimit = 32 * 1024;
 
 export function createBoard(notifications: Notifications, fs: FileSystem) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
@@ -167,6 +173,11 @@ export class Board {
    * the serial output written so far.
    */
   private serialOutputSentAt = 0;
+  /**
+   * If true, the host acknowledges serial output and we wait for it rather
+   * than limiting output to the device's baud rate.
+   */
+  private serialFlowControl = false;
 
   constructor(
     private notifications: Notifications,
@@ -428,6 +439,7 @@ export class Board {
     clearTimeout(this.pendingRestartTimeout);
     this.pendingRestartTimeout = null;
     this.serialOutputSentAt = 0;
+    this.notifications.resetSerialOutputAcknowledgements();
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -708,7 +720,21 @@ export class Board {
     if (!this.modulePromise) {
       return false;
     }
+    if (this.serialFlowControl) {
+      return (
+        this.notifications.serialOutputUnacknowledged >
+        serialOutputUnacknowledgedLimit
+      );
+    }
     return this.serialOutputSentAt - performance.now() > serialOutputBufferMs;
+  }
+
+  setSerialFlowControl(enabled: boolean): void {
+    this.serialFlowControl = enabled;
+  }
+
+  acknowledgeSerialOutput(length: number): void {
+    this.notifications.acknowledgeSerialOutput(length);
   }
 
   writeRadioRxBuffer(packet: Uint8Array): number {
@@ -769,6 +795,23 @@ export class Notifications {
 
   private serialOutputBuffer = "";
   private serialOutputTimeout: ReturnType<typeof setTimeout> | undefined;
+  /**
+   * Serial output (as string length) that the host hasn't acknowledged.
+   * Includes output not yet sent. Only meaningful with serial flow control.
+   */
+  serialOutputUnacknowledged = 0;
+
+  acknowledgeSerialOutput(length: number) {
+    // Clamped as acknowledgements for a previous run can arrive after a reset.
+    this.serialOutputUnacknowledged = Math.max(
+      0,
+      this.serialOutputUnacknowledged - length,
+    );
+  }
+
+  resetSerialOutputAcknowledgements() {
+    this.serialOutputUnacknowledged = 0;
+  }
 
   /**
    * Serial output is batched to limit the number of messages the host page
@@ -776,6 +819,7 @@ export class Notifications {
    */
   onSerialOutput = (data: string) => {
     this.serialOutputBuffer += data;
+    this.serialOutputUnacknowledged += data.length;
     if (this.serialOutputTimeout === undefined) {
       this.serialOutputTimeout = setTimeout(
         this.flushSerialOutput,
@@ -832,8 +876,12 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
     const { data } = e;
     switch (data.kind) {
       case "config": {
-        const { language, translations } = data;
+        const { language, translations, serialFlowControl = false } = data;
+        if (typeof serialFlowControl !== "boolean") {
+          throw new Error("Invalid config serialFlowControl field.");
+        }
         board.updateTranslations(language, translations);
+        board.setSerialFlowControl(serialFlowControl);
         break;
       }
       case "flash": {
@@ -858,6 +906,14 @@ export const createMessageListener = (board: Board) => (e: MessageEvent) => {
       }
       case "unmute": {
         board.unmute();
+        break;
+      }
+      case "serial_output_ack": {
+        const { length } = data;
+        if (!Number.isInteger(length) || length < 0) {
+          throw new Error("Invalid serial_output_ack length field.");
+        }
+        board.acknowledgeSerialOutput(length);
         break;
       }
       case "serial_input": {

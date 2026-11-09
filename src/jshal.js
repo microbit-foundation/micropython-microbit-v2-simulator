@@ -55,6 +55,10 @@ mergeInto(LibraryManager.library, {
     Module.board.writeSerialOutput(UTF8ToString(ptr, len));
   },
 
+  mp_js_hal_stdout_tx_busy: function () {
+    return Module.board.isSerialOutputBusy();
+  },
+
   mp_js_hal_filesystem_find: function (
     /** @type {number} */ name,
     /** @type {number} */ len,

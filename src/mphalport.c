@@ -17,6 +17,11 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
 
 void mp_hal_stdout_tx_strn(const char *str, size_t len) {
     mp_js_hal_stdout_tx_strn(str, len);
+    // Wait while the simulated UART catches up, as the device does when its
+    // TX buffer is full. Without this a tight print loop floods the host page.
+    while (mp_js_hal_stdout_tx_busy()) {
+        microbit_hal_idle();
+    }
 }
 
 int mp_hal_stdin_rx_chr(void) {

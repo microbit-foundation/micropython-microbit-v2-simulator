@@ -76,6 +76,18 @@ export class ResetError extends Error {
 
 const stoppedOpactity = "0.5";
 
+// Serial output is limited to the rate of the device's UART: 115200 baud with
+// 10 bits per byte (8N1). The baud rate is set by CODAL's NRF52Serial.
+const serialOutputMsPerByte = (10 * 1000) / 115200;
+// Output that can be queued before writes block, like the device's TX buffer.
+// The device's buffer is 20 bytes (CODAL_SERIAL_DEFAULT_BUFFER_SIZE) but it
+// spins while waiting, whereas we sleep for at least 5ms. The buffer needs to
+// cover a sleep (~58 bytes) or we lose time on every wait and fall below the
+// baud rate, so we use a larger buffer.
+const serialOutputBufferMs = 256 * serialOutputMsPerByte;
+// How often batched serial output is sent to the host page.
+const serialOutputBatchMs = 16;
+
 export function createBoard(notifications: Notifications, fs: FileSystem) {
   document.body.insertAdjacentHTML("afterbegin", svgText);
   const svg = document.querySelector("svg");
@@ -150,6 +162,11 @@ export class Board {
    * Timeout for the next frame of the panic animation.
    */
   private panicTimeout: any;
+  /**
+   * Time (performance.now()) at which the simulated UART will have sent all
+   * the serial output written so far.
+   */
+  private serialOutputSentAt = 0;
 
   constructor(
     private notifications: Notifications,
@@ -410,6 +427,7 @@ export class Board {
     }
     clearTimeout(this.pendingRestartTimeout);
     this.pendingRestartTimeout = null;
+    this.serialOutputSentAt = 0;
 
     this.modulePromise = this.createModule();
     const module = await this.modulePromise;
@@ -486,6 +504,8 @@ export class Board {
   async stop(brief: boolean = false): Promise<void> {
     // Preemptively stop audio so that we don't call into WASM for more data
     this.audio.boardStopped();
+    // Send output from before the stop so it arrives before any host reset.
+    this.notifications.flushSerialOutput();
 
     if (this.panicTimeout) {
       clearTimeout(this.panicTimeout);
@@ -672,8 +692,23 @@ export class Board {
   writeSerialOutput(text: string): void {
     // Avoid the Ctrl-C, Ctrl-D output when we request a stop.
     if (this.modulePromise) {
+      const now = performance.now();
+      this.serialOutputSentAt =
+        Math.max(now, this.serialOutputSentAt) +
+        text.length * serialOutputMsPerByte;
       this.notifications.onSerialOutput(text);
     }
+  }
+
+  /**
+   * True if the program should wait before writing more serial output.
+   */
+  isSerialOutputBusy(): boolean {
+    // Don't hold up a program that we're stopping.
+    if (!this.modulePromise) {
+      return false;
+    }
+    return this.serialOutputSentAt - performance.now() > serialOutputBufferMs;
   }
 
   writeRadioRxBuffer(packet: Uint8Array): number {
@@ -732,8 +767,31 @@ export class Notifications {
     });
   };
 
+  private serialOutputBuffer = "";
+  private serialOutputTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  /**
+   * Serial output is batched to limit the number of messages the host page
+   * has to handle.
+   */
   onSerialOutput = (data: string) => {
-    this.postMessage("serial_output", { data });
+    this.serialOutputBuffer += data;
+    if (this.serialOutputTimeout === undefined) {
+      this.serialOutputTimeout = setTimeout(
+        this.flushSerialOutput,
+        serialOutputBatchMs,
+      );
+    }
+  };
+
+  flushSerialOutput = () => {
+    clearTimeout(this.serialOutputTimeout);
+    this.serialOutputTimeout = undefined;
+    if (this.serialOutputBuffer) {
+      const data = this.serialOutputBuffer;
+      this.serialOutputBuffer = "";
+      this.send("serial_output", { data });
+    }
   };
 
   onRadioOutput = (data: Uint8Array) => {
@@ -753,6 +811,12 @@ export class Notifications {
   };
 
   private postMessage(kind: string, data: any) {
+    // Keep serial output in order with other messages.
+    this.flushSerialOutput();
+    this.send(kind, data);
+  }
+
+  private send(kind: string, data: any) {
     this.target.postMessage(
       {
         kind,

@@ -1,0 +1,7 @@
+Result of __new__ has .attr: False
+Result of __new__ is already a Foo: True
+in __init__
+After __init__ has .attr: True
+.attr: something
+TypeError
+TypeError

@@ -20,6 +20,11 @@ export default defineConfig<SimulatorOptions>({
       use: { ...devices["Desktop Chrome"] },
     },
     {
+      name: "micropython-tests",
+      testDir: "./micropython-tests",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
       // Emscripten assertions catch errors that the release firmware hides,
       // e.g. calling an export with the wrong number of arguments.
       name: "chromium-debug-wasm",

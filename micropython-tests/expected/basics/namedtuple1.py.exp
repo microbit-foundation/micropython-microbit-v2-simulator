@@ -1,0 +1,31 @@
+Tup(foo=1, bar=2)
+1 2
+1 2
+2
+True
+(1, 2, 1, 2)
+(1, 2, 1, 2, 1, 2)
+[1, 2]
+True
+True True
+Tup(foo=2, bar=1)
+2 1
+2 1
+2
+True
+(2, 1, 2, 1)
+(2, 1, 2, 1, 2, 1)
+[2, 1]
+True
+True True
+Tup(foo=3, bar=4)
+TypeError
+AttributeError
+TypeError
+TypeError
+TypeError
+TypeError
+TypeError
+TypeError
+1 2
+1 2

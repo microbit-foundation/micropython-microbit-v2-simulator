@@ -1,0 +1,20 @@
+Caught MemoryError via Exception
+Caught MemoryError
+Caught NameError via Exception
+Caught NameError
+Caught NotImplementedError via RuntimeError
+Caught NotImplementedError
+Caught OSError via Exception
+Caught OSError
+Caught OverflowError via ArithmeticError
+Caught OverflowError
+Caught RuntimeError via Exception
+Caught RuntimeError
+Caught SyntaxError via Exception
+Caught SyntaxError
+Caught TypeError via Exception
+Caught TypeError
+Caught ValueError via Exception
+Caught ValueError
+Caught ZeroDivisionError via ArithmeticError
+Caught ZeroDivisionError

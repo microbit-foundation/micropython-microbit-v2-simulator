@@ -1,0 +1,16 @@
+<class 'bool'>
+<class 'int'>
+<class 'tuple'>
+<class 'list'>
+<class 'dict'>
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+AttributeError

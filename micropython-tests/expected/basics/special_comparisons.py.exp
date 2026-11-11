@@ -1,0 +1,92 @@
+a == a
+A __eq__ called
+True
+a != a
+A __eq__ called
+False
+a == b
+A __eq__ called
+True
+a != b
+A __eq__ called
+False
+a == c
+A __eq__ called
+True
+a != c
+A __eq__ called
+False
+a == d
+A __eq__ called
+True
+a != d
+A __eq__ called
+False
+b == a
+A __eq__ called
+True
+b != a
+B __ne__ called
+True
+b == b
+True
+b != b
+B __ne__ called
+True
+b == c
+C __eq__ called
+False
+b != c
+B __ne__ called
+True
+b == d
+False
+b != d
+B __ne__ called
+True
+c == a
+C __eq__ called
+False
+c != a
+C __eq__ called
+True
+c == b
+C __eq__ called
+False
+c != b
+C __eq__ called
+True
+c == c
+C __eq__ called
+False
+c != c
+C __eq__ called
+True
+c == d
+C __eq__ called
+False
+c != d
+C __eq__ called
+True
+d == a
+A __eq__ called
+True
+d != a
+D __ne__ called
+False
+d == b
+False
+d != b
+D __ne__ called
+False
+d == c
+C __eq__ called
+False
+d != c
+D __ne__ called
+False
+d == d
+True
+d != d
+D __ne__ called
+False

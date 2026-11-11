@@ -1,0 +1,11 @@
+14187745
+14187745
+1267650600228229401496703205376
+1267650600228229401496703205376
+power of  2 test: passed
+power of 10 test: passed
+large neg: passed
+large pos: passed
+inf test: passed
+NaN test: passed
+small num: passed

@@ -1,0 +1,11 @@
+1
+1
+throw 123
+456
+1
+throw <class 'ZeroDivisionError'>
+456
+1
+ValueError
+1
+TypeError

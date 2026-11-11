@@ -1,0 +1,17 @@
+('', '', 'asdf')
+('', 'a', 'sdf')
+('a', 's', 'df')
+('asd', 'f', '')
+('as', 'd', 'f')
+('', 'asd', 'f')
+('a', 'sdf', '')
+('', 'as', 'df')
+('as', 'df', '')
+('', 'asdf', '')
+('', '', 'asdf')
+('', '', 'asdf')
+('', '', 'asdf')
+('abb', 'a', '')
+('ab', 'b', 'a')
+Raised TypeError
+Raised ValueError

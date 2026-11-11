@@ -1,0 +1,19 @@
+0
+False
+IndexError
+None
+1
+True
+1
+0
+2
+2
+3 4
+IndexError
+2
+6 7
+0
+IndexError
+4 5
+ValueError
+TypeError

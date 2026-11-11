@@ -1,0 +1,11 @@
+try 1
+try 2
+except 2
+except 1
+try 1
+try 2
+except 1
+except 1
+try func1
+try func2
+except func1

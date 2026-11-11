@@ -1,0 +1,10 @@
+{
+  "micropython": "da4b38e7562dfa451917f9d7f344a7f26de8c7bd",
+  "cpython": "3.8.20",
+  "dirs": [
+    "basics",
+    "float",
+    "unicode"
+  ],
+  "cpythonFailed": []
+}

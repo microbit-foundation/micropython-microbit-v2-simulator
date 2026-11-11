@@ -1,0 +1,20 @@
+Caught ArithmeticError via Exception
+Caught ArithmeticError
+Caught AssertionError via Exception
+Caught AssertionError
+Caught AttributeError via Exception
+Caught AttributeError
+Caught EOFError via Exception
+Caught EOFError
+Caught Exception via BaseException
+Caught Exception
+Caught ImportError via Exception
+Caught ImportError
+Caught IndentationError via SyntaxError
+Caught IndentationError
+Caught IndexError via LookupError
+Caught IndexError
+Caught KeyError via LookupError
+Caught KeyError
+Caught LookupError via Exception
+Caught LookupError

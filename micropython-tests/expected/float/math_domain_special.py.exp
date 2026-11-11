@@ -1,0 +1,56 @@
+inf
+0.0000
+nan
+log2 ValueError
+log2 ValueError
+inf
+log2 ValueError
+nan
+log10 ValueError
+log10 ValueError
+inf
+log10 ValueError
+nan
+inf
+-inf
+nan
+inf
+inf
+nan
+1.0000
+-1.0000
+nan
+inf
+-inf
+nan
+acosh ValueError
+acosh ValueError
+0.0000
+inf
+acosh ValueError
+nan
+atanh ValueError
+atanh ValueError
+atanh ValueError
+atanh ValueError
+nan
+1.0000
+-1.0000
+nan
+0.0000
+2.0000
+nan
+gamma ValueError
+gamma ValueError
+gamma ValueError
+1.0000
+inf
+gamma ValueError
+nan
+lgamma ValueError
+lgamma ValueError
+lgamma ValueError
+0.0000
+inf
+inf
+nan

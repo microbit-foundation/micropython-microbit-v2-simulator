@@ -1,0 +1,11 @@
+0
+1
+{(): 1}
+{(1,): 1}
+True
+TypeError
+123
+{a instance: 1}
+TypeError
+TypeError
+1

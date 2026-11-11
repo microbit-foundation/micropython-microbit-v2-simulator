@@ -1,0 +1,816 @@
+{:c}    >0<
+{:c}    >0<
+{:c}    >0<
+{:c}    >0<
+{:<c}   >0<
+{: <c}  >0<
+{:0<c}  >0<
+{:@<c}  >0<
+{:>c}   >0<
+{: >c}  >0<
+{:0>c}  >0<
+{:@>c}  >0<
+{:^c}   >0<
+{: ^c}  >0<
+{:0^c}  >0<
+{:@^c}  >0<
+{:1c}   >0<
+{:1c}   >0<
+{:1c}   >0<
+{:1c}   >0<
+{:<1c}  >0<
+{: <1c} >0<
+{:0<1c} >0<
+{:@<1c} >0<
+{:>1c}  >0<
+{: >1c} >0<
+{:0>1c} >0<
+{:@>1c} >0<
+{:^1c}  >0<
+{: ^1c} >0<
+{:0^1c} >0<
+{:@^1c} >0<
+{:2c}   > 0<
+{:2c}   > 0<
+{:2c}   > 0<
+{:2c}   > 0<
+{:<2c}  >0 <
+{: <2c} >0 <
+{:0<2c} >00<
+{:@<2c} >0@<
+{:>2c}  > 0<
+{: >2c} > 0<
+{:0>2c} >00<
+{:@>2c} >@0<
+{:^2c}  >0 <
+{: ^2c} >0 <
+{:0^2c} >00<
+{:@^2c} >0@<
+{:s}    ><
+{:s}    >a<
+{:s}    >bcd<
+{:s}    >This is a test with a longer string<
+{:s}    ><
+{:s}    >a<
+{:s}    >bcd<
+{:s}    >This is a test with a longer string<
+{:s}    ><
+{:s}    >a<
+{:s}    >bcd<
+{:s}    >This is a test with a longer string<
+{:s}    ><
+{:s}    >a<
+{:s}    >bcd<
+{:s}    >This is a test with a longer string<
+{:<s}   ><
+{:<s}   >a<
+{:<s}   >bcd<
+{:<s}   >This is a test with a longer string<
+{: <s}  ><
+{: <s}  >a<
+{: <s}  >bcd<
+{: <s}  >This is a test with a longer string<
+{:0<s}  ><
+{:0<s}  >a<
+{:0<s}  >bcd<
+{:0<s}  >This is a test with a longer string<
+{:@<s}  ><
+{:@<s}  >a<
+{:@<s}  >bcd<
+{:@<s}  >This is a test with a longer string<
+{:>s}   ><
+{:>s}   >a<
+{:>s}   >bcd<
+{:>s}   >This is a test with a longer string<
+{: >s}  ><
+{: >s}  >a<
+{: >s}  >bcd<
+{: >s}  >This is a test with a longer string<
+{:0>s}  ><
+{:0>s}  >a<
+{:0>s}  >bcd<
+{:0>s}  >This is a test with a longer string<
+{:@>s}  ><
+{:@>s}  >a<
+{:@>s}  >bcd<
+{:@>s}  >This is a test with a longer string<
+{:^s}   ><
+{:^s}   >a<
+{:^s}   >bcd<
+{:^s}   >This is a test with a longer string<
+{: ^s}  ><
+{: ^s}  >a<
+{: ^s}  >bcd<
+{: ^s}  >This is a test with a longer string<
+{:0^s}  ><
+{:0^s}  >a<
+{:0^s}  >bcd<
+{:0^s}  >This is a test with a longer string<
+{:@^s}  ><
+{:@^s}  >a<
+{:@^s}  >bcd<
+{:@^s}  >This is a test with a longer string<
+{:1s}   > <
+{:1s}   >a<
+{:1s}   >bcd<
+{:1s}   >This is a test with a longer string<
+{:1s}   > <
+{:1s}   >a<
+{:1s}   >bcd<
+{:1s}   >This is a test with a longer string<
+{:1s}   > <
+{:1s}   >a<
+{:1s}   >bcd<
+{:1s}   >This is a test with a longer string<
+{:1s}   > <
+{:1s}   >a<
+{:1s}   >bcd<
+{:1s}   >This is a test with a longer string<
+{:<1s}  > <
+{:<1s}  >a<
+{:<1s}  >bcd<
+{:<1s}  >This is a test with a longer string<
+{: <1s} > <
+{: <1s} >a<
+{: <1s} >bcd<
+{: <1s} >This is a test with a longer string<
+{:0<1s} >0<
+{:0<1s} >a<
+{:0<1s} >bcd<
+{:0<1s} >This is a test with a longer string<
+{:@<1s} >@<
+{:@<1s} >a<
+{:@<1s} >bcd<
+{:@<1s} >This is a test with a longer string<
+{:>1s}  > <
+{:>1s}  >a<
+{:>1s}  >bcd<
+{:>1s}  >This is a test with a longer string<
+{: >1s} > <
+{: >1s} >a<
+{: >1s} >bcd<
+{: >1s} >This is a test with a longer string<
+{:0>1s} >0<
+{:0>1s} >a<
+{:0>1s} >bcd<
+{:0>1s} >This is a test with a longer string<
+{:@>1s} >@<
+{:@>1s} >a<
+{:@>1s} >bcd<
+{:@>1s} >This is a test with a longer string<
+{:^1s}  > <
+{:^1s}  >a<
+{:^1s}  >bcd<
+{:^1s}  >This is a test with a longer string<
+{: ^1s} > <
+{: ^1s} >a<
+{: ^1s} >bcd<
+{: ^1s} >This is a test with a longer string<
+{:0^1s} >0<
+{:0^1s} >a<
+{:0^1s} >bcd<
+{:0^1s} >This is a test with a longer string<
+{:@^1s} >@<
+{:@^1s} >a<
+{:@^1s} >bcd<
+{:@^1s} >This is a test with a longer string<
+{:4s}   >    <
+{:4s}   >a   <
+{:4s}   >bcd <
+{:4s}   >This is a test with a longer string<
+{:4s}   >    <
+{:4s}   >a   <
+{:4s}   >bcd <
+{:4s}   >This is a test with a longer string<
+{:4s}   >    <
+{:4s}   >a   <
+{:4s}   >bcd <
+{:4s}   >This is a test with a longer string<
+{:4s}   >    <
+{:4s}   >a   <
+{:4s}   >bcd <
+{:4s}   >This is a test with a longer string<
+{:<4s}  >    <
+{:<4s}  >a   <
+{:<4s}  >bcd <
+{:<4s}  >This is a test with a longer string<
+{: <4s} >    <
+{: <4s} >a   <
+{: <4s} >bcd <
+{: <4s} >This is a test with a longer string<
+{:0<4s} >0000<
+{:0<4s} >a000<
+{:0<4s} >bcd0<
+{:0<4s} >This is a test with a longer string<
+{:@<4s} >@@@@<
+{:@<4s} >a@@@<
+{:@<4s} >bcd@<
+{:@<4s} >This is a test with a longer string<
+{:>4s}  >    <
+{:>4s}  >   a<
+{:>4s}  > bcd<
+{:>4s}  >This is a test with a longer string<
+{: >4s} >    <
+{: >4s} >   a<
+{: >4s} > bcd<
+{: >4s} >This is a test with a longer string<
+{:0>4s} >0000<
+{:0>4s} >000a<
+{:0>4s} >0bcd<
+{:0>4s} >This is a test with a longer string<
+{:@>4s} >@@@@<
+{:@>4s} >@@@a<
+{:@>4s} >@bcd<
+{:@>4s} >This is a test with a longer string<
+{:^4s}  >    <
+{:^4s}  > a  <
+{:^4s}  >bcd <
+{:^4s}  >This is a test with a longer string<
+{: ^4s} >    <
+{: ^4s} > a  <
+{: ^4s} >bcd <
+{: ^4s} >This is a test with a longer string<
+{:0^4s} >0000<
+{:0^4s} >0a00<
+{:0^4s} >bcd0<
+{:0^4s} >This is a test with a longer string<
+{:@^4s} >@@@@<
+{:@^4s} >@a@@<
+{:@^4s} >bcd@<
+{:@^4s} >This is a test with a longer string<
+{:10s}  >          <
+{:10s}  >a         <
+{:10s}  >bcd       <
+{:10s}  >This is a test with a longer string<
+{:10s}  >          <
+{:10s}  >a         <
+{:10s}  >bcd       <
+{:10s}  >This is a test with a longer string<
+{:10s}  >          <
+{:10s}  >a         <
+{:10s}  >bcd       <
+{:10s}  >This is a test with a longer string<
+{:10s}  >          <
+{:10s}  >a         <
+{:10s}  >bcd       <
+{:10s}  >This is a test with a longer string<
+{:<10s} >          <
+{:<10s} >a         <
+{:<10s} >bcd       <
+{:<10s} >This is a test with a longer string<
+{: <10s}>          <
+{: <10s}>a         <
+{: <10s}>bcd       <
+{: <10s}>This is a test with a longer string<
+{:0<10s}>0000000000<
+{:0<10s}>a000000000<
+{:0<10s}>bcd0000000<
+{:0<10s}>This is a test with a longer string<
+{:@<10s}>@@@@@@@@@@<
+{:@<10s}>a@@@@@@@@@<
+{:@<10s}>bcd@@@@@@@<
+{:@<10s}>This is a test with a longer string<
+{:>10s} >          <
+{:>10s} >         a<
+{:>10s} >       bcd<
+{:>10s} >This is a test with a longer string<
+{: >10s}>          <
+{: >10s}>         a<
+{: >10s}>       bcd<
+{: >10s}>This is a test with a longer string<
+{:0>10s}>0000000000<
+{:0>10s}>000000000a<
+{:0>10s}>0000000bcd<
+{:0>10s}>This is a test with a longer string<
+{:@>10s}>@@@@@@@@@@<
+{:@>10s}>@@@@@@@@@a<
+{:@>10s}>@@@@@@@bcd<
+{:@>10s}>This is a test with a longer string<
+{:^10s} >          <
+{:^10s} >    a     <
+{:^10s} >   bcd    <
+{:^10s} >This is a test with a longer string<
+{: ^10s}>          <
+{: ^10s}>    a     <
+{: ^10s}>   bcd    <
+{: ^10s}>This is a test with a longer string<
+{:0^10s}>0000000000<
+{:0^10s}>0000a00000<
+{:0^10s}>000bcd0000<
+{:0^10s}>This is a test with a longer string<
+{:@^10s}>@@@@@@@@@@<
+{:@^10s}>@@@@a@@@@@<
+{:@^10s}>@@@bcd@@@@<
+{:@^10s}>This is a test with a longer string<
+{!r:s}  >''<
+{!r:s}  >'a'<
+{!r:s}  >'bcd'<
+{!r:s}  >'This is a test with a longer string'<
+{!r:s}  >''<
+{!r:s}  >'a'<
+{!r:s}  >'bcd'<
+{!r:s}  >'This is a test with a longer string'<
+{!r:s}  >''<
+{!r:s}  >'a'<
+{!r:s}  >'bcd'<
+{!r:s}  >'This is a test with a longer string'<
+{!r:s}  >''<
+{!r:s}  >'a'<
+{!r:s}  >'bcd'<
+{!r:s}  >'This is a test with a longer string'<
+{!r:<s} >''<
+{!r:<s} >'a'<
+{!r:<s} >'bcd'<
+{!r:<s} >'This is a test with a longer string'<
+{!r: <s}>''<
+{!r: <s}>'a'<
+{!r: <s}>'bcd'<
+{!r: <s}>'This is a test with a longer string'<
+{!r:0<s}>''<
+{!r:0<s}>'a'<
+{!r:0<s}>'bcd'<
+{!r:0<s}>'This is a test with a longer string'<
+{!r:@<s}>''<
+{!r:@<s}>'a'<
+{!r:@<s}>'bcd'<
+{!r:@<s}>'This is a test with a longer string'<
+{!r:>s} >''<
+{!r:>s} >'a'<
+{!r:>s} >'bcd'<
+{!r:>s} >'This is a test with a longer string'<
+{!r: >s}>''<
+{!r: >s}>'a'<
+{!r: >s}>'bcd'<
+{!r: >s}>'This is a test with a longer string'<
+{!r:0>s}>''<
+{!r:0>s}>'a'<
+{!r:0>s}>'bcd'<
+{!r:0>s}>'This is a test with a longer string'<
+{!r:@>s}>''<
+{!r:@>s}>'a'<
+{!r:@>s}>'bcd'<
+{!r:@>s}>'This is a test with a longer string'<
+{!r:^s} >''<
+{!r:^s} >'a'<
+{!r:^s} >'bcd'<
+{!r:^s} >'This is a test with a longer string'<
+{!r: ^s}>''<
+{!r: ^s}>'a'<
+{!r: ^s}>'bcd'<
+{!r: ^s}>'This is a test with a longer string'<
+{!r:0^s}>''<
+{!r:0^s}>'a'<
+{!r:0^s}>'bcd'<
+{!r:0^s}>'This is a test with a longer string'<
+{!r:@^s}>''<
+{!r:@^s}>'a'<
+{!r:@^s}>'bcd'<
+{!r:@^s}>'This is a test with a longer string'<
+{!r:1s} >''<
+{!r:1s} >'a'<
+{!r:1s} >'bcd'<
+{!r:1s} >'This is a test with a longer string'<
+{!r:1s} >''<
+{!r:1s} >'a'<
+{!r:1s} >'bcd'<
+{!r:1s} >'This is a test with a longer string'<
+{!r:1s} >''<
+{!r:1s} >'a'<
+{!r:1s} >'bcd'<
+{!r:1s} >'This is a test with a longer string'<
+{!r:1s} >''<
+{!r:1s} >'a'<
+{!r:1s} >'bcd'<
+{!r:1s} >'This is a test with a longer string'<
+{!r:<1s}>''<
+{!r:<1s}>'a'<
+{!r:<1s}>'bcd'<
+{!r:<1s}>'This is a test with a longer string'<
+{!r: <1s}>''<
+{!r: <1s}>'a'<
+{!r: <1s}>'bcd'<
+{!r: <1s}>'This is a test with a longer string'<
+{!r:0<1s}>''<
+{!r:0<1s}>'a'<
+{!r:0<1s}>'bcd'<
+{!r:0<1s}>'This is a test with a longer string'<
+{!r:@<1s}>''<
+{!r:@<1s}>'a'<
+{!r:@<1s}>'bcd'<
+{!r:@<1s}>'This is a test with a longer string'<
+{!r:>1s}>''<
+{!r:>1s}>'a'<
+{!r:>1s}>'bcd'<
+{!r:>1s}>'This is a test with a longer string'<
+{!r: >1s}>''<
+{!r: >1s}>'a'<
+{!r: >1s}>'bcd'<
+{!r: >1s}>'This is a test with a longer string'<
+{!r:0>1s}>''<
+{!r:0>1s}>'a'<
+{!r:0>1s}>'bcd'<
+{!r:0>1s}>'This is a test with a longer string'<
+{!r:@>1s}>''<
+{!r:@>1s}>'a'<
+{!r:@>1s}>'bcd'<
+{!r:@>1s}>'This is a test with a longer string'<
+{!r:^1s}>''<
+{!r:^1s}>'a'<
+{!r:^1s}>'bcd'<
+{!r:^1s}>'This is a test with a longer string'<
+{!r: ^1s}>''<
+{!r: ^1s}>'a'<
+{!r: ^1s}>'bcd'<
+{!r: ^1s}>'This is a test with a longer string'<
+{!r:0^1s}>''<
+{!r:0^1s}>'a'<
+{!r:0^1s}>'bcd'<
+{!r:0^1s}>'This is a test with a longer string'<
+{!r:@^1s}>''<
+{!r:@^1s}>'a'<
+{!r:@^1s}>'bcd'<
+{!r:@^1s}>'This is a test with a longer string'<
+{!r:4s} >''  <
+{!r:4s} >'a' <
+{!r:4s} >'bcd'<
+{!r:4s} >'This is a test with a longer string'<
+{!r:4s} >''  <
+{!r:4s} >'a' <
+{!r:4s} >'bcd'<
+{!r:4s} >'This is a test with a longer string'<
+{!r:4s} >''  <
+{!r:4s} >'a' <
+{!r:4s} >'bcd'<
+{!r:4s} >'This is a test with a longer string'<
+{!r:4s} >''  <
+{!r:4s} >'a' <
+{!r:4s} >'bcd'<
+{!r:4s} >'This is a test with a longer string'<
+{!r:<4s}>''  <
+{!r:<4s}>'a' <
+{!r:<4s}>'bcd'<
+{!r:<4s}>'This is a test with a longer string'<
+{!r: <4s}>''  <
+{!r: <4s}>'a' <
+{!r: <4s}>'bcd'<
+{!r: <4s}>'This is a test with a longer string'<
+{!r:0<4s}>''00<
+{!r:0<4s}>'a'0<
+{!r:0<4s}>'bcd'<
+{!r:0<4s}>'This is a test with a longer string'<
+{!r:@<4s}>''@@<
+{!r:@<4s}>'a'@<
+{!r:@<4s}>'bcd'<
+{!r:@<4s}>'This is a test with a longer string'<
+{!r:>4s}>  ''<
+{!r:>4s}> 'a'<
+{!r:>4s}>'bcd'<
+{!r:>4s}>'This is a test with a longer string'<
+{!r: >4s}>  ''<
+{!r: >4s}> 'a'<
+{!r: >4s}>'bcd'<
+{!r: >4s}>'This is a test with a longer string'<
+{!r:0>4s}>00''<
+{!r:0>4s}>0'a'<
+{!r:0>4s}>'bcd'<
+{!r:0>4s}>'This is a test with a longer string'<
+{!r:@>4s}>@@''<
+{!r:@>4s}>@'a'<
+{!r:@>4s}>'bcd'<
+{!r:@>4s}>'This is a test with a longer string'<
+{!r:^4s}> '' <
+{!r:^4s}>'a' <
+{!r:^4s}>'bcd'<
+{!r:^4s}>'This is a test with a longer string'<
+{!r: ^4s}> '' <
+{!r: ^4s}>'a' <
+{!r: ^4s}>'bcd'<
+{!r: ^4s}>'This is a test with a longer string'<
+{!r:0^4s}>0''0<
+{!r:0^4s}>'a'0<
+{!r:0^4s}>'bcd'<
+{!r:0^4s}>'This is a test with a longer string'<
+{!r:@^4s}>@''@<
+{!r:@^4s}>'a'@<
+{!r:@^4s}>'bcd'<
+{!r:@^4s}>'This is a test with a longer string'<
+{!r:10s}>''        <
+{!r:10s}>'a'       <
+{!r:10s}>'bcd'     <
+{!r:10s}>'This is a test with a longer string'<
+{!r:10s}>''        <
+{!r:10s}>'a'       <
+{!r:10s}>'bcd'     <
+{!r:10s}>'This is a test with a longer string'<
+{!r:10s}>''        <
+{!r:10s}>'a'       <
+{!r:10s}>'bcd'     <
+{!r:10s}>'This is a test with a longer string'<
+{!r:10s}>''        <
+{!r:10s}>'a'       <
+{!r:10s}>'bcd'     <
+{!r:10s}>'This is a test with a longer string'<
+{!r:<10s}>''        <
+{!r:<10s}>'a'       <
+{!r:<10s}>'bcd'     <
+{!r:<10s}>'This is a test with a longer string'<
+{!r: <10s}>''        <
+{!r: <10s}>'a'       <
+{!r: <10s}>'bcd'     <
+{!r: <10s}>'This is a test with a longer string'<
+{!r:0<10s}>''00000000<
+{!r:0<10s}>'a'0000000<
+{!r:0<10s}>'bcd'00000<
+{!r:0<10s}>'This is a test with a longer string'<
+{!r:@<10s}>''@@@@@@@@<
+{!r:@<10s}>'a'@@@@@@@<
+{!r:@<10s}>'bcd'@@@@@<
+{!r:@<10s}>'This is a test with a longer string'<
+{!r:>10s}>        ''<
+{!r:>10s}>       'a'<
+{!r:>10s}>     'bcd'<
+{!r:>10s}>'This is a test with a longer string'<
+{!r: >10s}>        ''<
+{!r: >10s}>       'a'<
+{!r: >10s}>     'bcd'<
+{!r: >10s}>'This is a test with a longer string'<
+{!r:0>10s}>00000000''<
+{!r:0>10s}>0000000'a'<
+{!r:0>10s}>00000'bcd'<
+{!r:0>10s}>'This is a test with a longer string'<
+{!r:@>10s}>@@@@@@@@''<
+{!r:@>10s}>@@@@@@@'a'<
+{!r:@>10s}>@@@@@'bcd'<
+{!r:@>10s}>'This is a test with a longer string'<
+{!r:^10s}>    ''    <
+{!r:^10s}>   'a'    <
+{!r:^10s}>  'bcd'   <
+{!r:^10s}>'This is a test with a longer string'<
+{!r: ^10s}>    ''    <
+{!r: ^10s}>   'a'    <
+{!r: ^10s}>  'bcd'   <
+{!r: ^10s}>'This is a test with a longer string'<
+{!r:0^10s}>0000''0000<
+{!r:0^10s}>000'a'0000<
+{!r:0^10s}>00'bcd'000<
+{!r:0^10s}>'This is a test with a longer string'<
+{!r:@^10s}>@@@@''@@@@<
+{!r:@^10s}>@@@'a'@@@@<
+{!r:@^10s}>@@'bcd'@@@<
+{!r:@^10s}>'This is a test with a longer string'<
+{!s:s}  ><
+{!s:s}  >a<
+{!s:s}  >bcd<
+{!s:s}  >This is a test with a longer string<
+{!s:s}  ><
+{!s:s}  >a<
+{!s:s}  >bcd<
+{!s:s}  >This is a test with a longer string<
+{!s:s}  ><
+{!s:s}  >a<
+{!s:s}  >bcd<
+{!s:s}  >This is a test with a longer string<
+{!s:s}  ><
+{!s:s}  >a<
+{!s:s}  >bcd<
+{!s:s}  >This is a test with a longer string<
+{!s:<s} ><
+{!s:<s} >a<
+{!s:<s} >bcd<
+{!s:<s} >This is a test with a longer string<
+{!s: <s}><
+{!s: <s}>a<
+{!s: <s}>bcd<
+{!s: <s}>This is a test with a longer string<
+{!s:0<s}><
+{!s:0<s}>a<
+{!s:0<s}>bcd<
+{!s:0<s}>This is a test with a longer string<
+{!s:@<s}><
+{!s:@<s}>a<
+{!s:@<s}>bcd<
+{!s:@<s}>This is a test with a longer string<
+{!s:>s} ><
+{!s:>s} >a<
+{!s:>s} >bcd<
+{!s:>s} >This is a test with a longer string<
+{!s: >s}><
+{!s: >s}>a<
+{!s: >s}>bcd<
+{!s: >s}>This is a test with a longer string<
+{!s:0>s}><
+{!s:0>s}>a<
+{!s:0>s}>bcd<
+{!s:0>s}>This is a test with a longer string<
+{!s:@>s}><
+{!s:@>s}>a<
+{!s:@>s}>bcd<
+{!s:@>s}>This is a test with a longer string<
+{!s:^s} ><
+{!s:^s} >a<
+{!s:^s} >bcd<
+{!s:^s} >This is a test with a longer string<
+{!s: ^s}><
+{!s: ^s}>a<
+{!s: ^s}>bcd<
+{!s: ^s}>This is a test with a longer string<
+{!s:0^s}><
+{!s:0^s}>a<
+{!s:0^s}>bcd<
+{!s:0^s}>This is a test with a longer string<
+{!s:@^s}><
+{!s:@^s}>a<
+{!s:@^s}>bcd<
+{!s:@^s}>This is a test with a longer string<
+{!s:1s} > <
+{!s:1s} >a<
+{!s:1s} >bcd<
+{!s:1s} >This is a test with a longer string<
+{!s:1s} > <
+{!s:1s} >a<
+{!s:1s} >bcd<
+{!s:1s} >This is a test with a longer string<
+{!s:1s} > <
+{!s:1s} >a<
+{!s:1s} >bcd<
+{!s:1s} >This is a test with a longer string<
+{!s:1s} > <
+{!s:1s} >a<
+{!s:1s} >bcd<
+{!s:1s} >This is a test with a longer string<
+{!s:<1s}> <
+{!s:<1s}>a<
+{!s:<1s}>bcd<
+{!s:<1s}>This is a test with a longer string<
+{!s: <1s}> <
+{!s: <1s}>a<
+{!s: <1s}>bcd<
+{!s: <1s}>This is a test with a longer string<
+{!s:0<1s}>0<
+{!s:0<1s}>a<
+{!s:0<1s}>bcd<
+{!s:0<1s}>This is a test with a longer string<
+{!s:@<1s}>@<
+{!s:@<1s}>a<
+{!s:@<1s}>bcd<
+{!s:@<1s}>This is a test with a longer string<
+{!s:>1s}> <
+{!s:>1s}>a<
+{!s:>1s}>bcd<
+{!s:>1s}>This is a test with a longer string<
+{!s: >1s}> <
+{!s: >1s}>a<
+{!s: >1s}>bcd<
+{!s: >1s}>This is a test with a longer string<
+{!s:0>1s}>0<
+{!s:0>1s}>a<
+{!s:0>1s}>bcd<
+{!s:0>1s}>This is a test with a longer string<
+{!s:@>1s}>@<
+{!s:@>1s}>a<
+{!s:@>1s}>bcd<
+{!s:@>1s}>This is a test with a longer string<
+{!s:^1s}> <
+{!s:^1s}>a<
+{!s:^1s}>bcd<
+{!s:^1s}>This is a test with a longer string<
+{!s: ^1s}> <
+{!s: ^1s}>a<
+{!s: ^1s}>bcd<
+{!s: ^1s}>This is a test with a longer string<
+{!s:0^1s}>0<
+{!s:0^1s}>a<
+{!s:0^1s}>bcd<
+{!s:0^1s}>This is a test with a longer string<
+{!s:@^1s}>@<
+{!s:@^1s}>a<
+{!s:@^1s}>bcd<
+{!s:@^1s}>This is a test with a longer string<
+{!s:4s} >    <
+{!s:4s} >a   <
+{!s:4s} >bcd <
+{!s:4s} >This is a test with a longer string<
+{!s:4s} >    <
+{!s:4s} >a   <
+{!s:4s} >bcd <
+{!s:4s} >This is a test with a longer string<
+{!s:4s} >    <
+{!s:4s} >a   <
+{!s:4s} >bcd <
+{!s:4s} >This is a test with a longer string<
+{!s:4s} >    <
+{!s:4s} >a   <
+{!s:4s} >bcd <
+{!s:4s} >This is a test with a longer string<
+{!s:<4s}>    <
+{!s:<4s}>a   <
+{!s:<4s}>bcd <
+{!s:<4s}>This is a test with a longer string<
+{!s: <4s}>    <
+{!s: <4s}>a   <
+{!s: <4s}>bcd <
+{!s: <4s}>This is a test with a longer string<
+{!s:0<4s}>0000<
+{!s:0<4s}>a000<
+{!s:0<4s}>bcd0<
+{!s:0<4s}>This is a test with a longer string<
+{!s:@<4s}>@@@@<
+{!s:@<4s}>a@@@<
+{!s:@<4s}>bcd@<
+{!s:@<4s}>This is a test with a longer string<
+{!s:>4s}>    <
+{!s:>4s}>   a<
+{!s:>4s}> bcd<
+{!s:>4s}>This is a test with a longer string<
+{!s: >4s}>    <
+{!s: >4s}>   a<
+{!s: >4s}> bcd<
+{!s: >4s}>This is a test with a longer string<
+{!s:0>4s}>0000<
+{!s:0>4s}>000a<
+{!s:0>4s}>0bcd<
+{!s:0>4s}>This is a test with a longer string<
+{!s:@>4s}>@@@@<
+{!s:@>4s}>@@@a<
+{!s:@>4s}>@bcd<
+{!s:@>4s}>This is a test with a longer string<
+{!s:^4s}>    <
+{!s:^4s}> a  <
+{!s:^4s}>bcd <
+{!s:^4s}>This is a test with a longer string<
+{!s: ^4s}>    <
+{!s: ^4s}> a  <
+{!s: ^4s}>bcd <
+{!s: ^4s}>This is a test with a longer string<
+{!s:0^4s}>0000<
+{!s:0^4s}>0a00<
+{!s:0^4s}>bcd0<
+{!s:0^4s}>This is a test with a longer string<
+{!s:@^4s}>@@@@<
+{!s:@^4s}>@a@@<
+{!s:@^4s}>bcd@<
+{!s:@^4s}>This is a test with a longer string<
+{!s:10s}>          <
+{!s:10s}>a         <
+{!s:10s}>bcd       <
+{!s:10s}>This is a test with a longer string<
+{!s:10s}>          <
+{!s:10s}>a         <
+{!s:10s}>bcd       <
+{!s:10s}>This is a test with a longer string<
+{!s:10s}>          <
+{!s:10s}>a         <
+{!s:10s}>bcd       <
+{!s:10s}>This is a test with a longer string<
+{!s:10s}>          <
+{!s:10s}>a         <
+{!s:10s}>bcd       <
+{!s:10s}>This is a test with a longer string<
+{!s:<10s}>          <
+{!s:<10s}>a         <
+{!s:<10s}>bcd       <
+{!s:<10s}>This is a test with a longer string<
+{!s: <10s}>          <
+{!s: <10s}>a         <
+{!s: <10s}>bcd       <
+{!s: <10s}>This is a test with a longer string<
+{!s:0<10s}>0000000000<
+{!s:0<10s}>a000000000<
+{!s:0<10s}>bcd0000000<
+{!s:0<10s}>This is a test with a longer string<
+{!s:@<10s}>@@@@@@@@@@<
+{!s:@<10s}>a@@@@@@@@@<
+{!s:@<10s}>bcd@@@@@@@<
+{!s:@<10s}>This is a test with a longer string<
+{!s:>10s}>          <
+{!s:>10s}>         a<
+{!s:>10s}>       bcd<
+{!s:>10s}>This is a test with a longer string<
+{!s: >10s}>          <
+{!s: >10s}>         a<
+{!s: >10s}>       bcd<
+{!s: >10s}>This is a test with a longer string<
+{!s:0>10s}>0000000000<
+{!s:0>10s}>000000000a<
+{!s:0>10s}>0000000bcd<
+{!s:0>10s}>This is a test with a longer string<
+{!s:@>10s}>@@@@@@@@@@<
+{!s:@>10s}>@@@@@@@@@a<
+{!s:@>10s}>@@@@@@@bcd<
+{!s:@>10s}>This is a test with a longer string<
+{!s:^10s}>          <
+{!s:^10s}>    a     <
+{!s:^10s}>   bcd    <
+{!s:^10s}>This is a test with a longer string<
+{!s: ^10s}>          <
+{!s: ^10s}>    a     <
+{!s: ^10s}>   bcd    <
+{!s: ^10s}>This is a test with a longer string<
+{!s:0^10s}>0000000000<
+{!s:0^10s}>0000a00000<
+{!s:0^10s}>000bcd0000<
+{!s:0^10s}>This is a test with a longer string<
+{!s:@^10s}>@@@@@@@@@@<
+{!s:@^10s}>@@@@a@@@@@<
+{!s:@^10s}>@@@bcd@@@@<
+{!s:@^10s}>This is a test with a longer string<

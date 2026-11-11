@@ -1,0 +1,14 @@
+0.0 0
+-0.0 0
+1.0 1
+2.0 2
+-12.0 -12
+12345.0 12345
+0.1 <class 'int'>
+-0.1 <class 'int'>
+10.3 <class 'int'>
+0.4e3 <class 'int'>
+1e16 <class 'int'>
+inf <class 'int'>
+-inf <class 'int'>
+nan <class 'int'>

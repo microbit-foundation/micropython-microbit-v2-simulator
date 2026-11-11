@@ -1,0 +1,11 @@
+A.__new__
+A.__init__
+A.meth
+A.__new__
+A.meth
+A.__new__
+A.meth
+B.__new__ 1 2
+B inst: None
+C.__new__
+True

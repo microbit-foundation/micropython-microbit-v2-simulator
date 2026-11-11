@@ -1,0 +1,9 @@
+__enter__ 1
+__exit__ 1 None None
+__enter__ 10
+('enter', 10)
+__enter__ 15
+('enter', 15)
+__enter__ 20
+__exit__ 20 None None
+('exit', 20)

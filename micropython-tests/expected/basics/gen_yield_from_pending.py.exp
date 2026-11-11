@@ -1,0 +1,6 @@
+raise task
+outer iter 2
+raising
+main exception
+noop task
+outer iter 1

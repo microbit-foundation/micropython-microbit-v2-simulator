@@ -1,0 +1,176 @@
+1 in {1: 2}: True
+1 not in {1: 2}: False
+1 in dict_keys([1]): True
+1 not in dict_keys([1]): False
+2 in {1: 2}: False
+2 not in {1: 2}: True
+2 in dict_keys([1]): False
+2 not in dict_keys([1]): True
+supercalifragilistc in supercalifragilistc :: True
+supercalifragilistc not in supercalifragilistc :: False
+supercalifragilistc in supercalifragilistc :: True
+supercalifragilistc not in supercalifragilistc :: False
+upercalifragilistc in supercalifragilistc :: True
+upercalifragilistc not in supercalifragilistc :: False
+supercalifragilistc in upercalifragilistc :: False
+supercalifragilistc not in upercalifragilistc :: True
+percalifragilistc in supercalifragilistc :: True
+percalifragilistc not in supercalifragilistc :: False
+supercalifragilistc in percalifragilistc :: False
+supercalifragilistc not in percalifragilistc :: True
+ercalifragilistc in supercalifragilistc :: True
+ercalifragilistc not in supercalifragilistc :: False
+supercalifragilistc in ercalifragilistc :: False
+supercalifragilistc not in ercalifragilistc :: True
+rcalifragilistc in supercalifragilistc :: True
+rcalifragilistc not in supercalifragilistc :: False
+supercalifragilistc in rcalifragilistc :: False
+supercalifragilistc not in rcalifragilistc :: True
+califragilistc in supercalifragilistc :: True
+califragilistc not in supercalifragilistc :: False
+supercalifragilistc in califragilistc :: False
+supercalifragilistc not in califragilistc :: True
+alifragilistc in supercalifragilistc :: True
+alifragilistc not in supercalifragilistc :: False
+supercalifragilistc in alifragilistc :: False
+supercalifragilistc not in alifragilistc :: True
+lifragilistc in supercalifragilistc :: True
+lifragilistc not in supercalifragilistc :: False
+supercalifragilistc in lifragilistc :: False
+supercalifragilistc not in lifragilistc :: True
+ifragilistc in supercalifragilistc :: True
+ifragilistc not in supercalifragilistc :: False
+supercalifragilistc in ifragilistc :: False
+supercalifragilistc not in ifragilistc :: True
+fragilistc in supercalifragilistc :: True
+fragilistc not in supercalifragilistc :: False
+supercalifragilistc in fragilistc :: False
+supercalifragilistc not in fragilistc :: True
+ragilistc in supercalifragilistc :: True
+ragilistc not in supercalifragilistc :: False
+supercalifragilistc in ragilistc :: False
+supercalifragilistc not in ragilistc :: True
+agilistc in supercalifragilistc :: True
+agilistc not in supercalifragilistc :: False
+supercalifragilistc in agilistc :: False
+supercalifragilistc not in agilistc :: True
+gilistc in supercalifragilistc :: True
+gilistc not in supercalifragilistc :: False
+supercalifragilistc in gilistc :: False
+supercalifragilistc not in gilistc :: True
+ilistc in supercalifragilistc :: True
+ilistc not in supercalifragilistc :: False
+supercalifragilistc in ilistc :: False
+supercalifragilistc not in ilistc :: True
+listc in supercalifragilistc :: True
+listc not in supercalifragilistc :: False
+supercalifragilistc in listc :: False
+supercalifragilistc not in listc :: True
+istc in supercalifragilistc :: True
+istc not in supercalifragilistc :: False
+supercalifragilistc in istc :: False
+supercalifragilistc not in istc :: True
+stc in supercalifragilistc :: True
+stc not in supercalifragilistc :: False
+supercalifragilistc in stc :: False
+supercalifragilistc not in stc :: True
+tc in supercalifragilistc :: True
+tc not in supercalifragilistc :: False
+supercalifragilistc in tc :: False
+supercalifragilistc not in tc :: True
+c in supercalifragilistc :: True
+c not in supercalifragilistc :: False
+supercalifragilistc in c :: False
+supercalifragilistc not in c :: True
+s in supercalifragilistc :: True
+s not in supercalifragilistc :: False
+supercalifragilistc in s :: False
+supercalifragilistc not in s :: True
+su in supercalifragilistc :: True
+su not in supercalifragilistc :: False
+supercalifragilistc in su :: False
+supercalifragilistc not in su :: True
+sup in supercalifragilistc :: True
+sup not in supercalifragilistc :: False
+supercalifragilistc in sup :: False
+supercalifragilistc not in sup :: True
+supe in supercalifragilistc :: True
+supe not in supercalifragilistc :: False
+supercalifragilistc in supe :: False
+supercalifragilistc not in supe :: True
+super in supercalifragilistc :: True
+super not in supercalifragilistc :: False
+supercalifragilistc in super :: False
+supercalifragilistc not in super :: True
+superc in supercalifragilistc :: True
+superc not in supercalifragilistc :: False
+supercalifragilistc in superc :: False
+supercalifragilistc not in superc :: True
+superca in supercalifragilistc :: True
+superca not in supercalifragilistc :: False
+supercalifragilistc in superca :: False
+supercalifragilistc not in superca :: True
+supercal in supercalifragilistc :: True
+supercal not in supercalifragilistc :: False
+supercalifragilistc in supercal :: False
+supercalifragilistc not in supercal :: True
+supercali in supercalifragilistc :: True
+supercali not in supercalifragilistc :: False
+supercalifragilistc in supercali :: False
+supercalifragilistc not in supercali :: True
+supercalif in supercalifragilistc :: True
+supercalif not in supercalifragilistc :: False
+supercalifragilistc in supercalif :: False
+supercalifragilistc not in supercalif :: True
+supercalifr in supercalifragilistc :: True
+supercalifr not in supercalifragilistc :: False
+supercalifragilistc in supercalifr :: False
+supercalifragilistc not in supercalifr :: True
+supercalifra in supercalifragilistc :: True
+supercalifra not in supercalifragilistc :: False
+supercalifragilistc in supercalifra :: False
+supercalifragilistc not in supercalifra :: True
+supercalifrag in supercalifragilistc :: True
+supercalifrag not in supercalifragilistc :: False
+supercalifragilistc in supercalifrag :: False
+supercalifragilistc not in supercalifrag :: True
+supercalifragi in supercalifragilistc :: True
+supercalifragi not in supercalifragilistc :: False
+supercalifragilistc in supercalifragi :: False
+supercalifragilistc not in supercalifragi :: True
+supercalifragil in supercalifragilistc :: True
+supercalifragil not in supercalifragilistc :: False
+supercalifragilistc in supercalifragil :: False
+supercalifragilistc not in supercalifragil :: True
+supercalifragili in supercalifragilistc :: True
+supercalifragili not in supercalifragilistc :: False
+supercalifragilistc in supercalifragili :: False
+supercalifragilistc not in supercalifragili :: True
+supercalifragilis in supercalifragilistc :: True
+supercalifragilis not in supercalifragilistc :: False
+supercalifragilistc in supercalifragilis :: False
+supercalifragilistc not in supercalifragilis :: True
+supercalifragilist in supercalifragilistc :: True
+supercalifragilist not in supercalifragilistc :: False
+supercalifragilistc in supercalifragilist :: False
+supercalifragilistc not in supercalifragilist :: True
+supercalifragilistc in supercalifragilistc :: True
+supercalifragilistc not in supercalifragilistc :: False
+supercalifragilistc in supercalifragilistc :: True
+supercalifragilistc not in supercalifragilistc :: False
+True
+False True
+False True
+TypeError
+1 in []: False
+1 not in []: True
+1 in [1]: True
+1 not in [1]: False
+1 in [1, 2]: True
+1 not in [1, 2]: False
+2 in []: False
+2 not in []: True
+2 in [1]: False
+2 not in [1]: True
+2 in [1, 2]: True
+2 not in [1, 2]: False

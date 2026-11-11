@@ -1,0 +1,28 @@
+b'123'
+b'123'
+b'123'
+b'\\u1234'
+b''
+b'abc'
+
+b'123'
+b'123'
+b'123'
+49 51
+51
+123
+123
+TypeError
+150
+b'abc'
+b'abc'
+TypeError
+TypeError
+b'\x00\x00\x00'
+b'\x03\x02\x01'
+b'\x00\x01\x02\x03\x04'
+6
+255 142 254 125
+b'\x80\xff'
+b'\x80\xff'
+ValueError

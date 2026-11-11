@@ -1,0 +1,8 @@
+# test sys.path
+
+
+
+try:
+
+    import usys as sys
+

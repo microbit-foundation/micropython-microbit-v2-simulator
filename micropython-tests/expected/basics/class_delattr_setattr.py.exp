@@ -1,0 +1,19 @@
+get foo
+1
+set bar 2
+del baz
+set __setattr__ 1
+del __delattr__
+1 2
+3 2
+AttributeError
+a = 5
+AttributeError
+5
+6
+TypeError
+del a
+5
+AttributeError
+AttributeError
+AttributeError

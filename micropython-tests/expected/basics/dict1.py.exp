@@ -1,0 +1,16 @@
+{}
+{2: 123}
+2 2 3
+2 0 3
+True
+50
+False
+False
+{False: 'zero'}
+{0: 'false'}
+{True: 'one'}
+{1: 'true'}
+10 11 12
+KeyError 0 (0,)
+TypeError
+TypeError

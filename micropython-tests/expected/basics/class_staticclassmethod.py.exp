@@ -1,0 +1,8 @@
+f 0
+g 0
+sub 1
+add 2
+static get 1
+item
+static set 1 2
+static del 3

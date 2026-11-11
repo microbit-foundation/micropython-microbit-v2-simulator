@@ -20,15 +20,32 @@ as an iframe. The embedding API and URLs are not yet stable and are
 subject to change. If you are interested in embedding the simulator
 in your application please [get in touch](mailto:support@microbit.org).
 
-The URL to embed is https://python-simulator.usermbit.org/v/0.1/simulator.html.
+The URL to embed is https://python-simulator.usermbit.org/v/0.2/simulator.html.
 You can embed this in your application directly. We would love to hear about
 your use of the simulator so please open an issue to get in touch.
+
+### Versions
+
+Each release is deployed to its own path, which you can embed in two ways:
+
+- `/v/0.2/` serves the newest 0.2.x release. Use this to pick up fixes
+  without changing the URL you embed.
+- `/v/0.2.0/` serves exactly that release and never changes. Use this to pin
+  a version.
+
+While the simulator is at 0.x, a patch release (0.2.0 to 0.2.1) has fixes and
+compatible additions. A minor release (0.1 to 0.2) can change behaviour that
+embedders may notice, such as the supported browsers or the timing of
+messages, so we don't move you to it: `/v/0.1/` stays on the last 0.1.x
+release and you change the URL when you're ready. See the
+[releases](https://github.com/microbit-foundation/micropython-microbit-v2-simulator/releases)
+for what changed in each version.
 
 The iframe provides the micro:bit board user interface and some limited
 interactions. It does not provide a terminal for serial/the REPL or any UI to change the board sensor state.
 
 A value for a brand color can be passed to the simulator via a query
-string and is used to style the play button. E.g., https://python-simulator.usermbit.org/v/0.1/simulator.html?color=blue
+string and is used to style the play button. E.g., https://python-simulator.usermbit.org/v/0.2/simulator.html?color=blue
 
 [demo.html](./src/demo.html) is an example of embedding the simulator.
 It connects the iframe to a terminal and provides a simple interface for
@@ -324,18 +341,24 @@ abort fails the test. Every file in `src/examples` must have an entry in
 `e2e/audio.spec.ts` records the simulator's audio output and checks broad
 statistics (duration, level, pitch, dropouts) rather than exact samples.
 
-### Branch deployments
+### Deployments
 
-There is a CloudFlare pages based build for development purposes only. Do not
-embed the simulator via this URL as it may be removed at any time. CloudFlare's
-GitHub integration will comment on PRs with deployment details.
+GitHub Actions (`.github/workflows/build.yml`) builds, tests and deploys every
+push. The workflow uses Micro:bit Educational Foundation infrastructure, so it
+does not run on forks without modification.
 
-Branches in this repository are also deployed via CircleCI to https://review-python-simulator.usermbit.org/{branchName}/. This requires the user pushing code to have
-permissions for the relevant Micro:bit Educational Foundation infrastructure.
+Branches in this repository are deployed to
+https://review-python-simulator.usermbit.org/{branchName}/ and a comment with
+the link is added to each PR. These are for development only: do not embed the
+simulator via a branch URL as it may be removed at any time.
 
-Similarly, the main branch is deployed to https://python-simulator.usermbit.org/staging/.
+The main branch is deployed to https://python-simulator.usermbit.org/staging/.
 
-Tagged releases with a `v` prefix are deployed to https://python-simulator.usermbit.org/v/{number}/
+A GitHub release tagged `v{x.y.z}` is deployed to
+https://python-simulator.usermbit.org/v/{x.y.z}/ and is live at that exact
+version only. The major.minor path (e.g. `/v/0.2/`) moves to it in a separate
+step, when the Foundation updates the hosting configuration to include the
+release. See [Versions](#versions) for when to bump the minor version.
 
 ### Upgrading micropython-microbit-v2
 

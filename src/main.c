@@ -170,11 +170,17 @@ void microbit_pyexec_file(const char *filename) {
         // Execute the code.
         mp_hal_set_interrupt_char(CHAR_CTRL_C); // allow ctrl-C to interrupt us
         mp_call_function_0(module_fun);
+        MP_STATE_THREAD(gc_lock_depth) = 0;
         mp_hal_set_interrupt_char(-1); // disable interrupt
         mp_handle_pending(true); // handle any pending exceptions (and any callbacks)
         nlr_pop();
     } else {
         // Handle uncaught exception.
+
+        // The program may have ended with the heap locked via
+        // micropython.heap_lock(), which would leave reporting the exception
+        // and then the REPL unable to allocate.
+        MP_STATE_THREAD(gc_lock_depth) = 0;
         mp_hal_set_interrupt_char(-1); // disable interrupt
         mp_handle_pending(false); // clear any pending exceptions (and run any callbacks)
 

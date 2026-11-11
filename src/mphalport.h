@@ -23,3 +23,9 @@ static inline void mp_hal_unique_id(uint32_t id[2]) {
     id[0] = 0;
     id[1] = 0;
 }
+
+// Without these py/mphal.h falls back to the virtual pin API, which calls
+// through a pin protocol that the micro:bit pin types don't have.
+#define mp_hal_pin_obj_t uint8_t
+#define mp_hal_get_pin_obj(obj) microbit_obj_get_pin_name(obj)
+#define mp_hal_pin_read(pin) microbit_hal_pin_read(pin)

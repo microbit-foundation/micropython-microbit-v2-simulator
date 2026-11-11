@@ -52,7 +52,8 @@ mergeInto(LibraryManager.library, {
     /** @type {number} */ ptr,
     /** @type {number} */ len,
   ) {
-    Module.board.writeSerialOutput(UTF8ToString(ptr, len));
+    // Python strings can contain NUL, which would otherwise end the output.
+    Module.board.writeSerialOutput(UTF8ToString(ptr, len, true));
   },
 
   mp_js_hal_stdout_tx_busy: function () {

@@ -151,6 +151,11 @@ export class Simulator {
     await this.expectFinished();
   }
 
+  /** Length of the serial output since the last run, as sent. */
+  async serialLength(): Promise<number> {
+    return this.page.evaluate(() => (window as any).serial.length as number);
+  }
+
   async sendSerial(data: string): Promise<void> {
     await this.send({ kind: "serial_input", data });
   }

@@ -3,8 +3,22 @@ import { expect, Simulator, test } from "./fixtures";
 
 test.use({ recordAudio: true });
 
+// The recorder runs on the main thread, which is busy while the simulator
+// starts, so it misses the start of a sound made straight away. This holds
+// the program until there's serial input, sent once the recorder is running.
+const waitForRecorder =
+  "from microbit import uart as _uart, sleep as _sleep\nwhile not _uart.any():\n    _sleep(10)\n_uart.read()\n";
+
 async function runToEnd(simulator: Simulator, program: string) {
-  await simulator.run(program);
+  await simulator.run(waitForRecorder + program);
+  await expect
+    .poll(() =>
+      simulator.frame
+        .locator("body")
+        .evaluate(() => (window as any).__audioRecording.chunks.length),
+    )
+    .toBeGreaterThan(0);
+  await simulator.sendSerial("\n");
   await simulator.expectFinished({ timeout: 20_000 });
   // The last buffer can still be playing when the prompt appears.
   await simulator.page.waitForTimeout(300);

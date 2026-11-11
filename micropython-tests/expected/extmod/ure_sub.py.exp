@@ -1,0 +1,33 @@
+20 40 60 80 100
+5 10 15 20 25
+ABCBABCDAbcdA.
+
+
+static PyObject*
+py_myfunc(void){
+  return;
+}
+
+
+static PyObject*
+py_myfunc1(void){
+  return;
+}
+
+
+static PyObject*
+py_myfunc2(void){
+  return;
+}
+
+calzino colore blu con scarpa colore verde? ...
+abcabc
+c
+1b2b3a
+invalid group
+invalid group
+a
+b'a'
+a
+TypeError
+a\bc

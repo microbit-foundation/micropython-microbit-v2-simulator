@@ -9,7 +9,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { expect, test } from "../e2e/fixtures";
-import { skip } from "./skip";
 
 const micropythonDir = path.join(
   __dirname,
@@ -17,9 +16,16 @@ const micropythonDir = path.join(
 );
 const testsDir = path.join(micropythonDir, "tests");
 const expectedDir = path.join(__dirname, "expected");
+// Tests that don't apply to this port, with the reason. Tests that print SKIP
+// because a feature is missing skip themselves and aren't listed.
+const skip: Record<string, string> = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "skip.json"), "utf-8"),
+);
 const manifest: { micropython: string; dirs: string[] } = JSON.parse(
   fs.readFileSync(path.join(expectedDir, "manifest.json"), "utf-8"),
 );
+
+const importsSiblings = new Set(["import"]);
 
 // What the REPL prints once main.py has finished.
 const banner = /MicroPython [^\n]* on [^\n]*\nType "help\(\)"[^\n]*\n>>> $/;
@@ -74,8 +80,20 @@ for (const dir of manifest.dirs) {
           "No expected output: run micropython-tests/update-expected.py",
         ).toBeDefined();
 
+        // Tests in these directories import the files alongside them.
+        const siblings = importsSiblings.has(dir)
+          ? Object.fromEntries(
+              files
+                .filter((f) => f !== file)
+                .map((f) => [
+                  f,
+                  fs.readFileSync(path.join(testsDir, dir, f), "utf-8"),
+                ]),
+            )
+          : {};
         await simulator.run(
           fs.readFileSync(path.join(testsDir, name), "utf-8"),
+          siblings,
         );
         let previous = "";
         let serial = "";

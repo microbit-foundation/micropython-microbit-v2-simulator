@@ -341,13 +341,13 @@ abort fails the test. Every file in `src/examples` must have an entry in
 `e2e/audio.spec.ts` records the simulator's audio output and checks broad
 statistics (duration, level, pitch, dropouts) rather than exact samples.
 
-The same run includes MicroPython's own tests for the core language
+The same run includes MicroPython's own tests
 (`micropython-tests/`), as the `micropython-tests` Playwright project. Each
 test file runs as `main.py` and its serial output must match the test's `.exp`
 file or, where it has none, CPython's output for the same file. The CPython
 output is checked in under `micropython-tests/expected` so that test runs
 don't need a particular Python version. Tests that don't apply to this port
-are listed with reasons in `micropython-tests/skip.ts`.
+are listed with reasons in `micropython-tests/skip.json`.
 
     $ npx playwright test --project=micropython-tests
 
@@ -378,7 +378,7 @@ release. See [Versions](#versions) for when to bump the minor version.
    2. the HAL, which may require implementing in the simulator
    3. the filesystem, which has a JavaScript implementation.
 3. Regenerate the expected output for MicroPython's tests and review the
-   changes, along with `micropython-tests/skip.ts`. The script assets a
+   changes, along with `micropython-tests/skip.json`. The script asserts a
    specific CPython version; update it to match the version MicroPython
    uses.
 

@@ -1,0 +1,39 @@
+caught
+Traceback (most recent call last):
+  File  , line 38, in <module>
+Exception: msg
+
+caught
+Traceback (most recent call last):
+  File  , line 53, in <module>
+  File  , line 45, in f
+  File  , line 49, in g
+Exception: fail
+
+finally
+caught
+Traceback (most recent call last):
+  File  , line 61, in <module>
+  File  , line 45, in f
+  File  , line 49, in g
+Exception: fail
+
+reraise
+Traceback (most recent call last):
+  File  , line 71, in <module>
+  File  , line 45, in f
+  File  , line 49, in g
+Exception: fail
+
+caught
+Traceback (most recent call last):
+  File  , line 71, in <module>
+  File  , line 45, in f
+  File  , line 49, in g
+Exception: fail
+
+Traceback (most recent call last):
+  File  , line 88, in <module>
+  File  , line 83, in f
+AttributeError: 'function' object has no attribute 'X'
+

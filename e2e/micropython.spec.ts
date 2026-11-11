@@ -18,3 +18,17 @@ test("list comprehension", async ({ simulator }) => {
   await simulator.run("print([x * 2 for x in 'ab'])\n");
   await simulator.expectSerial(/\['aa', 'bb'\]/);
 });
+
+test("machine.time_pulse_us times out on an idle pin", async ({
+  simulator,
+}) => {
+  await simulator.run(
+    "from microbit import *\nimport machine\nprint(machine.time_pulse_us(pin0, 1, 1000))\n",
+  );
+  await simulator.expectSerial(/^-2\n/);
+});
+
+test("machine.time_pulse_us rejects a non-pin", async ({ simulator }) => {
+  await simulator.run("import machine\nmachine.time_pulse_us(0, 1, 1000)\n");
+  await simulator.expectSerial(/TypeError: expecting a pin/);
+});

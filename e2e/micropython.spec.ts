@@ -33,3 +33,17 @@ test("uncaught exception whose argument's __str__ raises", async ({
   await simulator.expectSerial(/line 5, in <module>\nException: \n/);
   await simulator.expectFinished();
 });
+
+test("program that ends with the heap locked", async ({ simulator }) => {
+  await simulator.run("import micropython\nmicropython.heap_lock()\n");
+  await simulator.expectFinished();
+});
+
+test("uncaught exception with the heap locked", async ({ simulator }) => {
+  await simulator.run(
+    "import micropython\nmicropython.heap_lock()\nraise ValueError\n",
+  );
+  await simulator.expectSerial(/ValueError/);
+  await simulator.skipErrorScroll();
+  await simulator.expectFinished();
+});

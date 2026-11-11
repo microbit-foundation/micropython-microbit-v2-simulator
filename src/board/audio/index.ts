@@ -63,6 +63,7 @@ export class Audio {
           this.currentSoundExpressionCallback();
         }
       },
+      soundExpressionLookaheadSeconds,
     );
   }
 
@@ -79,9 +80,12 @@ export class Audio {
   }
 
   playSoundExpression(expr: string) {
+    // Replaces anything still playing.
+    this.soundExpression!.stop();
     const soundEffects = parseSoundEffects(replaceBuiltinSound(expr));
     const onDone = () => {
-      this.stopSoundExpression();
+      // The synth has generated everything. What's scheduled plays out.
+      this.currentSoundExpressionCallback = undefined;
     };
     const synth = new SoundEmojiSynthesizer(0, onDone);
     synth.play(soundEffects);
@@ -109,10 +113,14 @@ export class Audio {
 
   stopSoundExpression(): void {
     this.currentSoundExpressionCallback = undefined;
+    this.soundExpression?.stop();
   }
 
   isSoundExpressionActive(): boolean {
-    return !!this.currentSoundExpressionCallback;
+    return (
+      !!this.currentSoundExpressionCallback ||
+      !!this.soundExpression?.isPlaying()
+    );
   }
 
   mute() {
@@ -170,14 +178,27 @@ export class Audio {
   }
 }
 
+/**
+ * The sound expression synth is asked for this much audio ahead of what is
+ * playing. Each buffer is under 12 ms and the next is requested from the main
+ * thread, so without a margin any brief stall there is heard as a click.
+ */
+const soundExpressionLookaheadSeconds = 0.1;
+
 class BufferedAudio {
   nextStartTime: number = -1;
   private sampleRate: number = -1;
+  private scheduled = new Set<AudioBufferSourceNode>();
 
+  /**
+   * @param lookaheadSeconds Keep at least this much audio scheduled by calling
+   * back for more straight away. Only for callbacks that write synchronously.
+   */
   constructor(
     private context: AudioContext,
     private destination: AudioNode,
     private callback: () => void,
+    private lookaheadSeconds: number = 0,
   ) {}
 
   init(sampleRate: number) {
@@ -194,22 +215,43 @@ class BufferedAudio {
     // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
     const source = this.context.createBufferSource();
     source.buffer = buffer;
-    source.onended = () => this.callback();
+    source.onended = () => {
+      this.scheduled.delete(source);
+      this.callback();
+    };
     source.connect(this.destination);
     const currentTime = this.context.currentTime;
     const first = this.nextStartTime < currentTime;
     const startTime = first ? currentTime : this.nextStartTime;
     this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
+    source.start(startTime);
+    this.scheduled.add(source);
     // For audio frames, we're frequently out of data. Speech is smooth.
-    if (first) {
-      // We're just getting started so buffer another frame.
+    if (first || this.nextStartTime - currentTime < this.lookaheadSeconds) {
+      // We're just getting started, or short of the lookahead, so buffer
+      // another frame.
       this.callback();
     }
-    source.start(startTime);
+  }
+
+  /** Whether anything written is still to finish playing. */
+  isPlaying(): boolean {
+    return this.nextStartTime > this.context.currentTime;
+  }
+
+  /** Silences what has been written but not yet played. */
+  stop() {
+    for (const source of this.scheduled) {
+      source.onended = null;
+      source.stop();
+    }
+    this.scheduled.clear();
+    this.nextStartTime = -1;
   }
 
   dispose() {
     // Prevent calls into WASM when the buffer nodes finish.
     this.callback = () => {};
+    this.stop();
   }
 }

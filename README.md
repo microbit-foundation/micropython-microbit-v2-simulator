@@ -378,9 +378,9 @@ release. See [Versions](#versions) for when to bump the minor version.
    2. the HAL, which may require implementing in the simulator
    3. the filesystem, which has a JavaScript implementation.
 3. Regenerate the expected output for MicroPython's tests and review the
-   changes, along with `micropython-tests/skip.ts`. The script must be run
-   with the CPython version it names, which is the one that MicroPython
-   version was tested against; update that if it has moved on.
+   changes, along with `micropython-tests/skip.ts`. The script assets a
+   specific CPython version; update it to match the version MicroPython
+   uses.
 
        $ python3.8 micropython-tests/update-expected.py
 

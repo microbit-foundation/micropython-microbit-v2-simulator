@@ -298,6 +298,31 @@ export class Simulator {
   }
 }
 
+/** Loads the simulator in a page, recording console errors and exceptions. */
+export const createSimulator = async (
+  page: Page,
+  flags: string[],
+): Promise<Simulator> => {
+  // Served by the test rather than the build so it doesn't ship.
+  await page.route("**/e2e-host.html*", (route) =>
+    route.fulfill({ body: hostHtml, contentType: "text/html" }),
+  );
+  await page.route("**/favicon.ico", (route) => route.fulfill({ body: "" }));
+
+  const simulator = new Simulator(page, flags);
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      simulator.errors.push(`console: ${msg.text()}`);
+    }
+  });
+  page.on("pageerror", (error) => {
+    simulator.errors.push(`pageerror: ${error.stack ?? error.message}`);
+  });
+
+  await simulator.load();
+  return simulator;
+};
+
 export const test = base.extend<SimulatorOptions & { simulator: Simulator }>({
   simulatorFlags: [[], { option: true }],
   recordAudio: [false, { option: true }],
@@ -305,23 +330,7 @@ export const test = base.extend<SimulatorOptions & { simulator: Simulator }>({
     if (recordAudio) {
       await page.addInitScript(installAudioRecorder);
     }
-    // Served by the test rather than the build so it doesn't ship.
-    await page.route("**/e2e-host.html*", (route) =>
-      route.fulfill({ body: hostHtml, contentType: "text/html" }),
-    );
-    await page.route("**/favicon.ico", (route) => route.fulfill({ body: "" }));
-
-    const simulator = new Simulator(page, simulatorFlags);
-    page.on("console", (msg) => {
-      if (msg.type() === "error") {
-        simulator.errors.push(`console: ${msg.text()}`);
-      }
-    });
-    page.on("pageerror", (error) => {
-      simulator.errors.push(`pageerror: ${error.stack ?? error.message}`);
-    });
-
-    await simulator.load();
+    const simulator = await createSimulator(page, simulatorFlags);
     await use(simulator);
 
     expect(

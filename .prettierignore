@@ -2,3 +2,4 @@
 term.js
 src/build
 lib
+micropython-tests/expected

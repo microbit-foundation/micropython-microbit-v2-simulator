@@ -1,0 +1,20 @@
+x get
+1
+AttributeError
+x get
+3
+x set
+x get
+4
+x del
+x get
+5
+x set
+x get
+6
+x del
+AttributeError
+AttributeError
+AttributeError
+42
+<class 'property'>

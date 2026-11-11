@@ -1,0 +1,53 @@
+(1+0j)
+(1.2+0j)
+1.2j
+(1+0j)
+(1.2+0j)
+1.2j
+(1+2j)
+(-2+1j)
+True
+1j
+(-1-2j)
+1j
+(1+1j)
+(2+1j)
+3j
+(-2+1j)
+-1j
+2j
+(-2+0j)
+0.5j
+0.5
+(0.4+0.2j)
+1 0
+0 0
+1 0
+-0.70711 -0.70711
+0.019703 0
+False
+True
+True True
+True True
+False
+False
+1.0
+2.2361
+1
+<class 'int'>
+(1.2+3j)
+0.58779 0.80902
+-0.16625 0.51167
+(nan+nanj)
+(nan+nanj)
+(inf+infj)
+(-inf-infj)
+AttributeError
+TypeError
+TypeError
+TypeError
+TypeError
+TypeError
+ZeroDivisionError
+ZeroDivisionError
+ZeroDivisionError

@@ -1,0 +1,10 @@
+in Sub meth
+in Base meth 1
+<super: <class 'A'
+B foo
+123
+A foo
+1
+TypeError
+AttributeError
+AttributeError

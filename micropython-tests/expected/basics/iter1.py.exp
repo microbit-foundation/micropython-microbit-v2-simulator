@@ -1,0 +1,22 @@
+TypeError
+TypeError
+4
+3
+2
+1
+0
+11
+10
+21
+20
+raised TypeError
+4
+raised StopIteration
+31
+30
+raising MyStopIteration
+(4, 3, 2, 1, 0)
+(11, 10)
+raising MyStopIteration
+(31, 30)
+raised TypeError

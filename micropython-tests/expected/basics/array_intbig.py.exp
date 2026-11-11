@@ -1,0 +1,10 @@
+array('L', [0, 4294967295])
+array('l', [-2147483648, 0, 2147483647])
+array('q')
+array('Q')
+array('q', [0])
+array('Q', [0])
+array('q', [-9223372036854775808, -1, 0, 1, 2, 9223372036854775807])
+array('Q', [0, 1, 2, 18446744073709551615])
+b'\xff\xff\xff\xff\xff\xff\xff\xff'
+b'\xff\xff\xff\xff\xff\xff\xff\xff'

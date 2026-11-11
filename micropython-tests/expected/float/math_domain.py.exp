@@ -1,0 +1,76 @@
+inf
+nan
+ceil OverflowError
+ceil ValueError
+floor OverflowError
+floor ValueError
+trunc OverflowError
+trunc ValueError
+sqrt ValueError
+0.0000
+inf
+nan
+inf
+nan
+sin ValueError
+nan
+cos ValueError
+nan
+tan ValueError
+nan
+asin ValueError
+1.5708
+asin ValueError
+asin ValueError
+nan
+acos ValueError
+0.0000
+acos ValueError
+acos ValueError
+nan
+1.5708
+nan
+inf
+nan
+inf
+nan
+inf
+nan
+0.0000
+1.0000
+pow ValueError
+pow ValueError
+1.0000
+1.0000
+0.0000
+1.0000
+inf
+nan
+nan
+nan
+1.2000
+1.2000
+fmod ValueError
+fmod ValueError
+0.0000
+fmod ValueError
+fmod ValueError
+nan
+nan
+nan
+0.0000
+-0.7854
+-2.3562
+2.3562
+0.0000
+1.5708
+0.7854
+nan
+nan
+nan
+0.0000
+inf
+inf
+inf
+nan
+nan

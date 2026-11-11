@@ -1,0 +1,14 @@
+Base1.__init__ ()
+0
+Base1.__init__ ([1, 2, 3],)
+3
+---
+Base1.__init__ ()
+0
+Base1.__init__ ([1, 2, 3],)
+3
+Base1.__init__ ([1, 2, 3],)
+Base1.__init__ ([1, 2, 3],)
+True
+True
+True

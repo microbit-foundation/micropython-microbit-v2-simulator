@@ -1,0 +1,9 @@
+2
+('class', 'A')
+import A None 0
+import a None 0
+import a.b None 0
+import a ('a',) 0
+import a.b ('a', 'b') 0
+import a ('a',) 1
+import a ('a', 'b') 2

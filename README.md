@@ -341,6 +341,16 @@ abort fails the test. Every file in `src/examples` must have an entry in
 `e2e/audio.spec.ts` records the simulator's audio output and checks broad
 statistics (duration, level, pitch, dropouts) rather than exact samples.
 
+The same run includes MicroPython's own tests for the core language
+(`micropython-tests/`), as the `micropython-tests` Playwright project. Each
+test file runs as `main.py` and its serial output must match the test's `.exp`
+file or, where it has none, CPython's output for the same file. The CPython
+output is checked in under `micropython-tests/expected` so that test runs
+don't need a particular Python version. Tests that don't apply to this port
+are listed with reasons in `micropython-tests/skip.ts`.
+
+    $ npx playwright test --project=micropython-tests
+
 ### Deployments
 
 GitHub Actions (`.github/workflows/build.yml`) builds, tests and deploys every
@@ -367,6 +377,12 @@ release. See [Versions](#versions) for when to bump the minor version.
    1. main.c, src/Makefile and mpconfigport.h all which have simulator versions that may need updates
    2. the HAL, which may require implementing in the simulator
    3. the filesystem, which has a JavaScript implementation.
+3. Regenerate the expected output for MicroPython's tests and review the
+   changes, along with `micropython-tests/skip.ts`. The script must be run
+   with the CPython version it names, which is the one that MicroPython
+   version was tested against; update that if it has moved on.
+
+       $ python3.8 micropython-tests/update-expected.py
 
 ### Web Assembly debugging
 

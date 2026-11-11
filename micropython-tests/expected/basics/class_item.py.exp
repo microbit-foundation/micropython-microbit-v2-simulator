@@ -1,0 +1,5 @@
+get 1
+item
+set 1 2
+del 3
+TypeError

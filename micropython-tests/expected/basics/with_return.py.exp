@@ -1,0 +1,19 @@
+__enter__ 1
+__exit__ 1 None None
+4
+__enter__ 1
+__exit__ 1 None None
+1
+__enter__ 1
+__exit__ 1 None None
+(1, 3)
+__enter__ 1
+__enter__ 2
+__exit__ 2 None None
+__exit__ 1 None None
+(1, 3, 5, 7)
+__enter__ 1
+__enter__ 2
+__exit__ 2 None None
+__exit__ 1 None None
+(1, 3, 5, 7)

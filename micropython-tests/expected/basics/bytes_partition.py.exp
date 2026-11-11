@@ -1,0 +1,17 @@
+(b'asdf', b'', b'')
+(b'', b'a', b'sdf')
+(b'a', b's', b'df')
+(b'asd', b'f', b'')
+(b'as', b'd', b'f')
+(b'', b'asd', b'f')
+(b'a', b'sdf', b'')
+(b'', b'as', b'df')
+(b'as', b'df', b'')
+(b'', b'asdf', b'')
+(b'asdf', b'', b'')
+(b'asdf', b'', b'')
+(b'asdf', b'', b'')
+(b'', b'a', b'bba')
+(b'a', b'b', b'ba')
+Raised TypeError
+Raised ValueError

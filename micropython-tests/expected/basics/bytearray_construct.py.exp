@@ -1,0 +1,5 @@
+bytearray(b'123')
+bytearray(b'1234')
+bytearray(b'12345')
+bytearray(b'\x01\x02')
+bytearray(b'\x01\x02')

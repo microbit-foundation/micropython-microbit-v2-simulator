@@ -1,0 +1,5 @@
+<class 'frozenset'> [1, 2, 3, 4]
+<class 'frozenset'> [2, 3, 4]
+<class 'frozenset'> [3, 4]
+<class 'frozenset'> [4]
+AttributeError

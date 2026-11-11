@@ -1,0 +1,23 @@
+abc
+abc
+abc
+'\x07\x08\t\n\x0b\x0c\r'
+\z
+
+abc
+abc
+abcdef
+123456
+123123123123123
+TypeError
+TypeError
+b
+c
+IndexError
+IndexError
+['s', 't', 'r']
+True
+True
+False
+True
+'\'"'

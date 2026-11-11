@@ -1,0 +1,10 @@
+5
+10
+1 100 foo
+1 None foo
+0 bar 200
+TypeError
+TypeError
+1
+1
+2

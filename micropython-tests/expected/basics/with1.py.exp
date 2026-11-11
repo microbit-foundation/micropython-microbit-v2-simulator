@@ -1,0 +1,21 @@
+__enter__
+True
+__exit__ None None
+__enter__
+__exit__ <class 'ValueError'> ValueError()
+ValueError
+__enter__
+__exit__ <class 'ValueError'> ValueError()
+No ValueError2
+===
+__enter__
+finally1
+finally2
+__exit__ <class 'ValueError'> ValueError()
+===
+__enter__
+finally1
+finally2
+__exit__ <class 'ValueError'> ValueError()
+finally3
+finally4

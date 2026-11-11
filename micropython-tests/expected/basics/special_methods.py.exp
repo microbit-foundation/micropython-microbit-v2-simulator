@@ -1,0 +1,17 @@
+__init__ called
+__init__ called
+__repr__ called
+__eq__ called
+__eq__ called
+__ne__ called
+__ne__ called
+__lt__ called
+__le__ called
+__eq__ called
+__ge__ called
+__gt__ called
+__add__ called
+__sub__ called
+42
+__int__ called
+TypeError

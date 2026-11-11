@@ -1,0 +1,64 @@
+E eq F
+False
+F ne E
+-456
+==== testing None
+E eq None
+123
+E eq None
+123
+E eq None
+False
+E eq None
+False
+False
+False
+F ne None
+-456
+F ne None
+-456
+==== testing 0
+E eq 0
+123
+E eq 0
+123
+E eq 0
+False
+E eq 0
+False
+False
+False
+F ne 0
+-456
+F ne 0
+-456
+==== testing 1
+E eq 1
+123
+E eq 1
+123
+E eq 1
+False
+E eq 1
+False
+False
+False
+F ne 1
+-456
+F ne 1
+-456
+==== testing a
+E eq a
+123
+E eq a
+123
+E eq a
+False
+E eq a
+False
+False
+False
+F ne a
+-456
+F ne a
+-456

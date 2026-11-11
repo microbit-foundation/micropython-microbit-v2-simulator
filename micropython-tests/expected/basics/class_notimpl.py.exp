@@ -1,0 +1,9 @@
+C(0) + 1
+TypeError
+C(0) - 2
+TypeError
+C(0) < 1
+TypeError
+- C(0)
+NotImplemented
+<class 'int'>

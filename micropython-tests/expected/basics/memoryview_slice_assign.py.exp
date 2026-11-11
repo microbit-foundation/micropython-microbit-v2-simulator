@@ -1,0 +1,13 @@
+bytearray(b'5128')
+bytearray(b'5128')
+bytearray(b'1212')
+ValueError
+ValueError
+ValueError
+array('i', [0, 3, 3, 0, 0])
+ValueError
+ValueError
+bytearray(b'\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08')
+bytearray(b'\x01\x02\x03\x04\x05\x06\x07\x08\t\t')
+array('I', [0, 0, 1, 2, 3, 4, 5, 6, 7, 8])
+array('I', [1, 2, 3, 4, 5, 6, 7, 8, 9, 9])

@@ -1,0 +1,5 @@
+{1: 'foo'}
+['bar', 'foo']
+['baz', 'foo2']
+ValueError
+ValueError

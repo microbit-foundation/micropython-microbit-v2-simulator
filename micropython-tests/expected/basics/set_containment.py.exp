@@ -1,0 +1,12 @@
+1 in {}: False
+1 not in {}: True
+1 in {1}: True
+1 not in {1}: False
+1 in {2}: False
+1 not in {2}: True
+2 in {}: False
+2 not in {}: True
+2 in {1}: False
+2 not in {1}: True
+2 in {2}: True
+2 not in {2}: False

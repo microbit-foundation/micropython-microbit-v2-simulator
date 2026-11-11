@@ -35,6 +35,12 @@ INC += -I$(BUILD)
 CWARN += -Wall -Wpointer-arith -Wuninitialized -Wno-array-bounds
 CFLAGS += $(INC) $(CWARN) -std=c99 -funsigned-char $(CFLAGS_MOD) $(CFLAGS_ARCH) $(COPT) $(CFLAGS_EXTRA)
 
+# MicroPython indexes pointers with negated unsigned values, e.g.
+# sp[-MP_OBJ_ITER_BUF_NSLOTS + 1] in py/vm.c, relying on the address
+# wrapping. Without this clang assumes it cannot wrap and folds the index into
+# the Wasm memory offset, which doesn't, so the access always traps.
+CFLAGS += -fwrapv-pointer
+
 # Debugging/Optimization
 ifdef DEBUG
 COPT += -O3

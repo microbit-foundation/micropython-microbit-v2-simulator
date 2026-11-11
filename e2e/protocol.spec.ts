@@ -85,6 +85,24 @@ test.describe("invalid messages", () => {
   });
 });
 
+test.describe("serial output", () => {
+  // 100 characters per line with the \r\n.
+  const printLoop = "while True:\n    print('x' * 98)\n";
+
+  test("is limited to the baud rate", async ({ simulator }) => {
+    await simulator.run(printLoop);
+    await expect.poll(() => simulator.serialLength()).toBeGreaterThan(0);
+    const before = await simulator.serialLength();
+    await simulator.page.waitForTimeout(1000);
+    const perSecond = (await simulator.serialLength()) - before;
+    // 115200 baud is 11520 bytes a second. Allow for timer slop.
+    expect(perSecond).toBeGreaterThan(5_000);
+    expect(perSecond).toBeLessThan(15_000);
+    // A program waiting on serial output can still be stopped.
+    await simulator.stop();
+  });
+});
+
 test.describe("radio", () => {
   test("config reports the group", async ({ simulator }) => {
     await simulator.run(

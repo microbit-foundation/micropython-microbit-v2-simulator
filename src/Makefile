@@ -72,7 +72,7 @@ JSFLAGS += -O3
 
 # MicroPython's C recursion (printing nested containers, the compiler) uses
 # this stack; Emscripten's 64 KB default is too small. MICROPY_STACK_CHECK
-# keeps us within it, see main.c.
+# stops it well short of this size, see main.c.
 JSFLAGS += -s STACK_SIZE=1MB
 
 JSFLAGS += -s ASYNCIFY

@@ -111,6 +111,18 @@ test.describe("limits", () => {
     await simulator.skipErrorScroll();
   });
 
+  // C recursion that doesn't go via Python function calls, so isn't bounded
+  // by the Python stack.
+  test("printing a list that contains itself raises RuntimeError", async ({
+    simulator,
+  }) => {
+    await simulator.run("l = []\nl.append(l)\nprint(l)\n");
+    await simulator.expectSerial(
+      /RuntimeError: maximum recursion depth exceeded/,
+    );
+    await simulator.skipErrorScroll();
+  });
+
   test("running out of heap raises MemoryError", async ({ simulator }) => {
     await simulator.run("l = []\nwhile True:\n    l = [l]\n");
     await simulator.expectSerial(/MemoryError/);

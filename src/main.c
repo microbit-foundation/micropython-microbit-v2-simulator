@@ -67,11 +67,14 @@ void mp_js_main(int heap_size) {
         microbit_system_init();
         microbit_display_init();
 
-        // Check against Emscripten's stack in linear memory (STACK_SIZE). This
-        // is where MP_STACK_CHECK measures, not the browser's native stack.
-        // The margin covers unchecked C frames below the last check.
+        // MP_STACK_CHECK measures Emscripten's stack in linear memory
+        // (STACK_SIZE), but C recursion also consumes the browser's own call
+        // stack, which is not ours to size and runs out first: Chrome throws
+        // a RangeError with about 128 KB of the linear stack used by
+        // recursive generators in the debug firmware. Limit well below that
+        // so deep recursion is a RuntimeError, as on the device.
         mp_stack_set_top((void *)emscripten_stack_get_base());
-        mp_stack_set_limit(emscripten_stack_get_base() - emscripten_stack_get_end() - 8 * 1024);
+        mp_stack_set_limit(64 * 1024);
 
         #if MICROPY_ENABLE_GC
         char *heap = (char *)malloc(heap_size * sizeof(char));

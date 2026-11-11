@@ -8,7 +8,8 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { expect, test } from "../e2e/fixtures";
+import { test as base } from "@playwright/test";
+import { createSimulator, expect, Simulator } from "../e2e/fixtures";
 
 const micropythonDir = path.join(
   __dirname,
@@ -24,6 +25,40 @@ const skip: Record<string, string> = JSON.parse(
 const manifest: { micropython: string; dirs: string[] } = JSON.parse(
   fs.readFileSync(path.join(expectedDir, "manifest.json"), "utf-8"),
 );
+
+// Loading the simulator takes longer than most of these tests, so each worker
+// keeps one and flashes it for each test. A test that fails closes it so that
+// the next starts clean.
+interface SharedSimulator {
+  get(): Promise<Simulator>;
+  close(): Promise<void>;
+}
+
+const test = base.extend<object, { shared: SharedSimulator }>({
+  shared: [
+    async ({ browser }, use, workerInfo) => {
+      let simulator: Simulator | undefined;
+      const shared: SharedSimulator = {
+        get: async () => {
+          if (!simulator) {
+            const page = await browser.newPage({
+              baseURL: workerInfo.project.use.baseURL,
+            });
+            simulator = await createSimulator(page, []);
+          }
+          return simulator;
+        },
+        close: async () => {
+          await simulator?.page.close();
+          simulator = undefined;
+        },
+      };
+      await use(shared);
+      await shared.close();
+    },
+    { scope: "worker" },
+  ],
+});
 
 const importsSiblings = new Set(["import"]);
 
@@ -72,7 +107,7 @@ for (const dir of manifest.dirs) {
   test.describe(dir, () => {
     for (const file of files) {
       const name = `${dir}/${file}`;
-      test(file, async ({ simulator }) => {
+      test(file, async ({ shared }) => {
         test.skip(name in skip, skip[name]);
         const expected = expectedOutput(name);
         expect(
@@ -80,51 +115,75 @@ for (const dir of manifest.dirs) {
           "No expected output: run micropython-tests/update-expected.py",
         ).toBeDefined();
 
-        // Tests in these directories import the files alongside them.
-        const siblings = importsSiblings.has(dir)
-          ? Object.fromEntries(
-              files
-                .filter((f) => f !== file)
-                .map((f) => [
-                  f,
-                  fs.readFileSync(path.join(testsDir, dir, f), "utf-8"),
-                ]),
-            )
-          : {};
-        await simulator.run(
-          fs.readFileSync(path.join(testsDir, name), "utf-8"),
-          siblings,
-        );
-        let previous = "";
-        let serial = "";
-        await expect
-          .poll(
-            async () => {
-              serial = await simulator.serial();
-              // An uncaught exception scrolls on the display before the REPL
-              // starts. Skip that once the output has gone quiet, so as not
-              // to interrupt a test that prints a traceback and carries on.
-              if (
-                serial === previous &&
-                serial.includes("Traceback") &&
-                !banner.test(serial)
-              ) {
-                await simulator.skipErrorScroll();
-              }
-              previous = serial;
-              return (
-                banner.test(serial) ||
-                (await simulator.unexpectedErrors()).length > 0
-              );
-            },
-            { timeout: 30_000, intervals: [100, 250, 500, 1000] },
-          )
-          .toBe(true);
-        const actual = serial.replace(banner, "");
+        const simulator = await shared.get();
+        let actual: string;
+        try {
+          actual = await run(simulator, dir, file, files);
+        } catch (e) {
+          await shared.close();
+          throw e;
+        }
         // The convention for tests that need a feature the port lacks.
         test.skip(actual === "SKIP\n", "Skipped itself");
         expect(actual).toBe(expected);
       });
     }
   });
+}
+
+/** Runs a test to completion and returns what it printed. */
+async function run(
+  simulator: Simulator,
+  dir: string,
+  file: string,
+  files: string[],
+): Promise<string> {
+  // Tests in these directories import the files alongside them.
+  const siblings = importsSiblings.has(dir)
+    ? Object.fromEntries(
+        files
+          .filter((f) => f !== file)
+          .map((f) => [
+            f,
+            fs.readFileSync(path.join(testsDir, dir, f), "utf-8"),
+          ]),
+      )
+    : {};
+  await simulator.run(
+    fs.readFileSync(path.join(testsDir, dir, file), "utf-8"),
+    siblings,
+  );
+  let serial = "";
+  let changedAt = Date.now();
+  await expect
+    .poll(
+      async () => {
+        const previous = serial;
+        serial = await simulator.serial();
+        if (serial !== previous) {
+          changedAt = Date.now();
+        }
+        // An uncaught exception scrolls on the display before the REPL
+        // starts. Skip that once the output has gone quiet, so as not to
+        // interrupt a test that prints a traceback and carries on.
+        if (
+          Date.now() - changedAt > 500 &&
+          serial.includes("Traceback") &&
+          !banner.test(serial)
+        ) {
+          await simulator.skipErrorScroll();
+          changedAt = Date.now();
+        }
+        return (
+          banner.test(serial) || (await simulator.unexpectedErrors()).length > 0
+        );
+      },
+      { timeout: 30_000, intervals: [20, 50, 100, 250] },
+    )
+    .toBe(true);
+  expect(
+    await simulator.unexpectedErrors(),
+    "Unexpected errors from the simulator",
+  ).toEqual([]);
+  return serial.replace(banner, "");
 }

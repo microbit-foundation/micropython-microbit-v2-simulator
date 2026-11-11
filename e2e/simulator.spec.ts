@@ -111,10 +111,7 @@ test.describe("limits", () => {
     await simulator.skipErrorScroll();
   });
 
-  // microbit_display_exception allocates its message before installing an
-  // exception handler, so with the heap still full the MemoryError escapes
-  // to nlr_jump_fail. The same code is in the device firmware.
-  test.fail("running out of heap raises MemoryError", async ({ simulator }) => {
+  test("running out of heap raises MemoryError", async ({ simulator }) => {
     await simulator.run("l = []\nwhile True:\n    l = [l]\n");
     await simulator.expectSerial(/MemoryError/);
     await simulator.skipErrorScroll();

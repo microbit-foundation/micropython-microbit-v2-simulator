@@ -23,7 +23,16 @@ import sys
 REFERENCE_PYTHON = (3, 8)
 
 # Directories under MicroPython's tests/ to run.
-TEST_DIRS = ["basics", "float", "unicode"]
+TEST_DIRS = [
+    "basics",
+    "extmod",
+    "float",
+    "import",
+    "micropython",
+    "misc",
+    "stress",
+    "unicode",
+]
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MICROPYTHON = os.path.join(
@@ -40,6 +49,9 @@ def main():
             % (REFERENCE_PYTHON + sys.version_info[:2])
         )
 
+    with open(os.path.join(HERE, "skip.json")) as f:
+        skip = json.load(f)
+
     shutil.rmtree(EXPECTED, ignore_errors=True)
     failed = []
     for test_dir in TEST_DIRS:
@@ -48,7 +60,7 @@ def main():
             if not name.endswith(".py"):
                 continue
             test = test_dir + "/" + name
-            if os.path.exists(os.path.join(TESTS, test + ".exp")):
+            if test in skip or os.path.exists(os.path.join(TESTS, test + ".exp")):
                 continue
             # Flags and working directory as in run-tests.py.
             result = subprocess.run(
@@ -70,7 +82,7 @@ def main():
         "micropython": commit,
         "cpython": "%d.%d.%d" % sys.version_info[:3],
         "dirs": TEST_DIRS,
-        # These need an entry in skip.ts.
+        # These need an entry in skip.json.
         "cpythonFailed": failed,
     }
     with open(os.path.join(EXPECTED, "manifest.json"), "w") as f:

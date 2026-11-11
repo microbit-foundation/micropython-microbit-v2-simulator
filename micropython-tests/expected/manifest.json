@@ -3,7 +3,12 @@
   "cpython": "3.8.20",
   "dirs": [
     "basics",
+    "extmod",
     "float",
+    "import",
+    "micropython",
+    "misc",
+    "stress",
     "unicode"
   ],
   "cpythonFailed": []

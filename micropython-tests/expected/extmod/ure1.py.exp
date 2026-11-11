@@ -1,0 +1,57 @@
+abc
+IndexError
+xyz781
+xyz78
+IndexError
+a
+z
+None
+None
+===
+None
+None
+d
+A
+===
+-a
+-a
+===
+oo
+IndexError
+foo
+wor
+a
+
+ab
+b
+c
+None
+Caught invalid regex
+b'a'
+===
+a.c
+True
+True
+a
+.].]
+.]+.]
+abxcd1-23
+a\aa\bb\bbab
+-
+True
+a
+['foo', 'b', 'r']
+['foo', 'b', 'r']
+['foo', 'b', 'r']
+['foo', 'b', 'r']
+['foo', 'b', 'r']
+===
+f
+b'f'
+f
+TypeError
+f
+b'f'
+f
+TypeError
+===

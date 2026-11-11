@@ -1,0 +1,9 @@
+randrange
+ValueError
+ValueError
+ValueError
+ValueError
+randint
+ValueError
+choice
+IndexError

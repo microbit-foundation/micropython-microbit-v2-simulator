@@ -1,0 +1,28 @@
+None
+False
+True
+1
+-2
+abcde
+[]
+[None]
+[None, False, True]
+[None, False, True]
+sorted dict []
+sorted dict [('a', True)]
+sorted dict [('a', None), ('b', False), ('c', True)]
+sorted dict [('a', []), ('b', [1]), ('c', {'3': 4})]
+abcdef
+abcdef
+abc
+def
+abcdef
+abc	def
+abcꯍ
+sorted dict [('a', []), ('b', [1]), ('c', {'3': 4})]
+ValueError
+ValueError
+ValueError
+ValueError
+ValueError
+ValueError

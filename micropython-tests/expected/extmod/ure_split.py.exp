@@ -1,0 +1,6 @@
+['a', 'b', 'c', 'foobar']
+['a', 'b', 'c', 'foobar']
+['a', 'b    c   foobar']
+['a', 'b', 'c   foobar']
+['0', '3', '9']
+[b'foo', b'bar']

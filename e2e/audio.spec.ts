@@ -186,3 +186,63 @@ test("muting from the embedder silences output", async ({ simulator }) => {
   );
   expect(audio.stats().soundSeconds).toBe(0);
 });
+
+// Buffered audio asks for its next chunk via a callback, unlike music's
+// oscillator, so each kind needs that to still be connected after a reboot.
+for (const [name, program] of [
+  ["sound expression", "from microbit import *\naudio.play(Sound.GIGGLE)\n"],
+  ["AudioFrame", audioFrameProgram],
+  ["speech", "import speech\nspeech.say('hello world')\n"],
+]) {
+  test(`${name} plays to the end after a soft reboot`, async ({
+    simulator,
+  }) => {
+    await simulator.run(program);
+    await simulator.expectFinished({ timeout: 20_000 });
+    await simulator.sendSerial("\x04");
+    await simulator.expectSerial(/soft reboot\n[^]*>>> $/, {
+      timeout: 20_000,
+    });
+  });
+}
+
+// Buffers already scheduled outlive the program. The fixture fails the test
+// if one finishing calls into the stopped firmware.
+for (const [name, program] of [
+  [
+    "sound expression",
+    "from microbit import *\nprint('playing')\nwhile True:\n    audio.play(Sound.GIGGLE)\n",
+  ],
+  [
+    "AudioFrame",
+    audioFrameProgram.replace("import audio", "import audio\nprint('playing')"),
+  ],
+  [
+    "speech",
+    "import speech\nprint('playing')\nwhile True:\n    speech.say('hello world')\n",
+  ],
+]) {
+  test(`stopping the program stops ${name}`, async ({ simulator }) => {
+    await simulator.run(program);
+    await simulator.expectSerial(/playing/);
+    await simulator.page.waitForTimeout(500);
+    await simulator.stop();
+    const atStop = (await simulator.audio()).samples.length;
+    await simulator.page.waitForTimeout(1000);
+    const audio = await simulator.audio();
+    const afterStop = new AudioRecording(
+      audio.samples.subarray(atStop),
+      audio.sampleRate,
+    );
+    expect(audio.stats().soundSeconds).toBeGreaterThan(0.2);
+    expect(
+      afterStop
+        .windows(0.1)
+        .slice(2)
+        .every((w) => w.rms === 0),
+    ).toBe(true);
+
+    await simulator.run("from microbit import *\naudio.play(Sound.HELLO)\n");
+    await simulator.expectFinished({ timeout: 20_000 });
+  });
+}

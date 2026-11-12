@@ -164,10 +164,12 @@ export class Audio {
   }
 
   boardStopped() {
+    // Also called for a soft reboot, after which the same module plays again,
+    // so this must leave the callbacks connected.
     this.stopOscillator();
-    this.speech?.dispose();
-    this.soundExpression?.dispose();
-    this.default?.dispose();
+    this.speech?.stop();
+    this.stopSoundExpression();
+    this.default?.stop();
   }
 
   private stopOscillator() {
@@ -239,7 +241,10 @@ class BufferedAudio {
     return this.nextStartTime > this.context.currentTime;
   }
 
-  /** Silences what has been written but not yet played. */
+  /**
+   * Silences what has been written but not yet played. Nothing more is
+   * requested via the callback until there's another write.
+   */
   stop() {
     for (const source of this.scheduled) {
       source.onended = null;
@@ -247,11 +252,5 @@ class BufferedAudio {
     }
     this.scheduled.clear();
     this.nextStartTime = -1;
-  }
-
-  dispose() {
-    // Prevent calls into WASM when the buffer nodes finish.
-    this.callback = () => {};
-    this.stop();
   }
 }

@@ -146,6 +146,27 @@ print('done')
     await simulator.expectSerial(/^b'hell'\ndone\n/);
   });
 
+  test("receives a message of the maximum length", async ({ simulator }) => {
+    await simulator.run(`import radio
+from microbit import *
+radio.on()
+radio.config(length=251)
+while True:
+    message = radio.receive()
+    if message:
+        print(len(message), message[-3:])
+        break
+    sleep(20)
+`);
+    await simulator.waitForState((s) => (s.radio as any)?.enabled === true);
+    // The header radio.send adds to strings counts towards the length.
+    const text = "x".repeat(245) + "end";
+    await simulator.radioInput(
+      new Uint8Array([1, 0, 1, ...new TextEncoder().encode(text)]),
+    );
+    await simulator.expectSerial(/^248 end\n/);
+  });
+
   test("input beyond the queue size is dropped", async ({ simulator }) => {
     await simulator.run(receive("radio.config(queue=2)"));
     await simulator.waitForState((s) => (s.radio as any)?.enabled === true);

@@ -9,7 +9,7 @@ build:
 dist: build
 	mkdir -p $(BUILD)/build
 	cp -r $(SRC)/*.html $(SRC)/term.js src/examples $(SRC)/build/sw.js $(BUILD)
-	cp $(SRC)/build/firmware.js $(SRC)/build/firmware.wasm $(SRC)/build/firmware-debug.js $(SRC)/build/firmware-debug.wasm $(SRC)/build/firmware-debug.dwarf.wasm $(SRC)/build/simulator.js $(BUILD)/build/
+	cp $(SRC)/build/firmware.js $(SRC)/build/firmware.wasm $(SRC)/build/firmware-debug.js $(SRC)/build/firmware-debug.wasm $(SRC)/build/firmware-debug.dwarf.wasm $(SRC)/build/simulator.js $(SRC)/build/audio-worklet.js $(BUILD)/build/
 
 watch: dist
 	fswatch -o -e src/build src  | while read _; do $(MAKE) dist; done

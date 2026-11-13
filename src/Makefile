@@ -188,6 +188,7 @@ $(BUILD)/micropython.js: $(OBJ) jshal.js simulator-js
 
 simulator-js:
 	npx esbuild --target=$(ESBUILD_TARGET) '--define:process.env.STAGE="$(STAGE)"' ./simulator.ts --bundle --outfile=$(BUILD)/simulator.js --loader:.svg=text
+	npx esbuild --target=$(ESBUILD_TARGET) ./board/audio/buffered-audio-worklet.ts --bundle --outfile=$(BUILD)/audio-worklet.js
 	npx esbuild --target=$(ESBUILD_TARGET) --define:process.env.VERSION="$$(node -e 'process.stdout.write(`"` + require("../package.json").version + `"`)')" ./sw.ts --bundle --outfile=$(BUILD)/sw.js
 
 include $(TOP)/py/mkrules.mk

@@ -267,7 +267,7 @@ export class Board {
       instantiateWasm,
     });
     const module = new ModuleWrapper(wrapped);
-    this.audio.initializeCallbacks({
+    await this.audio.initializeCallbacks({
       defaultAudioCallback: wrapped._microbit_hal_audio_ready_callback,
       speechAudioCallback: wrapped._microbit_hal_audio_speech_ready_callback,
     });

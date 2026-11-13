@@ -50,12 +50,14 @@ export class Audio {
       this.volumeNode,
       defaultAudioCallback,
       0,
-      frameStartDelaySeconds,
+      startDelaySeconds,
     );
     this.speech = new BufferedAudio(
       this.context,
       this.volumeNode,
       speechAudioCallback,
+      0,
+      startDelaySeconds,
     );
     this.soundExpression = new BufferedAudio(
       this.context,
@@ -183,24 +185,23 @@ export class Audio {
 }
 
 /**
- * Sound expressions and audio frames are asked for this much audio ahead of
- * what is playing. Their buffers are under 12 ms and the next is requested
- * from the main thread, so without a margin any brief stall there is heard as
- * a click.
+ * Each kind of buffered audio is asked for this much ahead of what is playing.
+ * The buffers are under 12 ms and the next is requested from the main thread,
+ * so without a margin any brief stall there is heard as a click.
  */
 const lookaheadSeconds = 0.1;
 
 /**
- * How far ahead of the audio clock the first audio frame starts.
+ * How far ahead of the audio clock audio frames and speech start.
  *
  * The clock advances a render block at a time (128 samples, 2.9 ms), often
- * several at once, and a frame lasts 4 ms. If the first frame started at the
- * current time, one jump could put the clock past its end before the firmware
- * had written the second frame. That frame would then count as a fresh start
- * and play from the new time, with silence in between. The delay leaves time
- * for the following frames to be queued.
+ * several at once, and their buffers can be as short as 3.4 ms. If the first
+ * buffer started at the current time, one jump could put the clock past its
+ * end before the firmware had written the second. That buffer would then
+ * count as a fresh start and play from the new time, with silence in between.
+ * The delay leaves time for the following buffers to be queued.
  */
-const frameStartDelaySeconds = 0.02;
+const startDelaySeconds = 0.02;
 
 class BufferedAudio {
   nextStartTime: number = -1;
@@ -248,10 +249,7 @@ class BufferedAudio {
     this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
     source.start(startTime);
     this.scheduled.add(source);
-    // For audio frames, we're frequently out of data. Speech is smooth.
-    if (first || this.nextStartTime - currentTime < this.lookaheadSeconds) {
-      // We're just getting started, or short of the lookahead, so buffer
-      // another frame.
+    if (this.nextStartTime - currentTime < this.lookaheadSeconds) {
       this.callback();
     }
   }
@@ -263,7 +261,7 @@ class BufferedAudio {
 
   /**
    * Whether it's playing with less than the lookahead scheduled. For audio
-   * whose callback can't write synchronously, so the caller has to top it up.
+   * whose callback can't write synchronously, so the firmware tops it up.
    */
   wantsData(): boolean {
     const ahead = this.nextStartTime - this.context.currentTime;

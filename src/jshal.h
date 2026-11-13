@@ -77,6 +77,7 @@ void mp_js_hal_audio_write_data(const uint8_t *buf, size_t num_samples);
 bool mp_js_hal_audio_wants_data(void);
 void mp_js_hal_audio_speech_init(uint32_t sample_rate);
 void mp_js_hal_audio_speech_write_data(const uint8_t *buf, size_t num_samples);
+bool mp_js_hal_audio_speech_wants_data(void);
 void mp_js_hal_audio_period_us(int period);
 void mp_js_hal_audio_amplitude_u10(int amplitude);
 void mp_js_hal_audio_play_expression(const char *name);

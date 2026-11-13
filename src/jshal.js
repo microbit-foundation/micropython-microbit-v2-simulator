@@ -246,6 +246,11 @@ mergeInto(LibraryManager.library, {
     Module.board.audio.speech.init(sample_rate);
   },
 
+  mp_js_hal_audio_speech_wants_data: function () {
+    // @ts-expect-error
+    return Module.board.audio.speech.wantsData();
+  },
+
   mp_js_hal_audio_speech_write_data: function (
     /** @type {number} */ buf,
     /** @type {number} */ num_samples,

@@ -59,8 +59,30 @@ void microbit_hal_background_processing(void) {
     emscripten_sleep(0);
 }
 
+static bool audio_data_written;
+
+// The firmware prepares one audio frame per pass of the scheduler and writes
+// it when asked via microbit_hal_audio_ready_callback, normally as the
+// previous frame finishes playing. A frame is 4 ms, less than the sleep in
+// microbit_hal_idle, so left to that playback runs dry between frames. This
+// asks for frames ahead of time until enough are scheduled.
+static void audio_top_up(void) {
+    // Stop for a pending exception as mp_handle_pending would raise it here,
+    // which not every caller of microbit_hal_idle expects.
+    while (mp_js_hal_audio_wants_data() && MP_STATE_THREAD(mp_pending_exception) == MP_OBJ_NULL) {
+        audio_data_written = false;
+        microbit_hal_audio_ready_callback();
+        mp_handle_pending(true);
+        if (!audio_data_written) {
+            // The source is exhausted or the scheduler is busy.
+            break;
+        }
+    }
+}
+
 void microbit_hal_idle(void) {
     microbit_hal_process_events();
+    audio_top_up();
     emscripten_sleep(5);
 }
 
@@ -438,6 +460,7 @@ void microbit_hal_audio_init(uint32_t sample_rate) {
 }
 
 void microbit_hal_audio_write_data(const uint8_t *buf, size_t num_samples) {
+    audio_data_written = true;
     mp_js_hal_audio_write_data(buf, num_samples);
 }
 

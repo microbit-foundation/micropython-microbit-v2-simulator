@@ -236,6 +236,11 @@ mergeInto(LibraryManager.library, {
     );
   },
 
+  mp_js_hal_audio_wants_data: function () {
+    // @ts-expect-error
+    return Module.board.audio.default.wantsData();
+  },
+
   mp_js_hal_audio_speech_init: function (/** @type {number} */ sample_rate) {
     // @ts-expect-error
     Module.board.audio.speech.init(sample_rate);

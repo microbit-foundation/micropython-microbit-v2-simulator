@@ -49,6 +49,8 @@ export class Audio {
       this.context,
       this.volumeNode,
       defaultAudioCallback,
+      0,
+      frameStartDelaySeconds,
     );
     this.speech = new BufferedAudio(
       this.context,
@@ -63,7 +65,7 @@ export class Audio {
           this.currentSoundExpressionCallback();
         }
       },
-      soundExpressionLookaheadSeconds,
+      lookaheadSeconds,
     );
   }
 
@@ -181,11 +183,24 @@ export class Audio {
 }
 
 /**
- * The sound expression synth is asked for this much audio ahead of what is
- * playing. Each buffer is under 12 ms and the next is requested from the main
- * thread, so without a margin any brief stall there is heard as a click.
+ * Sound expressions and audio frames are asked for this much audio ahead of
+ * what is playing. Their buffers are under 12 ms and the next is requested
+ * from the main thread, so without a margin any brief stall there is heard as
+ * a click.
  */
-const soundExpressionLookaheadSeconds = 0.1;
+const lookaheadSeconds = 0.1;
+
+/**
+ * How far ahead of the audio clock the first audio frame starts.
+ *
+ * The clock advances a render block at a time (128 samples, 2.9 ms), often
+ * several at once, and a frame lasts 4 ms. If the first frame started at the
+ * current time, one jump could put the clock past its end before the firmware
+ * had written the second frame. That frame would then count as a fresh start
+ * and play from the new time, with silence in between. The delay leaves time
+ * for the following frames to be queued.
+ */
+const frameStartDelaySeconds = 0.02;
 
 class BufferedAudio {
   nextStartTime: number = -1;
@@ -195,17 +210,20 @@ class BufferedAudio {
   /**
    * @param lookaheadSeconds Keep at least this much audio scheduled by calling
    * back for more straight away. Only for callbacks that write synchronously.
+   * @param startDelaySeconds How far ahead to start when nothing is playing.
    */
   constructor(
     private context: AudioContext,
     private destination: AudioNode,
     private callback: () => void,
     private lookaheadSeconds: number = 0,
+    private startDelaySeconds: number = 0,
   ) {}
 
   init(sampleRate: number) {
+    // Anything still scheduled plays out, with new audio following on, so
+    // playing sounds one after another neither overlaps nor clips them.
     this.sampleRate = sampleRate;
-    this.nextStartTime = -1;
   }
 
   createBuffer(length: number) {
@@ -224,7 +242,9 @@ class BufferedAudio {
     source.connect(this.destination);
     const currentTime = this.context.currentTime;
     const first = this.nextStartTime < currentTime;
-    const startTime = first ? currentTime : this.nextStartTime;
+    const startTime = first
+      ? currentTime + this.startDelaySeconds
+      : this.nextStartTime;
     this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
     source.start(startTime);
     this.scheduled.add(source);
@@ -239,6 +259,15 @@ class BufferedAudio {
   /** Whether anything written is still to finish playing. */
   isPlaying(): boolean {
     return this.nextStartTime > this.context.currentTime;
+  }
+
+  /**
+   * Whether it's playing with less than the lookahead scheduled. For audio
+   * whose callback can't write synchronously, so the caller has to top it up.
+   */
+  wantsData(): boolean {
+    const ahead = this.nextStartTime - this.context.currentTime;
+    return ahead > 0 && ahead < lookaheadSeconds;
   }
 
   /**

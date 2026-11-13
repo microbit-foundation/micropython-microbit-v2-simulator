@@ -146,11 +146,20 @@ test("AudioFrame playback", async ({ simulator }) => {
   expect(stats.rms).toBeGreaterThan(0.5);
 });
 
-// Each ~16 ms chunk is only requested when the previous one ends, so
-// underruns leave dozens of short gaps that are heard as buzzing.
-test.fail("AudioFrame playback has no dropouts", async ({ simulator }) => {
+test("AudioFrame playback has no dropouts", async ({ simulator }) => {
   const audio = await runToEnd(simulator, audioFrameProgram);
   expect(audio.stats().gaps).toBe(0);
+});
+
+test("AudioFrame sounds played in turn follow on", async ({ simulator }) => {
+  const audio = await runToEnd(
+    simulator,
+    audioFrameProgram + "audio.play(frames())\n",
+  );
+  const stats = audio.stats();
+  // Overlapping would shorten this and clipping the first would leave a gap.
+  expectWithin(stats, "soundSeconds", 1.55, 2.5);
+  expect(stats.gaps).toBe(0);
 });
 
 test("stopping the program stops the sound", async ({ simulator }) => {

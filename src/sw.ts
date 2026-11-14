@@ -7,6 +7,7 @@ declare const clients: Clients;
 const assets = [
   "simulator.html",
   "build/simulator.js",
+  "build/audio-worklet.js",
   "build/firmware.js",
   "build/firmware.wasm",
 ];

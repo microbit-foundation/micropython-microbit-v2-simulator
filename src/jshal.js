@@ -236,31 +236,33 @@ mergeInto(LibraryManager.library, {
     );
   },
 
+  mp_js_hal_audio_wants_data: function () {
+    // @ts-expect-error
+    return Module.board.audio.default.wantsData();
+  },
+
   mp_js_hal_audio_speech_init: function (/** @type {number} */ sample_rate) {
     // @ts-expect-error
     Module.board.audio.speech.init(sample_rate);
+  },
+
+  mp_js_hal_audio_speech_wants_data: function () {
+    // @ts-expect-error
+    return Module.board.audio.speech.wantsData();
   },
 
   mp_js_hal_audio_speech_write_data: function (
     /** @type {number} */ buf,
     /** @type {number} */ num_samples,
   ) {
-    /** @type {AudioBuffer | undefined} */ let webAudioBuffer;
-    try {
-      // @ts-expect-error
-      webAudioBuffer = Module.board.audio.speech.createBuffer(num_samples);
-    } catch (e) {
-      // Swallow error on older Safari to keep the sim in a good state.
-      // @ts-expect-error
-      if (e.name === "NotSupportedError") {
-        return;
-      } else {
-        throw e;
-      }
-    }
     // @ts-expect-error
     Module.board.audio.speech.writeData(
-      Module.conversions.convertAudioBuffer(Module.HEAPU8, buf, webAudioBuffer),
+      Module.conversions.convertAudioBuffer(
+        Module.HEAPU8,
+        buf,
+        // @ts-expect-error
+        Module.board.audio.speech.createBuffer(num_samples),
+      ),
     );
   },
 

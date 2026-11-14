@@ -108,6 +108,18 @@ test("speech.say", async ({ simulator }) => {
   expect(stats.rms).toBeGreaterThan(0.3);
 });
 
+// Programs rarely set the mode. This one halves the default's 6.7 ms buffers,
+// which makes any underrun show up reliably.
+test("speech at the highest sample rate has no dropouts", async ({
+  simulator,
+}) => {
+  const audio = await runToEnd(
+    simulator,
+    "import speech\nspeech.say('hello world', mode=3)\n",
+  );
+  expect(audio.stats().gaps).toBe(0);
+});
+
 test("built-in sound expression", async ({ simulator }) => {
   const audio = await runToEnd(
     simulator,
@@ -146,11 +158,35 @@ test("AudioFrame playback", async ({ simulator }) => {
   expect(stats.rms).toBeGreaterThan(0.5);
 });
 
-// Each ~16 ms chunk is only requested when the previous one ends, so
-// underruns leave dozens of short gaps that are heard as buzzing.
-test.fail("AudioFrame playback has no dropouts", async ({ simulator }) => {
+test("AudioFrame playback has no dropouts", async ({ simulator }) => {
   const audio = await runToEnd(simulator, audioFrameProgram);
   expect(audio.stats().gaps).toBe(0);
+});
+
+// Without a sleep the program never idles, which is where frames are
+// otherwise topped up.
+test("AudioFrame playback in a busy loop has no dropouts", async ({
+  simulator,
+}) => {
+  const audio = await runToEnd(
+    simulator,
+    audioFrameProgram.replace("audio.play(frames())", "") +
+      "audio.play(frames(), wait=False)\nwhile audio.is_playing():\n    pass\n",
+  );
+  const stats = audio.stats();
+  expectWithin(stats, "soundSeconds", 0.7, 1.5);
+  expect(stats.gaps).toBe(0);
+});
+
+test("AudioFrame sounds played in turn follow on", async ({ simulator }) => {
+  const audio = await runToEnd(
+    simulator,
+    audioFrameProgram + "audio.play(frames())\n",
+  );
+  const stats = audio.stats();
+  // Overlapping would shorten this and clipping the first would leave a gap.
+  expectWithin(stats, "soundSeconds", 1.55, 2.5);
+  expect(stats.gaps).toBe(0);
 });
 
 test("stopping the program stops the sound", async ({ simulator }) => {

@@ -1,3 +1,8 @@
+import type {
+  BufferedAudioProcessorOptions,
+  BufferedAudioRequest,
+  BufferedAudioResponse,
+} from "./buffered-audio-worklet";
 import { replaceBuiltinSound } from "./built-in-sounds";
 import { SoundEmojiSynthesizer } from "./sound-emoji-synthesizer";
 import { parseSoundEffects } from "./sound-expressions";
@@ -18,6 +23,7 @@ export class Audio {
   // You can mute the sim before it's running so we can't immediately write to the muteNode.
   private muted: boolean = false;
   private context: AudioContext | undefined;
+  private workletLoaded: Promise<boolean> | undefined;
   private oscillator: OscillatorNode | undefined;
   private volumeNode: GainNode | undefined;
   private muteNode: GainNode | undefined;
@@ -29,13 +35,17 @@ export class Audio {
 
   constructor() {}
 
-  initializeCallbacks({
+  async initializeCallbacks({
     defaultAudioCallback,
     speechAudioCallback,
   }: AudioOptions) {
     if (!this.context) {
       throw new Error("Context must be pre-created from a user event");
     }
+    const hasWorklet = await this.workletLoaded!;
+    this.default?.dispose();
+    this.speech?.dispose();
+    this.soundExpression?.dispose();
     this.muteNode = this.context.createGain();
     this.muteNode.gain.setValueAtTime(
       this.muted ? 0 : 1,
@@ -45,35 +55,62 @@ export class Audio {
     this.volumeNode = this.context.createGain();
     this.volumeNode.connect(this.muteNode);
 
+    const createNode = (
+      startQueuedSeconds: number,
+      startDelaySeconds: number,
+    ) => {
+      if (!hasWorklet) {
+        return undefined;
+      }
+      const processorOptions: BufferedAudioProcessorOptions = {
+        startQueuedSeconds,
+        startDelaySeconds,
+      };
+      const node = new AudioWorkletNode(this.context!, "buffered-audio", {
+        numberOfInputs: 0,
+        outputChannelCount: [1],
+        processorOptions,
+      });
+      node.connect(this.volumeNode!);
+      return node;
+    };
     this.default = new BufferedAudio(
-      this.context,
-      this.volumeNode,
+      createNode(startQueuedSeconds, startDelaySeconds),
       defaultAudioCallback,
     );
     this.speech = new BufferedAudio(
-      this.context,
-      this.volumeNode,
+      createNode(startQueuedSeconds, startDelaySeconds),
       speechAudioCallback,
     );
     this.soundExpression = new BufferedAudio(
-      this.context,
-      this.volumeNode,
+      createNode(0, 0),
       () => {
         if (this.currentSoundExpressionCallback) {
           this.currentSoundExpressionCallback();
         }
       },
-      soundExpressionLookaheadSeconds,
+      lookaheadSeconds,
     );
   }
 
   async createAudioContextFromUserInteraction(): Promise<void> {
-    this.context =
-      this.context ??
-      new (window.AudioContext || window.webkitAudioContext)({
+    if (!this.context) {
+      this.context = new (window.AudioContext || window.webkitAudioContext)({
         // The highest rate is the sound expression synth.
         sampleRate: 44100,
       });
+      // Browsers only provide worklets in a secure context. Without one,
+      // buffered audio is silent.
+      this.workletLoaded = this.context.audioWorklet
+        ? this.context.audioWorklet
+            .addModule("build/audio-worklet.js")
+            .then(() => true)
+            .catch((e) => {
+              console.error("Failed to load the audio worklet", e);
+              return false;
+            })
+        : Promise.resolve(false);
+    }
     if (this.context.state === "suspended") {
       return this.context.resume();
     }
@@ -90,22 +127,15 @@ export class Audio {
     const synth = new SoundEmojiSynthesizer(0, onDone);
     synth.play(soundEffects);
 
+    this.soundExpression!.init(synth.sampleRate);
     const callback = () => {
       const source = synth.pull();
-      if (this.context) {
-        // Use createBuffer instead of new AudioBuffer to support Safari 14.0.
-        const target = this.context.createBuffer(
-          1,
-          source.length,
-          synth.sampleRate,
-        );
-        const channel = target.getChannelData(0);
-        for (let i = 0; i < source.length; i++) {
-          // Buffer is (0, 1023) we need to map it to (-1, 1)
-          channel[i] = (source[i] - 512) / 512;
-        }
-        this.soundExpression!.writeData(target);
+      const target = this.soundExpression!.createBuffer(source.length);
+      for (let i = 0; i < source.length; i++) {
+        // Buffer is (0, 1023) we need to map it to (-1, 1)
+        target[i] = (source[i] - 512) / 512;
       }
+      this.soundExpression!.writeData(target);
     };
     this.currentSoundExpressionCallback = callback;
     callback();
@@ -181,64 +211,112 @@ export class Audio {
 }
 
 /**
- * The sound expression synth is asked for this much audio ahead of what is
- * playing. Each buffer is under 12 ms and the next is requested from the main
- * thread, so without a margin any brief stall there is heard as a click.
+ * Each kind of buffered audio is asked for this much ahead of what is playing.
+ * The buffers are under 12 ms and the next is requested from the main thread,
+ * so without a margin any brief stall there is heard as a click.
  */
-const soundExpressionLookaheadSeconds = 0.1;
+const lookaheadSeconds = 0.1;
 
+/**
+ * Audio frames and speech don't start playing until this much is queued.
+ * Their buffers can be as short as 3.4 ms and the firmware has to run again
+ * to produce each of those that follow, so playing the first straight away
+ * risks running out before the second arrives.
+ */
+const startQueuedSeconds = 0.01;
+
+/**
+ * The longest to wait for that, so that a sound shorter than it still plays.
+ */
+const startDelaySeconds = 0.02;
+
+/**
+ * Queues buffers of samples to play one after another on the audio thread.
+ * The callback is called as each finishes, for the next to be written.
+ */
 class BufferedAudio {
-  nextStartTime: number = -1;
   private sampleRate: number = -1;
-  private scheduled = new Set<AudioBufferSourceNode>();
+  /** The length in seconds of each buffer written that has yet to finish. */
+  private pending: number[] = [];
+  private pendingSeconds = 0;
+  /** Counts stops, to ignore buffers reported finished that were discarded. */
+  private generation = 0;
 
   /**
-   * @param lookaheadSeconds Keep at least this much audio scheduled by calling
+   * @param node Undefined if the browser can't load the worklet, in which case
+   * there's no sound but buffers still finish so that programs don't hang.
+   * @param lookaheadSeconds Keep at least this much audio queued by calling
    * back for more straight away. Only for callbacks that write synchronously.
    */
   constructor(
-    private context: AudioContext,
-    private destination: AudioNode,
+    private node: AudioWorkletNode | undefined,
     private callback: () => void,
     private lookaheadSeconds: number = 0,
-  ) {}
+  ) {
+    if (node) {
+      node.port.onmessage = (e: MessageEvent<BufferedAudioResponse>) => {
+        this.ended(e.data.ended, e.data.generation);
+      };
+    }
+  }
 
   init(sampleRate: number) {
+    // Anything still queued plays out, with new audio following on, so
+    // playing sounds one after another neither overlaps nor clips them.
     this.sampleRate = sampleRate;
-    this.nextStartTime = -1;
   }
 
   createBuffer(length: number) {
-    // Use createBuffer instead of new AudioBuffer to support Safari 14.0.
-    return this.context.createBuffer(1, length, this.sampleRate);
+    return new Float32Array(length);
   }
 
-  writeData(buffer: AudioBuffer) {
-    // Use createBufferSource instead of new AudioBufferSourceNode to support Safari 14.0.
-    const source = this.context.createBufferSource();
-    source.buffer = buffer;
-    source.onended = () => {
-      this.scheduled.delete(source);
+  /** Takes ownership of the buffer. */
+  writeData(samples: Float32Array) {
+    const seconds = samples.length / this.sampleRate;
+    this.pending.push(seconds);
+    this.pendingSeconds += seconds;
+    const generation = this.generation;
+    if (this.node) {
+      this.post(
+        {
+          kind: "data",
+          samples,
+          sampleRate: this.sampleRate,
+          generation,
+        },
+        [samples.buffer],
+      );
+    } else {
+      setTimeout(() => this.ended(1, generation), seconds * 1000);
+    }
+    if (this.pendingSeconds < this.lookaheadSeconds) {
       this.callback();
-    };
-    source.connect(this.destination);
-    const currentTime = this.context.currentTime;
-    const first = this.nextStartTime < currentTime;
-    const startTime = first ? currentTime : this.nextStartTime;
-    this.nextStartTime = startTime + buffer.length / buffer.sampleRate;
-    source.start(startTime);
-    this.scheduled.add(source);
-    // For audio frames, we're frequently out of data. Speech is smooth.
-    if (first || this.nextStartTime - currentTime < this.lookaheadSeconds) {
-      // We're just getting started, or short of the lookahead, so buffer
-      // another frame.
+    }
+  }
+
+  private ended(count: number, generation: number) {
+    if (generation !== this.generation) {
+      return;
+    }
+    for (let i = 0; i < count; i++) {
+      this.pending.shift();
+      // Summed again, as subtracting would accumulate rounding errors.
+      this.pendingSeconds = this.pending.reduce((a, b) => a + b, 0);
       this.callback();
     }
   }
 
   /** Whether anything written is still to finish playing. */
   isPlaying(): boolean {
-    return this.nextStartTime > this.context.currentTime;
+    return this.pending.length > 0;
+  }
+
+  /**
+   * Whether it's playing with less than the lookahead queued. For audio
+   * whose callback can't write synchronously, so the firmware tops it up.
+   */
+  wantsData(): boolean {
+    return this.isPlaying() && this.pendingSeconds < lookaheadSeconds;
   }
 
   /**
@@ -246,11 +324,20 @@ class BufferedAudio {
    * requested via the callback until there's another write.
    */
   stop() {
-    for (const source of this.scheduled) {
-      source.onended = null;
-      source.stop();
-    }
-    this.scheduled.clear();
-    this.nextStartTime = -1;
+    this.generation++;
+    this.pending = [];
+    this.pendingSeconds = 0;
+    this.post({ kind: "stop" });
+  }
+
+  dispose() {
+    this.stop();
+    this.callback = () => {};
+    this.post({ kind: "close" });
+    this.node?.disconnect();
+  }
+
+  private post(request: BufferedAudioRequest, transfer: Transferable[] = []) {
+    this.node?.port.postMessage(request, transfer);
   }
 }

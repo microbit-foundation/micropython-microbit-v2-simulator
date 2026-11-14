@@ -34,8 +34,13 @@ describe("BufferedAudioProcessor", () => {
     responses = [];
   });
 
-  const createProcessor = (startDelaySeconds: number): Processor =>
-    new registered({ processorOptions: { startDelaySeconds } });
+  const createProcessor = (
+    startQueuedSeconds = 0,
+    startDelaySeconds = 0,
+  ): Processor =>
+    new registered({
+      processorOptions: { startQueuedSeconds, startDelaySeconds },
+    });
 
   const send = (processor: Processor, request: BufferedAudioRequest) =>
     processor.port.onmessage({ data: request });
@@ -58,7 +63,7 @@ describe("BufferedAudioProcessor", () => {
   };
 
   it("plays buffers in order then silence", () => {
-    const processor = createProcessor(0);
+    const processor = createProcessor();
     send(processor, data([0.25, 0.5]));
     send(processor, data([0.75]));
     expect(render(processor, 5)).toEqual([0.25, 0.5, 0.75, 0, 0]);
@@ -66,7 +71,7 @@ describe("BufferedAudioProcessor", () => {
   });
 
   it("reports buffers as they end", () => {
-    const processor = createProcessor(0);
+    const processor = createProcessor();
     send(processor, data([0.25, 0.5]));
     send(processor, data([0.75, 1]));
     render(processor, 3);
@@ -79,24 +84,46 @@ describe("BufferedAudioProcessor", () => {
   });
 
   it("interpolates a lower sample rate across buffers", () => {
-    const processor = createProcessor(0);
+    const processor = createProcessor();
     send(processor, data([0, 0.5], contextSampleRate / 2));
     send(processor, data([1, 0], contextSampleRate / 2));
     expect(render(processor, 9)).toEqual([0, 0.25, 0.5, 0.75, 1, 0.5, 0, 0, 0]);
   });
 
-  it("delays the start when nothing is queued", () => {
-    const processor = createProcessor(2 / contextSampleRate);
-    send(processor, data([0.5]));
-    send(processor, data([1]));
-    expect(render(processor, 4)).toEqual([0, 0, 0.5, 1]);
-    render(processor, 1);
+  it("waits for enough to be queued before starting", () => {
+    const processor = createProcessor(
+      3 / contextSampleRate,
+      100 / contextSampleRate,
+    );
+    send(processor, data([0.25, 0.5]));
+    expect(render(processor, 4)).toEqual([0, 0, 0, 0]);
+    send(processor, data([0.75]));
+    expect(render(processor, 4)).toEqual([0.25, 0.5, 0.75, 0]);
+    // Having run out, it waits again.
+    send(processor, data([1, 1]));
+    expect(render(processor, 2)).toEqual([0, 0]);
+  });
+
+  it("counts what is queued at the output sample rate", () => {
+    const processor = createProcessor(
+      4 / contextSampleRate,
+      100 / contextSampleRate,
+    );
+    send(processor, data([0.5, 1], contextSampleRate / 2));
+    expect(render(processor, 2)).toEqual([0.5, 0.75]);
+  });
+
+  it("starts after the delay with less queued", () => {
+    const processor = createProcessor(
+      3 / contextSampleRate,
+      2 / contextSampleRate,
+    );
     send(processor, data([0.5]));
     expect(render(processor, 4)).toEqual([0, 0, 0.5, 0]);
   });
 
   it("discards what is queued on stop", () => {
-    const processor = createProcessor(0);
+    const processor = createProcessor();
     send(processor, data([0.5, 0.5, 0.5]));
     render(processor, 1);
     send(processor, { kind: "stop" });
@@ -106,7 +133,7 @@ describe("BufferedAudioProcessor", () => {
   });
 
   it("finishes when closed", () => {
-    const processor = createProcessor(0);
+    const processor = createProcessor();
     send(processor, { kind: "close" });
     expect(processor.process([], [[new Float32Array(1)]])).toBe(false);
   });

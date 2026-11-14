@@ -55,11 +55,15 @@ export class Audio {
     this.volumeNode = this.context.createGain();
     this.volumeNode.connect(this.muteNode);
 
-    const createNode = (startDelaySeconds: number) => {
+    const createNode = (
+      startQueuedSeconds: number,
+      startDelaySeconds: number,
+    ) => {
       if (!hasWorklet) {
         return undefined;
       }
       const processorOptions: BufferedAudioProcessorOptions = {
+        startQueuedSeconds,
         startDelaySeconds,
       };
       const node = new AudioWorkletNode(this.context!, "buffered-audio", {
@@ -71,15 +75,15 @@ export class Audio {
       return node;
     };
     this.default = new BufferedAudio(
-      createNode(startDelaySeconds),
+      createNode(startQueuedSeconds, startDelaySeconds),
       defaultAudioCallback,
     );
     this.speech = new BufferedAudio(
-      createNode(startDelaySeconds),
+      createNode(startQueuedSeconds, startDelaySeconds),
       speechAudioCallback,
     );
     this.soundExpression = new BufferedAudio(
-      createNode(0),
+      createNode(0, 0),
       () => {
         if (this.currentSoundExpressionCallback) {
           this.currentSoundExpressionCallback();
@@ -214,10 +218,15 @@ export class Audio {
 const lookaheadSeconds = 0.1;
 
 /**
- * How long audio frames and speech wait to start after the first buffer is
- * written. Their buffers can be as short as 3.4 ms and the firmware has to
- * run again to produce each of those that follow, so playing the first
- * straight away risks running out before the second arrives.
+ * Audio frames and speech don't start playing until this much is queued.
+ * Their buffers can be as short as 3.4 ms and the firmware has to run again
+ * to produce each of those that follow, so playing the first straight away
+ * risks running out before the second arrives.
+ */
+const startQueuedSeconds = 0.01;
+
+/**
+ * The longest to wait for that, so that a sound shorter than it still plays.
  */
 const startDelaySeconds = 0.02;
 

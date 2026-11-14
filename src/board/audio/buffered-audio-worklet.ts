@@ -11,9 +11,11 @@
 
 export interface BufferedAudioProcessorOptions {
   /**
-   * How long to wait before playing a buffer that arrives when nothing is
-   * queued, for the ones after it to arrive.
+   * A buffer that arrives when nothing is queued isn't played until this much
+   * is queued, so that it doesn't run out before the ones after it arrive.
    */
+  startQueuedSeconds: number;
+  /** The longest to wait for that. */
   startDelaySeconds: number;
 }
 
@@ -54,15 +56,19 @@ class BufferedAudioProcessor extends AudioWorkletProcessor {
   private queue: QueuedBuffer[] = [];
   /** Position in the first queued buffer, fractional when resampling. */
   private position = 0;
+  private startQueuedFrames: number;
   private startDelayFrames: number;
+  /** While waiting to start, how much longer to wait at most. */
   private delayFrames = 0;
+  /** While waiting to start, the output frames queued. */
+  private queuedFrames = 0;
   private closed = false;
 
   constructor(options: { processorOptions: BufferedAudioProcessorOptions }) {
     super();
-    this.startDelayFrames = Math.round(
-      options.processorOptions.startDelaySeconds * sampleRate,
-    );
+    const { startQueuedSeconds, startDelaySeconds } = options.processorOptions;
+    this.startQueuedFrames = startQueuedSeconds * sampleRate;
+    this.startDelayFrames = Math.round(startDelaySeconds * sampleRate);
     this.port.onmessage = (e: MessageEvent<BufferedAudioRequest>) => {
       const request = e.data;
       switch (request.kind) {
@@ -70,10 +76,13 @@ class BufferedAudioProcessor extends AudioWorkletProcessor {
           if (this.queue.length === 0) {
             this.position = 0;
             this.delayFrames = this.startDelayFrames;
+            this.queuedFrames = 0;
           }
+          const step = request.sampleRate / sampleRate;
+          this.queuedFrames += request.samples.length / step;
           this.queue.push({
             samples: request.samples,
-            step: request.sampleRate / sampleRate,
+            step,
             generation: request.generation,
           });
           break;
@@ -96,8 +105,11 @@ class BufferedAudioProcessor extends AudioWorkletProcessor {
     let generation = 0;
     for (let i = 0; i < output.length; i++) {
       if (this.delayFrames > 0) {
-        this.delayFrames--;
-        continue;
+        if (this.queuedFrames < this.startQueuedFrames) {
+          this.delayFrames--;
+          continue;
+        }
+        this.delayFrames = 0;
       }
       let head = this.queue[0];
       while (head && this.position >= head.samples.length) {
